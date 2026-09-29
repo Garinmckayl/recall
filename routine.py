@@ -13,6 +13,7 @@ from typing import Optional
 
 import db
 import views
+import watch
 
 MIN_DAYS = 3            # distinct past days needed before we claim a routine
 MIN_REGULARITY = 0.6    # share of days in the span with a sighting near the usual time
@@ -96,3 +97,22 @@ def deviations(now: Optional[float] = None) -> list[dict]:
         if c and c["status"] in ("missing", "unusual_time"):
             out.append(c)
     return out
+
+
+def notify_overdue(now: Optional[float] = None) -> list[dict]:
+    """Recall does not wait to be asked: when a named person is overdue (or turns up at a very unusual time),
+    push one check-in alert per person per day (ntfy + live feed)."""
+    now = now or time.time()
+    day = dt.datetime.fromtimestamp(now).strftime("%Y-%m-%d")
+    fired = []
+    for d in deviations(now):
+        key = f"routine_alert:{d['person_id']}:{day}"
+        if db.kv_get(key):
+            continue
+        db.kv_set(key, str(now))
+        msg = f"Check-in: {d['text']}"
+        delivered = watch.notify(msg)
+        aid = db.insert("alerts", rule_id=None, event_id=None, ts=now, message=msg, delivered=1 if delivered else 0)
+        db.feed("alert", msg, {"alert_id": aid, "kind": "routine", "person_id": d["person_id"], "rule": "Routine check-in"})
+        fired.append({"alert_id": aid, "message": msg})
+    return fired

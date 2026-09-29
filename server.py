@@ -11,6 +11,8 @@ import threading
 import time
 from typing import Optional
 
+from collections import defaultdict, deque
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
 
@@ -23,6 +25,7 @@ import jev
 import pipeline
 import query
 import ring_api
+import routine
 import ring_sim
 import roles
 import views
@@ -40,11 +43,54 @@ async def _lifespan(_: FastAPI):
                 time.sleep(1.0)
 
     threading.Thread(target=warm, daemon=True, name="ring-device-sync").start()
+
+    def routine_watch() -> None:
+        time.sleep(20)
+        while True:
+            try:
+                routine.notify_overdue()
+            except Exception as e:                       # never let a check-in failure kill the loop
+                db.feed("error", f"routine watch: {e}")
+            time.sleep(300)
+
+    threading.Thread(target=routine_watch, daemon=True, name="routine-watch").start()
     yield
 
 
 app = FastAPI(title="Recall", lifespan=_lifespan)
 app.include_router(ring_sim.router)
+
+# -- public-deploy guards -------------------------------------------------------------
+# Per-client sliding-window limits on the endpoints that spend money (Bedrock/Jev). Behind a proxy or
+# Cloudflare tunnel the client IP comes from CF-Connecting-IP / X-Forwarded-For.
+_RATE = {"/api/ask": (20, 60), "/api/demo/emit": (6, 60), "/mcp": (40, 60)}
+_hits: dict[tuple[str, str], deque] = defaultdict(deque)
+
+
+def _client_ip(request: Request) -> str:
+    return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+            or (request.client.host if request.client else "?"))
+
+
+@app.middleware("http")
+async def _rate_limit(request: Request, call_next):
+    limit = _RATE.get(request.url.path)
+    if limit and request.method == "POST":
+        now, (n, per) = time.time(), limit
+        q = _hits[(_client_ip(request), request.url.path)]
+        while q and now - q[0] > per:
+            q.popleft()
+        if len(q) >= n:
+            return JSONResponse({"detail": f"rate limit: {n} requests per {per}s"}, status_code=429,
+                                headers={"Retry-After": str(per)})
+        q.append(now)
+    return await call_next(request)
+
+
+def _require_admin(request: Request) -> None:
+    if config.ADMIN_TOKEN and request.headers.get("x-admin-token") != config.ADMIN_TOKEN:
+        raise HTTPException(403, "admin token required")
+
 
 
 # -- UI + media -----------------------------------------------------------------------
@@ -68,6 +114,14 @@ def _file(path: Optional[str], media_type: str) -> FileResponse:
 @app.get("/media/clip/{event_id}.mp4")
 def media_clip(event_id: str):
     e = db.one("SELECT clip_path FROM events WHERE id=?", (event_id,))
+    if os.getenv("RECALL_WEBM") and e and e["clip_path"] and os.path.exists(e["clip_path"]):
+        # Capture-only mode: headless Chromium has no H.264, so serve a cached VP9 transcode of the same clip.
+        import subprocess
+        webm = e["clip_path"].rsplit(".", 1)[0] + ".webm"
+        if not os.path.exists(webm):
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", e["clip_path"], "-c:v", "libvpx-vp9", "-crf", "28",
+                            "-b:v", "0", "-deadline", "realtime", "-cpu-used", "5", "-an", webm], check=True)
+        return _file(webm, "video/webm")
     return _file(e and e["clip_path"], "video/mp4")
 
 
@@ -285,8 +339,19 @@ def api_demo_emit(payload: dict):
     return ring_sim.emit(cam["ring_device_id"], payload["clip"], payload.get("kind") or "motion")
 
 
+@app.post("/api/demo/checkin")
+def api_demo_checkin(request: Request, payload: Optional[dict] = None):
+    """Run the proactive routine check now (the same call the background loop makes every 5 minutes).
+    force=true lets it re-fire for a person already alerted today (retakes)."""
+    _require_admin(request)
+    if (payload or {}).get("force"):
+        db.execute("DELETE FROM kv WHERE k LIKE 'routine_alert:%'")
+    return {"fired": routine.notify_overdue()}
+
+
 @app.post("/api/demo/seed")
-def api_demo_seed(payload: Optional[dict] = None):
+def api_demo_seed(request: Request, payload: Optional[dict] = None):
+    _require_admin(request)
     import seed
     threading.Thread(target=seed.run, kwargs={"reset": bool((payload or {}).get("reset", True))},
                      daemon=True, name="seed").start()

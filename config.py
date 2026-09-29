@@ -43,7 +43,7 @@ BEDROCK_MODEL = os.getenv("BEDROCK_MODEL", "us.amazon.nova-lite-v1:0")
 
 # Paths
 MEDIA_DIR = ROOT / "media"
-DATA_DIR = ROOT / "data"
+DATA_DIR = Path(os.getenv("RECALL_DATA_DIR", str(ROOT / "data")))
 EVENTS_PATH = DATA_DIR / "events.jsonl"
 WORLD_PATH = DATA_DIR / "world.json"
 
@@ -88,3 +88,6 @@ STATIC_DIR = ROOT / "static"
 ROLE_PRIOR_MASS = 0.5
 # A person is a "trajectory" session while consecutive sightings are within this gap
 SESSION_GAP_SEC = 45 * 60
+
+# Public-deploy safety: destructive demo endpoints need this token when it is set (unset = open, for local use)
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")

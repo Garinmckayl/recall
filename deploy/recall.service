@@ -1,0 +1,19 @@
+[Unit]
+Description=Recall — persistent visual memory over Ring events
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/recall
+EnvironmentFile=/home/ubuntu/recall/.env
+Environment=RECALL_WORKERS=2
+ExecStart=/home/ubuntu/recall/.venv/bin/uvicorn server:app --host 0.0.0.0 --port 8300
+Restart=always
+RestartSec=3
+# the box is shared and small: keep Recall from starving the other services
+MemoryMax=900M
+TasksMax=200
+
+[Install]
+WantedBy=multi-user.target

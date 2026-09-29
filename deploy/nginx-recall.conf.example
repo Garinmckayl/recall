@@ -1,0 +1,13 @@
+# Replace recall.example.com with the (sub)domain you point at this instance. Add TLS with your usual method.
+server {
+    listen 80;
+    server_name recall.example.com;
+    client_max_body_size 200m;
+
+    location / {
+        proxy_pass http://127.0.0.1:8300;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+}

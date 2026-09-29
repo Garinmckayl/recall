@@ -42,7 +42,9 @@ def load_manifest() -> dict:
     return SAMPLE
 
 
-def _when(days_ago: int, hhmm: str) -> float:
+def _when(days_ago: int, hhmm: str, minutes_ago: float | None = None) -> float:
+    if minutes_ago is not None:                        # "just happened" events stay consistent with the real clock
+        return time.time() - minutes_ago * 60
     h, m = (int(x) for x in hhmm.split(":"))
     d = dt.datetime.now().date() - dt.timedelta(days=days_ago)
     return min(dt.datetime.combine(d, dt.time(h, m)).timestamp(), time.time() - 120)
@@ -59,11 +61,11 @@ def run(reset: bool = True) -> dict:
     st = ring_sim.load_state()
     dev = {d["name"]: d["id"] for d in st["devices"]}
     man = load_manifest()
-    entries = sorted(man["events"], key=lambda e: (-e["days_ago"], e["time"]))
+    entries = sorted(man["events"], key=lambda e: _when(e.get("days_ago", 0), e.get("time", "00:00"), e.get("minutes_ago")))
     ids = []
     for e in entries:
         res = ring_sim.emit(dev[e["camera"]], e["clip"], e.get("kind", "motion"),
-                            occurred_at=_when(e["days_ago"], e["time"]), sub_type="human", deliver=False)
+                            occurred_at=_when(e.get("days_ago", 0), e.get("time", "00:00"), e.get("minutes_ago")), sub_type="human", deliver=False)
         ids.append((res["event"]["id"], e))
     out = pipeline.sync()
     pipeline.drain()

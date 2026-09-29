@@ -33,6 +33,7 @@ def build(now: Optional[float] = None) -> dict:
                   (now - WINDOW_DAYS * 86400,))
 
     flags, night, regulars, seen_events = [], [], [], set()
+    night_seen: set = set()
     for e in recent:
         f = set(e.get("flags") or [])
         when = f"{_cam(e)}, {views.fmt_when(e['ts'], now)}"
@@ -48,9 +49,15 @@ def build(now: Optional[float] = None) -> dict:
             seen_events.add(e["id"])
         hour = dt.datetime.fromtimestamp(e["ts"]).hour
         if (hour >= 20 or hour < 6) and e["id"] not in seen_events and (now - e["ts"]) < 3 * 86400:
+            people = [db.one("SELECT * FROM persons WHERE id=?", (a["person_id"],)) for a in actors if a.get("person_id")]
+            if any(p and (p.get("name") or p.get("is_resident")) for p in people):
+                continue                                    # arrived with someone the owner knows
             for a in actors:
                 p = db.one("SELECT * FROM persons WHERE id=?", (a["person_id"],)) if a.get("person_id") else None
+                if p and p["id"] in night_seen:
+                    continue
                 if p and p["kind"] == "person" and not p.get("name") and not p.get("is_resident"):
+                    night_seen.add(p["id"])
                     night.append({"kind": "night_unknown", "text": f"Unfamiliar person at night — {when}: the {p['label']}.",
                                   "event_id": e["id"], "person_id": p["id"], "ts": e["ts"], "sev": 2})
                     break
@@ -62,9 +69,9 @@ def build(now: Optional[float] = None) -> dict:
         regulars.append({"kind": "unnamed_regular", "text": f"The {p['label']} has appeared {p['n_obs']} times{hint}. Name them?",
                          "event_id": None, "person_id": p["id"], "ts": p.get("last_ts"), "sev": 3})
 
-    devs = [{"kind": "routine", "text": d["text"], "event_id": None, "person_id": d["person_id"], "ts": d.get("ts"), "sev": 1.5}
+    devs = [{"kind": "routine", "text": d["text"], "event_id": None, "person_id": d["person_id"], "ts": d.get("ts"), "sev": 0.5}
             for d in routine.deviations(now)]
-    items = (sorted(flags, key=lambda i: (i["sev"], -i["ts"])) + devs
+    items = (devs + sorted(flags, key=lambda i: (i["sev"], -i["ts"]))
              + sorted(night, key=lambda i: -i["ts"]) + regulars)
     items = items[:MAX_ITEMS]
     for i in items:

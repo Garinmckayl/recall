@@ -91,32 +91,6 @@
       "label": "Dog in the yard"
     },
     {
-      "clip": "23438.mp4",
-      "camera": "Backyard",
-      "kind": "motion",
-      "days_ago": 0,
-      "time": "18:37",
-      "label": "Dad",
-      "name": "Dad",
-      "relation": "father"
-    },
-    {
-      "clip": "23438.mp4",
-      "camera": "Garage",
-      "kind": "motion",
-      "days_ago": 0,
-      "time": "18:42",
-      "label": "Dad"
-    },
-    {
-      "clip": "23438.mp4",
-      "camera": "Driveway",
-      "kind": "motion",
-      "days_ago": 0,
-      "time": "18:45",
-      "label": "Dad"
-    },
-    {
       "clip": "31375.mp4",
       "camera": "Front Door",
       "kind": "motion",
@@ -163,6 +137,29 @@
       "days_ago": 2,
       "time": "07:29",
       "label": "Mom"
+    },
+    {
+      "clip": "dad_driveway.mp4",
+      "camera": "Driveway",
+      "kind": "motion",
+      "minutes_ago": 48,
+      "label": "Dad arrives",
+      "name": "Dad",
+      "relation": "father"
+    },
+    {
+      "clip": "dad_frontdoor.mp4",
+      "camera": "Front Door",
+      "kind": "motion",
+      "minutes_ago": 43,
+      "label": "Dad at the front door"
+    },
+    {
+      "clip": "dad_backyard.mp4",
+      "camera": "Backyard",
+      "kind": "motion",
+      "minutes_ago": 38,
+      "label": "Dad at the back door"
     }
   ]
 }

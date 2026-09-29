@@ -7,6 +7,7 @@ can never mint duplicate person nodes.
 from __future__ import annotations
 
 import io
+import os
 import re
 import subprocess
 import threading
@@ -26,7 +27,7 @@ import ring_api
 import roles
 import watch
 
-_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="recall")
+_pool = ThreadPoolExecutor(max_workers=int(os.getenv("RECALL_WORKERS", "4")), thread_name_prefix="recall")
 _id_lock = threading.Lock()
 _futures: list[Future] = []
 

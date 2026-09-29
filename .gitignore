@@ -10,3 +10,21 @@ data/
 everyday-agents-ranker/
 *.db
 .pytest_cache/
+data_capture/
+video/capture/
+video/audio/
+video/renders/
+
+# local deployment settings and generated video media (regenerate with video/*.py)
+deploy/host.env
+video/audio/
+video/renders/
+video/capture/
+video/broll/
+video/__pycache__/
+video/recall-demo/assets/
+video/recall-demo/snapshots/
+video/recall-demo/node_modules/
+video/recall-demo/CLAUDE.md
+video/recall-demo/AGENTS.md
+__pycache__/

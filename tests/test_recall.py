@@ -398,3 +398,63 @@ def test_citation_carries_boxes(mem):
     db.update("actors", "id", aid, boxes=[{"t": 1.0, "bbox": [10, 10, 500, 900]}])
     r = query.ask("Show me the last pizza delivery", now=NOW)
     assert r["citations"][0]["boxes"] == [{"t": 1.0, "bbox": [10, 10, 500, 900]}]
+
+
+# -- public-deploy guards -------------------------------------------------------------
+
+def test_seed_requires_admin_token_when_set(mem, monkeypatch):
+    from fastapi.testclient import TestClient
+    import server
+    monkeypatch.setattr(config, "ADMIN_TOKEN", "s3cret")
+    import seed
+    monkeypatch.setattr(seed, "run", lambda **k: {})                        # never actually seed in a test
+    c = TestClient(server.app)
+    assert c.post("/api/demo/seed", json={}).status_code == 403
+    assert c.post("/api/demo/seed", json={}, headers={"X-Admin-Token": "nope"}).status_code == 403
+    assert c.post("/api/demo/seed", json={}, headers={"X-Admin-Token": "s3cret"}).status_code == 200
+
+
+def test_rate_limit_on_expensive_endpoints(mem, monkeypatch):
+    from fastapi.testclient import TestClient
+    import server
+    monkeypatch.setitem(server._RATE, "/api/ask", (3, 60))
+    server._hits.clear()
+    c = TestClient(server.app)
+    codes = [c.post("/api/ask", json={"q": "who is here?"}).status_code for _ in range(5)]
+    assert codes[:3] == [200, 200, 200] and codes[3:] == [429, 429]
+    # a different client is unaffected
+    assert c.post("/api/ask", json={"q": "hi"}, headers={"CF-Connecting-IP": "9.9.9.9"}).status_code == 200
+
+
+def test_routine_push_fires_once_per_day(mem, monkeypatch):
+    import routine
+    _routine_home()
+    sent = []
+    monkeypatch.setattr(watch, "notify", lambda m: sent.append(m) or True)
+    first = routine.notify_overdue(NOW)
+    assert len(first) == 1 and first[0]["message"].startswith("Check-in: Mom usually appears around 7:30 AM")
+    assert routine.notify_overdue(NOW + 600) == [] and len(sent) == 1        # once per person per day
+    assert db.one("SELECT type FROM feed WHERE type='alert'") is not None
+    assert len(routine.notify_overdue(NOW + 86400)) == 1                       # next day it can fire again
+
+
+def test_digest_night_unknown_deduped_and_skips_companions_of_family(mem):
+    import digest
+    add_person("person_40", "woman in blue", kind="person")
+    add_person("person_41", "man in uniform", name="Dad", relation="father", resident=1)
+    for i, hhmm in enumerate(("20:03", "20:08", "20:13")):
+        add_event(f"n{i}", "front_door", at(0, hhmm), "Dad hugs a woman.",
+                  [{"pid": "person_41", "actions": ["approaches_door"]}, {"pid": "person_40", "actions": ["hugs"]}])
+    assert [i for i in digest.build(NOW)["attention"] if i["kind"] == "night_unknown"] == []
+    add_person("person_42", "stranger in hood")
+    for i, hhmm in enumerate(("22:03", "22:08")):
+        add_event(f"s{i}", "backyard", at(0, hhmm), "A stranger lingers.", [{"pid": "person_42", "actions": ["lingers"]}])
+    assert len([i for i in digest.build(NOW + 4 * 3600)["attention"] if i["kind"] == "night_unknown"]) == 1
+
+
+def test_path_text_uses_description_when_no_actions(mem):
+    add_person("person_50", "man in uniform", name="Dad", relation="father", resident=1)
+    add_event("p1", "driveway", at(0, "19:30"), "x", [{"pid": "person_50", "desc": "A man in a military uniform hugging a woman.", "actions": ["approaches_door"]}])
+    add_event("p2", "front_door", at(0, "19:36"), "x", [{"pid": "person_50", "desc": "A man in a military uniform hugging a woman at the door."}])
+    r = query.ask("Where was Dad last seen?", now=NOW)
+    assert "military uniform" in r["timeline"][-1]["text"].lower() and "appears" not in r["timeline"][-1]["text"]

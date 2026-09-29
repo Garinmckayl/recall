@@ -942,7 +942,7 @@ function renderPeopleCards(list){
 }
 
 /* ---------- chat ---------- */
-const SUGGESTIONS = ["Show me the last pizza delivery","Which guy is the delivery guy?","Who knocked six days ago?","Where was my father last seen?","Did anyone enter after Dad left?","Who pulled a gun at my door?","Is Mom's day normal today?","Tell me next time this person comes"];
+const SUGGESTIONS = ["Where was Dad last seen?","Is Mom's day normal today?","Did anyone come in after Dad left?","Tell me next time this person comes","Which guy is the delivery guy?","Who knocked six days ago?"];
 const OPLABEL = {routine_check:"Routine", identify_person:"Who is it", find_events:"Search", last_seen:"Last seen", after_departure:"After they left", security_incident:"Security", watch_request:"Watching", describe_person:"Profile"};
 const opLabel = op => OPLABEL[op] || nice(op);
 function addMsg(node, cls){

@@ -300,7 +300,10 @@ def _path_items(evs: list[dict], pid: str, person: dict) -> list[dict]:
     items = []
     for e in evs:
         a = _actor_of(e, pid)
-        items.append(_tl(e, f"{_pname(person).capitalize()} {views.humanize_actions((a or {}).get('actions') or [], (a or {}).get('carrying'))}"))
+        acts = (a or {}).get("actions") or []
+        what = views.humanize_actions(acts, (a or {}).get("carrying")) if acts else \
+            ((a or {}).get("description") or "appears").split(".")[0][:80].strip().lower()
+        items.append(_tl(e, f"{_pname(person).capitalize()}: {what}" if not acts else f"{_pname(person).capitalize()} {what}"))
     return items
 
 
