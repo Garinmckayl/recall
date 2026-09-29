@@ -1,0 +1,82 @@
+[
+ {
+  "t": 132.55,
+  "sfx": "node_pop",
+  "gain": 0.8
+ },
+ {
+  "t": 133.8,
+  "sfx": "node_pop",
+  "gain": 0.8
+ },
+ {
+  "t": 135.35,
+  "sfx": "node_pop",
+  "gain": 0.8
+ },
+ {
+  "t": 136.4,
+  "sfx": "box_lock",
+  "gain": 0.6
+ },
+ {
+  "t": 136.8,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 137.0,
+  "sfx": "node_pop",
+  "gain": 0.8
+ },
+ {
+  "t": 137.55,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 138.55,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 139.45,
+  "sfx": "node_pop",
+  "gain": 0.8
+ },
+ {
+  "t": 140.1,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 141.1,
+  "sfx": "box_lock",
+  "gain": 0.6
+ },
+ {
+  "t": 141.8,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 144.7,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 146.35,
+  "sfx": "tick",
+  "gain": 0.7
+ },
+ {
+  "t": 147.05,
+  "sfx": "whoosh",
+  "gain": 0.7
+ },
+ {
+  "t": 148.35,
+  "sfx": "swoosh_in",
+  "gain": 0.6
+ }
+]

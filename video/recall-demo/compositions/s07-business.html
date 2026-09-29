@@ -1,0 +1,343 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter", sans-serif; color:#fff; }
+    #root .s7-layer { position:absolute; inset:0; }
+    #s07-business-bg-navy { background:
+        radial-gradient(1200px 700px at 50% 55%, #12305a 0%, rgba(18,48,90,0) 70%),
+        linear-gradient(180deg, #0a1626 0%, #08111f 100%); }
+    #s07-business-bg-paper { background:#f6f5f1; clip-path:circle(0px at 960px 540px); }
+    #s07-business-bg-paper::after { content:""; position:absolute; inset:0;
+        background-image:radial-gradient(rgba(13,17,23,.07) 1.5px, transparent 1.6px); background-size:38px 38px; }
+
+    /* ---- homes grid (zoom-out) ---- */
+    #s07-business-grid { position:absolute; left:50px; top:240px; width:1820px; height:700px; }
+    .s7-home { position:absolute; width:140px; height:140px; display:flex; align-items:center; justify-content:center; }
+    .s7-home svg { width:84px; height:84px; overflow:visible; }
+
+    /* ---- headline + stat ---- */
+    #s07-business-title { position:absolute; left:120px; top:84px; width:1500px; font-family:"Sora", sans-serif; font-weight:800; font-size:80px; letter-spacing:-0.02em; line-height:1.05; }
+    #s07-business-stat { position:absolute; left:120px; top:56px; width:1300px; height:200px; }
+    #s07-business-stat .s7-num { position:absolute; left:0; top:0; font-family:"Sora", sans-serif; font-weight:800; font-size:150px; line-height:1; letter-spacing:-0.03em; color:#39b7ee; }
+    #s07-business-stat .s7-stx { position:absolute; left:400px; top:34px; font-weight:600; font-size:42px; line-height:1.18; color:#fff; }
+    #s07-business-stat .s7-src { position:absolute; left:400px; top:150px; font-weight:500; font-size:24px; color:#9fb6d3; letter-spacing:.02em; }
+
+    /* ---- segment cards ---- */
+    #s07-business-cards { position:absolute; left:112px; top:320px; width:1696px; height:560px; display:flex; gap:32px; }
+    .s7-card { position:relative; width:400px; height:560px; background:#fff; border-radius:22px; padding:30px; color:#0d1117;
+               box-shadow:0 24px 60px rgba(0,0,0,.35); display:flex; flex-direction:column; }
+    .s7-ico { width:72px; height:72px; border-radius:20px; background:rgba(15,127,184,.12); display:flex; align-items:center; justify-content:center; }
+    .s7-ico svg { width:42px; height:42px; }
+    .s7-ct { margin-top:22px; font-weight:800; font-size:33px; letter-spacing:-0.01em; line-height:1.1; }
+    .s7-cv { margin-top:12px; font-weight:500; font-size:24px; line-height:1.36; color:#465063; }
+    .s7-sp { flex:1; }
+    .s7-tag { font-weight:700; font-size:16px; letter-spacing:.14em; color:#5b6676; margin-bottom:10px; }
+    .s7-bub { background:#e8f4fb; color:#0b5d8a; border-radius:20px 20px 20px 5px; padding:16px 18px; font-weight:600; font-size:25px; line-height:1.3; }
+
+    /* ---- shared-need rail ---- */
+    #s07-business-need { position:absolute; left:112px; top:900px; width:1696px; height:110px; }
+    #s07-business-need svg { position:absolute; left:0; top:0; width:1696px; height:40px; overflow:visible; }
+    #s07-business-need .s7-pill { position:absolute; left:50%; top:44px; margin-left:-330px; width:660px; height:62px; border-radius:31px; display:flex; align-items:center; justify-content:center;
+        background:rgba(57,183,238,.16); border:1.5px solid rgba(57,183,238,.6); font-weight:700; font-size:30px; color:#fff; }
+
+    /* ---- desk + wall of screens ---- */
+    #s07-business-desk { position:absolute; inset:0; }
+    #s07-business-cap1 { position:absolute; left:0; top:74px; width:1920px; text-align:center; font-family:"Sora", sans-serif; font-weight:800; font-size:76px; letter-spacing:-0.02em; }
+    #s07-business-cap2 { position:absolute; left:0; top:178px; width:1920px; text-align:center; font-weight:500; font-size:40px; color:#9fb6d3; }
+    #s07-business-wall { position:absolute; left:441px; top:270px; width:1038px; height:396px; display:grid; grid-template-columns:repeat(3,330px); grid-template-rows:repeat(2,186px); gap:24px; }
+    .s7-scr { position:relative; border-radius:10px; overflow:hidden; border:2px solid rgba(57,183,238,.65); background:#000; }
+    .s7-scr img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(.75) brightness(.9); }
+    .s7-scr::after { content:""; position:absolute; inset:0; background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 5px); }
+    .s7-scr .s7-lbl { position:absolute; left:10px; top:8px; z-index:2; font-weight:700; font-size:14px; letter-spacing:.12em; color:#fff; text-shadow:0 1px 3px #000; }
+    .s7-scr .s7-off { position:absolute; inset:0; background:#050b14; opacity:0; z-index:3; }
+    #s07-business-person { position:absolute; left:750px; top:700px; width:420px; height:310px; }
+
+    /* ---- dashboard on paper ---- */
+    #s07-business-dash { position:absolute; left:520px; top:220px; width:1240px; height:640px; background:#fff; border-radius:26px; box-shadow:0 30px 80px rgba(13,17,23,.16); color:#0d1117; }
+    #s07-business-dash .s7-dh { position:absolute; left:50px; top:34px; font-weight:800; font-size:32px; }
+    #s07-business-dash .s7-dq { position:absolute; right:50px; top:34px; display:flex; gap:12px; align-items:center; }
+    .s7-pillg { background:#e3f6ee; color:#12704c; font-weight:700; font-size:20px; padding:8px 16px; border-radius:20px; }
+    .s7-pille { background:#eef0f3; color:#5b6676; font-weight:700; font-size:16px; letter-spacing:.1em; padding:8px 12px; border-radius:20px; }
+    #s07-business-tiles { position:absolute; left:50px; top:110px; width:1140px; height:480px; display:grid; grid-template-columns:repeat(4,265px); grid-template-rows:repeat(3,146px); gap:20px 20px; }
+    .s7-tile { position:relative; background:#f6f5f1; border:1px solid #e4e1d8; border-radius:18px; padding:20px 22px; }
+    .s7-tile .s7-tn { font-weight:800; font-size:23px; margin-top:44px; }
+    .s7-tile .s7-ts { font-weight:500; font-size:18px; color:#465063; margin-top:4px; }
+    .s7-tile svg { position:absolute; left:20px; top:18px; width:40px; height:40px; overflow:visible; }
+    #s07-business-cams { position:absolute; left:130px; top:220px; width:330px; height:640px; }
+    #s07-business-cams .s7-ch { position:absolute; left:0; width:300px; height:96px; background:#fff; border:1px solid #e4e1d8; border-radius:20px; display:flex; align-items:center; gap:16px; padding:0 20px;
+        box-shadow:0 12px 30px rgba(13,17,23,.10); font-weight:700; font-size:26px; color:#0d1117; }
+    #s07-business-cams .s7-ch svg { width:44px; height:44px; }
+    #s07-business-cams .s7-cap { position:absolute; left:0; top:20px; font-weight:800; font-size:22px; letter-spacing:.14em; color:#0f7fb8; }
+    #s07-business-flow { position:absolute; left:0; top:0; width:1920px; height:1080px; }
+
+    /* ---- system of record ---- */
+    #s07-business-sor { position:absolute; left:0; top:330px; width:1920px; text-align:center; color:#0d1117; font-family:"Sora", sans-serif; font-weight:800; font-size:160px; letter-spacing:-0.035em; line-height:1; }
+    #s07-business-sor span { display:inline-block; }
+    #s07-business-underline { position:absolute; left:360px; top:520px; width:1200px; height:10px; border-radius:5px; background:#0f7fb8; }
+    #s07-business-proof { position:absolute; left:0; top:610px; width:1920px; display:flex; justify-content:center; }
+    #s07-business-proof .s7-chip { display:flex; align-items:center; gap:22px; background:#0f7fb8; color:#fff; padding:14px 42px 14px 16px; border-radius:70px; font-weight:800; font-size:44px; box-shadow:0 18px 50px rgba(15,127,184,.4); }
+    #s07-business-proof .s7-thumb { position:relative; width:104px; height:74px; border-radius:14px; overflow:hidden; border:3px solid #fff; }
+    #s07-business-proof .s7-thumb img { width:100%; height:100%; object-fit:cover; }
+    #s07-business-proof .s7-thumb i { position:absolute; left:26px; top:6px; width:44px; height:62px; border:3px solid #39b7ee; border-radius:6px; }
+  </style>
+
+  <div id="root" data-composition-id="s07-business" data-width="1920" data-height="1080">
+    <div id="s07-business-bg-navy" class="s7-layer"></div>
+    <div id="s07-business-grid"></div>
+
+    <div id="s07-business-title">This is bigger than one family.</div>
+    <div id="s07-business-stat">
+      <div class="s7-num" id="s07-business-statnum">75%</div>
+      <div class="s7-stx">of adults 50+ want<br>to age at home</div>
+      <div class="s7-src">AARP, 2024</div>
+    </div>
+
+    <div id="s07-business-cards">
+      <div class="s7-card" id="s07-business-card1">
+        <div class="s7-ico"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="14" r="6"/><path d="M4 36c0-7 5-11 11-11s11 4 11 11"/><path d="M33 33c-4-3-7-5-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 40 24c0 4-3 6-7 9z"/></svg></div>
+        <div class="s7-ct">Family caregivers</div>
+        <div class="s7-cv">Ask, get proof, get pinged when a routine breaks.</div>
+        <div class="s7-sp"></div>
+        <div class="s7-tag">EXAMPLE QUERY</div>
+        <div class="s7-bub">Where was Dad last seen?</div>
+      </div>
+      <div class="s7-card" id="s07-business-card2">
+        <div class="s7-ico"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21 22 6l17 15"/><path d="M9 18v20h26V18"/><path d="M22 20v10M17 25h10"/></svg></div>
+        <div class="s7-ct">Home-care agencies</div>
+        <div class="s7-cv">Remote check-ins between visits, and an evidence trail for incident review.</div>
+        <div class="s7-sp"></div>
+        <div class="s7-tag">EXAMPLE QUERY</div>
+        <div class="s7-bub">Has Mrs. Alvarez left her room today?</div>
+      </div>
+      <div class="s7-card" id="s07-business-card3">
+        <div class="s7-ico"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="28" height="33" rx="3"/><path d="M14 13h5M25 13h5M14 20h5M25 20h5M14 27h5M25 27h5"/><path d="M19 39v-6h6v6"/></svg></div>
+        <div class="s7-ct">Senior-living operators</div>
+        <div class="s7-cv">One memory across many cameras and sites.</div>
+        <div class="s7-sp"></div>
+        <div class="s7-tag">EXAMPLE QUERY</div>
+        <div class="s7-bub">Has anyone entered the east wing after 9 PM?</div>
+      </div>
+      <div class="s7-card" id="s07-business-card4">
+        <div class="s7-ico"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 5 8 10v11c0 9 6 15 14 18 8-3 14-9 14-18V10z"/><path d="m15 22 5 5 9-10"/></svg></div>
+        <div class="s7-ct">Insurers &amp; claims</div>
+        <div class="s7-cv">Timestamped, clip-backed evidence for claims.</div>
+        <div class="s7-sp"></div>
+        <div class="s7-tag">EXAMPLE QUERY</div>
+        <div class="s7-bub">Show the timeline of the 4:12 PM incident.</div>
+      </div>
+    </div>
+
+    <div id="s07-business-need">
+      <svg viewBox="0 0 1696 40"><path id="s07-business-rail" d="M200 0V16H1496V0M632 16V0M1064 16V0M848 16V44" stroke="#39b7ee" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      <div class="s7-pill" id="s07-business-pill">One shared need: know someone is safe.</div>
+    </div>
+
+    <div id="s07-business-desk">
+      <div id="s07-business-cap1">to know someone is safe</div>
+      <div id="s07-business-cap2">without a human watching a screen.</div>
+      <div id="s07-business-wall">
+        <div class="s7-scr"><img src="assets/thumbs/evt_0034cb6802ea.jpg" alt=""><span class="s7-lbl">CAM 01</span><div class="s7-off"></div></div>
+        <div class="s7-scr"><img src="assets/thumbs/evt_04e753ecf845.jpg" alt=""><span class="s7-lbl">CAM 02</span><div class="s7-off"></div></div>
+        <div class="s7-scr"><img src="assets/thumbs/evt_14b758b4beb1.jpg" alt=""><span class="s7-lbl">CAM 03</span><div class="s7-off"></div></div>
+        <div class="s7-scr"><img src="assets/thumbs/evt_1a494ca888ad.jpg" alt=""><span class="s7-lbl">CAM 04</span><div class="s7-off"></div></div>
+        <div class="s7-scr"><img src="assets/thumbs/evt_1cf5a19a4243.jpg" alt=""><span class="s7-lbl">CAM 05</span><div class="s7-off"></div></div>
+        <div class="s7-scr"><img src="assets/thumbs/evt_2e99bd3ce29a.jpg" alt=""><span class="s7-lbl">CAM 06</span><div class="s7-off"></div></div>
+      </div>
+      <svg id="s07-business-person" viewBox="0 0 420 310" fill="none" stroke="#39b7ee" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="148" y="128" width="124" height="120" rx="26" fill="rgba(57,183,238,.08)"/>
+        <circle cx="210" cy="104" r="36" fill="rgba(57,183,238,.10)"/>
+        <path d="M120 252c0-52 40-84 90-84s90 32 90 84" fill="rgba(57,183,238,.10)"/>
+        <path d="M16 258h388"/><path d="M70 258v40M350 258v40"/>
+      </svg>
+    </div>
+
+    <div id="s07-business-bg-paper" class="s7-layer"></div>
+
+    <div id="s07-business-flow"><svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+      <path id="s07-business-f1" d="M430 390 H520" stroke="#0f7fb8" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+      <path id="s07-business-f2" d="M430 540 H520" stroke="#0f7fb8" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+      <path id="s07-business-f3" d="M430 690 H520" stroke="#0f7fb8" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+    </svg></div>
+    <div id="s07-business-cams">
+      <div class="s7-cap" id="s07-business-camcap">ALREADY INSTALLED</div>
+      <div class="s7-ch" style="top:120px"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="26" height="20" rx="4"/><path d="m32 20 8-5v14l-8-5"/><circle cx="19" cy="22" r="4"/></svg>Front Door</div>
+      <div class="s7-ch" style="top:270px"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="26" height="20" rx="4"/><path d="m32 20 8-5v14l-8-5"/><circle cx="19" cy="22" r="4"/></svg>Driveway</div>
+      <div class="s7-ch" style="top:420px"><svg viewBox="0 0 44 44" fill="none" stroke="#0f7fb8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="26" height="20" rx="4"/><path d="m32 20 8-5v14l-8-5"/><circle cx="19" cy="22" r="4"/></svg>Backyard</div>
+    </div>
+
+    <div id="s07-business-dash">
+      <div class="s7-dh">Homes &amp; sites</div>
+      <div class="s7-dq"><span class="s7-pillg">All quiet</span><span class="s7-pille">EXAMPLE DATA</span></div>
+      <div id="s07-business-tiles"></div>
+    </div>
+
+    <div id="s07-business-sor"><span>system of record</span></div>
+    <div id="s07-business-underline"></div>
+    <div id="s07-business-proof">
+      <div class="s7-chip" id="s07-business-chip">
+        <div class="s7-thumb"><img src="assets/thumbs/evt_e946ba9b7cd2.jpg" alt=""><i></i></div>
+        <span>proof in every answer</span>
+        <svg width="46" height="46" viewBox="0 0 46 46" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="23" r="19"/><path d="m14 24 6 6 12-13"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+      /* ------------------------------------------------------------------
+         Build the network of homes (seeded, deterministic): 13 x 5, hero = col 6,row 2
+      ------------------------------------------------------------------ */
+      let seed = 11;
+      const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+      const GREEN = "#35d39a", AMBER = "#f0a81a";
+      const grid = $("#s07-business-grid");
+      const cells = [];
+      const homeSvg = (col, id) =>
+        '<svg viewBox="0 0 100 100" fill="none"><circle class="s7-ring" cx="50" cy="50" r="43" stroke="' + col + '" stroke-width="5" stroke-linecap="round" transform="rotate(-90 50 50)"/>' +
+        '<path d="M28 52 50 32l22 20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M33 49v20h34V49" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M46 69V57h8v12" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 13; c++) {
+          const hero = c === 6 && r === 2;
+          const amber = !hero && rnd() < 0.13;
+          const el = document.createElement("div");
+          el.className = "s7-home";
+          el.style.left = c * 140 + "px";
+          el.style.top = r * 140 + "px";
+          el.innerHTML = homeSvg(amber ? AMBER : GREEN);
+          grid.appendChild(el);
+          cells.push({ el, hero, amber, d: Math.hypot(c - 6, r - 2) });
+        }
+      }
+      const heroCell = cells.find((x) => x.hero);
+      const amberCells = cells.filter((x) => x.amber).slice(0, 7);
+
+      /* dashboard tiles */
+      const tileData = [
+        ["Maple St · Home", "Seen 6 min ago", 0], ["Room 214", "Seen 11 min ago", 0], ["East wing", "All clear", 0], ["Unit 3B", "Seen 2 min ago", 0],
+        ["Oak Ave · Home", "Seen 18 min ago", 0], ["Room 108", "Nothing yet today", 1], ["Garden level", "All clear", 0], ["Unit 5A", "Seen 9 min ago", 0],
+        ["Cedar Ct · Home", "Seen 4 min ago", 0], ["Room 320", "Seen 15 min ago", 0], ["West wing", "All clear", 0], ["Unit 2C", "Seen 7 min ago", 0]
+      ];
+      const tiles = $("#s07-business-tiles");
+      tileData.forEach((t) => {
+        const col = t[2] ? AMBER : "#1f9d6b";
+        const d = document.createElement("div");
+        d.className = "s7-tile";
+        d.innerHTML = '<svg viewBox="0 0 40 40" fill="none"><circle class="s7-tring" cx="20" cy="20" r="15" stroke="' + col + '" stroke-width="5" stroke-linecap="round" transform="rotate(-90 20 20)"/>' +
+          (t[2] ? '<path d="M20 12v9M20 26v.5" stroke="' + col + '" stroke-width="3.5" stroke-linecap="round"/>' : '<path d="m13 20 5 5 9-10" stroke="' + col + '" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>') + '</svg>' +
+          '<div class="s7-tn">' + t[0] + '</div><div class="s7-ts">' + t[1] + '</div>';
+        tiles.appendChild(d);
+      });
+      const tileEls = $$(".s7-tile");
+      const amberTile = tileEls[5];
+
+      /* ------------------------------------------------------------------
+         Timeline (SCENE-LOCAL seconds; abs = 106.5 + local)
+      ------------------------------------------------------------------ */
+      // initial states
+      const others = cells.filter((x) => !x.hero).map((x) => x.el);
+      gsap.set(others, { opacity: 0 });
+      gsap.set("#s07-business-grid", { scale: 4, transformOrigin: "910px 350px" });
+      gsap.set(["#s07-business-title", "#s07-business-stat", ".s7-card", "#s07-business-need", "#s07-business-desk", "#s07-business-dash",
+              "#s07-business-cams", "#s07-business-flow", "#s07-business-sor", "#s07-business-underline", "#s07-business-proof"], { opacity: 0 });
+
+      // 0.3-2.4  "This is bigger than one family."
+      tl.fromTo(heroCell.el.querySelector(".s7-ring"), { strokeDasharray: 271, strokeDashoffset: 271 }, { strokeDashoffset: 0, duration: 1.1, ease: "power2.out" }, 0.15);
+      tl.fromTo("#s07-business-title", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 0.4);
+
+      // 2.2 zoom out to the network of homes
+      tl.to("#s07-business-grid", { scale: 1, duration: 1.7, ease: "power3.inOut" }, 2.2);
+      cells.filter((x) => !x.hero).forEach((x) => tl.to(x.el, { opacity: 1, duration: 0.55, ease: "power2.out" }, 2.45 + x.d * 0.1));
+
+      // 3.0 -> "Three-quarters ... want to age at home" (spoken 3.17-6.07)
+      tl.to("#s07-business-title", { opacity: 0, y: -22, duration: 0.4, ease: "power2.in" }, 2.85);
+      tl.fromTo("#s07-business-stat", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.1);
+      const cnt = { v: 0 }, numEl = $("#s07-business-statnum");
+      tl.fromTo(cnt, { v: 0 }, { v: 75, duration: 1.3, ease: "power2.out", onUpdate: () => { numEl.textContent = Math.round(cnt.v) + "%"; } }, 3.15);
+
+      // subtle, finite amber pulses across the network
+      amberCells.forEach((x, i) => {
+        tl.fromTo(x.el.querySelector("svg"), { scale: 1, transformOrigin: "50% 50%" }, { scale: 1.22, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, 4.0 + i * 0.28);
+      });
+
+      // 6.2 the network recedes; four cards flip in on their spoken names
+      tl.to("#s07-business-grid", { opacity: 0.16, duration: 0.9, ease: "power2.inOut" }, 6.1);
+      const flips = [6.4, 7.1, 8.6, 10.2];
+      ["#s07-business-card1", "#s07-business-card2", "#s07-business-card3", "#s07-business-card4"].forEach((sel, i) => {
+        const t0 = flips[i];
+        tl.fromTo(sel, { opacity: 0, rotationY: -78, y: 34, transformPerspective: 1300, transformOrigin: "50% 50%" },
+                       { opacity: 1, rotationY: 0, y: 0, duration: 0.65, ease: "back.out(1.25)" }, t0);
+        tl.fromTo(sel, { boxShadow: "0 24px 60px rgba(0,0,0,.35), 0 0 0 0px rgba(57,183,238,0)" },
+                       { boxShadow: "0 24px 60px rgba(0,0,0,.35), 0 0 0 7px rgba(57,183,238,.75)", duration: 0.3, yoyo: true, repeat: 1, ease: "power2.out" }, t0 + 0.55);
+      });
+
+      // 11.0 "... all need the same thing:"  -> shared-need rail
+      tl.fromTo("#s07-business-need", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 11.05);
+      tl.fromTo("#s07-business-rail", { strokeDasharray: 4000, strokeDashoffset: 4000 }, { strokeDashoffset: 0, duration: 1.0, ease: "power2.inOut" }, 11.1);
+      tl.fromTo("#s07-business-pill", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 11.7);
+
+      // 12.9 cards + stat exit
+      tl.to([".s7-card"], { y: 70, opacity: 0, scale: 0.95, duration: 0.5, ease: "power2.in", stagger: 0.06 }, 12.85);
+      tl.to(["#s07-business-need", "#s07-business-stat"], { opacity: 0, y: 20, duration: 0.45, ease: "power2.in" }, 12.85);
+
+      tl.to("#s07-business-grid", { opacity: 0.05, duration: 0.6, ease: "power2.inOut" }, 13.0);
+
+      // 13.2 "to know someone is safe ... without a human watching a screen."
+      tl.set("#s07-business-desk", { opacity: 1 }, 13.15);
+      tl.fromTo("#s07-business-cap1", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 13.2);
+      const scr = $$(".s7-scr");
+      tl.fromTo(scr, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out", stagger: 0.09 }, 13.5);
+      tl.fromTo("#s07-business-person", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 14.4);
+      tl.fromTo("#s07-business-cap2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 14.75);
+      // 16.2 "screen." -> the wall goes dark
+      tl.to(scr.map((s) => s.querySelector(".s7-off")), { opacity: 0.93, duration: 0.55, ease: "power2.in", stagger: 0.05 }, 16.15);
+      tl.to("#s07-business-person", { opacity: 0.25, duration: 0.5 }, 16.3);
+      tl.to(["#s07-business-cap1", "#s07-business-cap2"], { opacity: 0, y: -18, duration: 0.45, ease: "power2.in" }, 16.55);
+
+      // 16.7 paper reveal (circle wipe) -> calm dashboard
+      tl.to("#s07-business-bg-paper", { clipPath: "circle(1500px at 960px 540px)", duration: 1.1, ease: "power2.inOut" }, 16.65);
+      tl.set("#s07-business-desk", { opacity: 0 }, 17.9);
+      tl.set(["#s07-business-dash", "#s07-business-cams", "#s07-business-flow"], { opacity: 1 }, 17.4);
+      tl.fromTo("#s07-business-dash", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 17.45);
+      tileEls.forEach((t, i) => {
+        tl.fromTo(t, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 17.9 + i * 0.07);
+        tl.fromTo(t.querySelector(".s7-tring"), { strokeDasharray: 95, strokeDashoffset: 95 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 17.95 + i * 0.07);
+      });
+
+      // 18.5 "cameras that are already installed" -> camera column feeds the dashboard
+      tl.fromTo("#s07-business-camcap", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 18.45);
+      $$("#s07-business-cams .s7-ch").forEach((c, i) => tl.fromTo(c, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 18.55 + i * 0.16));
+      ["#s07-business-f1", "#s07-business-f2", "#s07-business-f3"].forEach((f, i) => {
+        tl.fromTo(f, { strokeDashoffset: 60, opacity: 0 }, { strokeDashoffset: 0, opacity: 1, duration: 0.8, ease: "none" }, 19.05 + i * 0.12);
+      });
+      // Room 108 quietly asks for a check-in (finite pulse)
+      tl.fromTo(amberTile, { boxShadow: "0 0 0 0px rgba(240,168,26,0)" }, { boxShadow: "0 0 0 6px rgba(240,168,26,.55)", duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, 19.9);
+
+      // 21.15 "system of record"
+      tl.to(["#s07-business-dash", "#s07-business-cams", "#s07-business-flow"], { opacity: 0.08, duration: 0.55, ease: "power2.inOut" }, 20.95);
+      tl.set(["#s07-business-sor", "#s07-business-underline"], { opacity: 1 }, 21.1);
+      tl.fromTo("#s07-business-sor span", { opacity: 0, y: 46, scale: 1.08 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }, 21.12);
+      tl.fromTo("#s07-business-underline", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 21.55);
+      // 22.5 "proof in every answer"
+      tl.set("#s07-business-proof", { opacity: 1 }, 22.45);
+      tl.fromTo("#s07-business-chip", { opacity: 0, y: 34, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.7)" }, 22.5);
+      // hold + a very slow settle
+      tl.to("#s07-business-sor", { scale: 1.025, transformOrigin: "50% 50%", duration: 3.0, ease: "none" }, 22.0);
+
+      window.__timelines["s07-business"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

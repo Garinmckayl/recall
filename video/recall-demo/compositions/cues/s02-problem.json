@@ -1,0 +1,18 @@
+[
+ {"t":14.50,"sfx":"card_flip","gain":0.8},
+ {"t":14.50,"sfx":"whoosh","gain":0.4,"dur":0.8,"fade":0.2},
+ {"t":18.80,"sfx":"card_flip","gain":0.8},
+ {"t":21.00,"sfx":"card_flip","gain":0.8},
+ {"t":22.60,"sfx":"clock_tick","gain":0.8,"dur":2.5,"fade":0.3},
+ {"t":24.60,"sfx":"ping_stack","gain":0.8,"dur":3.0,"fade":0.3},
+ {"t":27.50,"sfx":"ping_stack","gain":0.7,"dur":2.5,"fade":0.3},
+ {"t":29.30,"sfx":"tape_scrub","gain":0.9,"dur":2.5,"fade":0.25},
+ {"t":33.90,"sfx":"needle_stop","gain":0.9,"dur":1.5,"fade":0.2},
+ {"t":34.10,"sfx":"whoosh","gain":0.35,"dur":0.8,"fade":0.2},
+ {"t":35.45,"sfx":"tick","gain":0.7},
+ {"t":37.05,"sfx":"tick","gain":0.7},
+ {"t":37.05,"sfx":"sting_low","gain":0.8,"dur":2.0,"fade":0.4},
+ {"t":39.70,"sfx":"swoosh_in","gain":0.5},
+ {"t":40.00,"sfx":"riser","gain":0.9,"dur":3.0,"fade":0.2},
+ {"t":41.00,"sfx":"swoosh_in","gain":0.6}
+]

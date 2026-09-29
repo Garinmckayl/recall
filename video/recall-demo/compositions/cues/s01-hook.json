@@ -1,0 +1,18 @@
+[
+ {"t":0.10,"sfx":"phone_vibrate","gain":0.9,"dur":2.2,"fade":0.3},
+ {"t":1.00,"sfx":"heartbeat","gain":0.7,"dur":6.0,"fade":0.5},
+ {"t":2.30,"sfx":"notify","gain":0.6},
+ {"t":3.40,"sfx":"notify","gain":0.65},
+ {"t":4.50,"sfx":"notify","gain":0.7},
+ {"t":4.58,"sfx":"sting_low","gain":0.45,"dur":1.6,"fade":0.4},
+ {"t":5.40,"sfx":"notify","gain":0.75},
+ {"t":6.70,"sfx":"riser","gain":0.9,"dur":3.0,"fade":0.2},
+ {"t":7.20,"sfx":"typing","gain":0.8,"dur":1.45,"fade":0.15},
+ {"t":9.55,"sfx":"whoosh","gain":0.45,"dur":0.7,"fade":0.2},
+ {"t":9.80,"sfx":"bass_hit","gain":1.0},
+ {"t":10.15,"sfx":"whoosh","gain":0.4,"dur":0.7,"fade":0.2},
+ {"t":10.35,"sfx":"box_lock","gain":0.8},
+ {"t":10.85,"sfx":"box_lock","gain":0.7},
+ {"t":11.62,"sfx":"lane_sweep","gain":0.7},
+ {"t":13.00,"sfx":"bass_hit","gain":1.1}
+]

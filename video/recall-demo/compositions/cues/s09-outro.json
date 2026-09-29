@@ -1,0 +1,18 @@
+[
+  {"t": 149.0, "sfx": "room_tone",  "gain": 0.5, "dur": 8, "fade": 1.5},
+  {"t": 149.5, "sfx": "notify",     "gain": 0.55},
+  {"t": 150.1, "sfx": "tick",       "gain": 0.4},
+  {"t": 150.6, "sfx": "phone_ring", "gain": 0.9, "dur": 3.2, "fade": 0.25},
+  {"t": 153.8, "sfx": "tick",       "gain": 0.7},
+  {"t": 153.85, "sfx": "swoosh_in", "gain": 0.4},
+  {"t": 157.7, "sfx": "whoosh",     "gain": 0.6},
+  {"t": 159.2, "sfx": "riser",      "gain": 0.55, "dur": 3.0, "fade": 0.25},
+  {"t": 160.0, "sfx": "tick",       "gain": 0.6},
+  {"t": 162.3, "sfx": "whoosh",     "gain": 0.75},
+  {"t": 163.0, "sfx": "bass_hit",   "gain": 0.6},
+  {"t": 168.55, "sfx": "swoosh_in", "gain": 0.5},
+  {"t": 169.6, "sfx": "card_flip",  "gain": 0.5},
+  {"t": 169.8, "sfx": "card_flip",  "gain": 0.5},
+  {"t": 170.0, "sfx": "card_flip",  "gain": 0.5},
+  {"t": 170.2, "sfx": "card_flip",  "gain": 0.5}
+]

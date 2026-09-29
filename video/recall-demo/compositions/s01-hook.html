@@ -1,0 +1,274 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head><body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter", sans-serif; color:#fff; }
+    .s01-layer { position:absolute; inset:0; }
+    #s01-bg { background:#05070b; }
+
+    /* ---------- part 1: the phone ---------- */
+    #s01-p1 { opacity:0; }
+    .s01-brw { opacity:0; }
+    .s01-brw video { position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover;
+      filter: saturate(.22) brightness(.62) contrast(1.15) sepia(.25) hue-rotate(178deg); }
+    #s01-brshade { background: radial-gradient(ellipse at center, rgba(5,7,11,.35) 0%, rgba(5,7,11,.85) 100%); }
+
+    #s01-phonewrap { position:absolute; left:50%; top:50%; width:520px; height:1000px; margin-left:-260px; margin-top:-500px; }
+    #s01-phone { position:absolute; inset:0; border-radius:76px; background:#0a0c11; border:3px solid #2a2f3a;
+      box-shadow: 0 40px 140px rgba(0,0,0,.85), 0 0 90px rgba(57,183,238,.10), inset 0 0 0 10px #12151c; }
+    #s01-screen { position:absolute; left:14px; top:14px; right:14px; bottom:14px; border-radius:62px; overflow:hidden;
+      background: linear-gradient(165deg,#1b2335 0%, #0e1521 55%, #080b11 100%); }
+    #s01-island { position:absolute; left:50%; margin-left:-78px; top:20px; width:156px; height:42px; border-radius:21px; background:#000; }
+    #s01-date { position:absolute; left:0; right:0; top:88px; text-align:center; font-weight:500; font-size:30px; color:rgba(255,255,255,.72); letter-spacing:.01em; }
+    #s01-clock { position:absolute; left:0; right:0; top:150px; text-align:center; font-family:"Sora",sans-serif; font-weight:800; font-size:170px; letter-spacing:-.04em; line-height:1; color:#f4f6fa; }
+    #s01-notif { position:absolute; left:26px; top:400px; width:440px; height:150px; }
+    .s01-peek { position:absolute; left:0; right:0; top:0; height:128px; border-radius:30px; background:#232838; opacity:0; }
+    #s01-ncard { position:absolute; left:0; right:0; top:0; height:128px; border-radius:30px; background:#333a4d; opacity:0;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+    #s01-nico { position:absolute; left:20px; top:32px; width:64px; height:64px; border-radius:32px; background:#2fbf71; display:flex; align-items:center; justify-content:center; }
+    #s01-nico svg { width:34px; height:34px; }
+    .s01-badge { position:absolute; left:-2px; top:-8px; width:34px; height:34px; border-radius:17px; background:#e5484d; color:#fff;
+      font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; opacity:0; border:3px solid #333a4d; }
+    #s01-ntxt { position:absolute; left:104px; top:24px; right:20px; }
+    #s01-nt { font-weight:700; font-size:34px; color:#fff; }
+    #s01-nbw { position:relative; height:36px; margin-top:6px; }
+    .s01-nb { position:absolute; left:0; top:0; font-weight:500; font-size:28px; color:rgba(255,255,255,.78); white-space:nowrap; opacity:0; }
+    #s01-ntime { position:absolute; right:22px; top:26px; font-size:22px; color:rgba(255,255,255,.55); }
+    .s01-qbtn { position:absolute; bottom:52px; width:84px; height:84px; border-radius:42px; background:rgba(255,255,255,.10); }
+    #s01-home { position:absolute; left:50%; margin-left:-90px; bottom:18px; width:180px; height:7px; border-radius:4px; background:rgba(255,255,255,.55); }
+
+    .s01-k { position:absolute; opacity:0; font-family:"Sora",sans-serif; font-weight:800; letter-spacing:-.03em; line-height:.95; color:#fff; }
+    .s01-ksub { position:absolute; opacity:0; font-family:"Inter",sans-serif; font-weight:600; font-size:34px; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+    #s01-kA { left:60px; top:340px; width:630px; text-align:right; font-size:236px; }
+    #s01-kAsub { left:60px; top:690px; width:630px; text-align:right; }
+    #s01-kB { left:1230px; top:270px; width:630px; text-align:left; font-size:360px; color:#39b7ee; }
+    #s01-kBsub { left:1236px; top:730px; width:630px; text-align:left; }
+    #s01-kC { left:60px; top:430px; width:630px; text-align:right; font-size:170px; }
+    #s01-kD1 { left:1230px; top:360px; width:630px; text-align:left; font-size:150px; }
+    #s01-kD2 { left:1230px; top:505px; width:640px; text-align:left; font-size:104px; }
+    #s01-kDline { position:absolute; left:1234px; top:640px; width:610px; height:10px; background:#e5484d; transform-origin:left center; transform:scaleX(0); border-radius:5px; }
+
+    /* ---------- part 2: the real product ---------- */
+    #s01-camwrap { opacity:0; overflow:hidden; background:#f6f5f1; }
+    #s01-cam { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; }
+    #s01-cap { position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; }
+    .s01-pill { position:absolute; left:96px; opacity:0; padding:16px 26px 16px 22px; border-radius:40px; background:rgba(9,13,20,.92);
+      border:1px solid rgba(255,255,255,.18); box-shadow:0 18px 50px rgba(0,0,0,.45); font-weight:700; font-size:36px; color:#fff;
+      display:flex; align-items:center; gap:14px; white-space:nowrap; }
+    .s01-pill i { display:block; width:16px; height:16px; border-radius:8px; background:#39b7ee; }
+    .s01-pill small { display:block; font-weight:500; font-size:26px; color:rgba(255,255,255,.7); }
+    #s01-c1 { top:760px; }
+    #s01-c2 { top:838px; }
+    #s01-c3 { top:940px; }
+    #s01-c3 i { background:#f0a81a; }
+
+    /* ---------- title ---------- */
+    #s01-title { opacity:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    #s01-tword { font-family:"Sora",sans-serif; font-weight:800; font-size:250px; letter-spacing:-.045em; line-height:1; color:#fff; }
+    #s01-tbar { width:220px; height:10px; border-radius:5px; background:#39b7ee; transform-origin:center; transform:scaleX(0); margin-top:22px; }
+    #s01-tsub { margin-top:34px; font-weight:500; font-size:46px; letter-spacing:.005em; color:rgba(255,255,255,.86); opacity:0; }
+
+    /* ---------- finish ---------- */
+    #s01-flash { background:#fff; opacity:0; }
+    #s01-vig { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 46%, rgba(0,0,0,.72) 100%); pointer-events:none; }
+    #s01-grain { opacity:.075; mix-blend-mode:screen; pointer-events:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      background-size:320px 320px; }
+    #s01-tag { position:absolute; left:56px; top:48px; padding:9px 16px; border:1px solid rgba(255,255,255,.4); border-radius:4px;
+      font-weight:600; font-size:22px; letter-spacing:.34em; text-transform:uppercase; color:rgba(255,255,255,.62); opacity:0; }
+  </style>
+
+  <div id="root" data-composition-id="s01-hook" data-width="1920" data-height="1080">
+    <div id="s01-bg" class="s01-layer"></div>
+
+    <!-- PART 1 · the phone (0 – 6.85) -->
+    <div id="s01-p1" class="s01-layer">
+      <div id="s01-br1w" class="s01-layer s01-brw"><video id="s01-br1" class="clip" src="assets/broll/49020.mp4" data-start="1.8" data-duration="2.7" data-media-start="1" data-track-index="1" data-hf-media-start-basis="local" muted playsinline></video></div>
+      <div id="s01-br2w" class="s01-layer s01-brw"><video id="s01-br2" class="clip" src="assets/broll/48790.mp4" data-start="4.4" data-duration="2.45" data-media-start="0.5" data-track-index="2" data-hf-media-start-basis="local" muted playsinline></video></div>
+      <div id="s01-brshade" class="s01-layer"></div>
+
+      <div id="s01-phonewrap">
+        <div id="s01-phone">
+          <div id="s01-screen">
+            <div id="s01-island"></div>
+            <div id="s01-date">Tuesday, September 29</div>
+            <div id="s01-clock">8:20</div>
+            <div id="s01-notif">
+              <div class="s01-peek" id="s01-peek2"></div>
+              <div class="s01-peek" id="s01-peek1"></div>
+              <div id="s01-ncard">
+                <div id="s01-nico">
+                  <svg viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
+                  <div class="s01-badge" id="s01-bd1">1</div>
+                  <div class="s01-badge" id="s01-bd2">2</div>
+                  <div class="s01-badge" id="s01-bd3">3</div>
+                  <div class="s01-badge" id="s01-bd4">4</div>
+                </div>
+                <div id="s01-ntxt">
+                  <div id="s01-nt">Dad</div>
+                  <div id="s01-nbw">
+                    <span class="s01-nb" id="s01-nb1">Missed call</span>
+                    <span class="s01-nb" id="s01-nb2">2 missed calls</span>
+                    <span class="s01-nb" id="s01-nb3">3 missed calls</span>
+                    <span class="s01-nb" id="s01-nb4">4 missed calls</span>
+                  </div>
+                </div>
+                <div id="s01-ntime">now</div>
+              </div>
+            </div>
+            <div class="s01-qbtn" style="left:52px"></div>
+            <div class="s01-qbtn" style="right:52px"></div>
+            <div id="s01-home"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s01-kA" class="s01-k">8:20</div><div id="s01-kAsub" class="s01-ksub">PM · tonight</div>
+      <div id="s01-kB" class="s01-k">81</div><div id="s01-kBsub" class="s01-ksub">years old</div>
+      <div id="s01-kC" class="s01-k">ALONE</div>
+      <div id="s01-kD1" class="s01-k">NOT</div><div id="s01-kD2" class="s01-k">ANSWERING</div><div id="s01-kDline"></div>
+    </div>
+
+    <!-- PART 2 · the real product (7.2 – 12.6) -->
+    <div id="s01-camwrap" class="s01-layer">
+      <div id="s01-cam">
+        <video id="s01-cap" class="clip" src="assets/cap/t_hero.mp4" data-start="7.2" data-duration="5.4" data-media-start="1.15" data-playback-rate="1.25" data-track-index="3" data-hf-media-start-basis="local" muted playsinline></video>
+      </div>
+    </div>
+    <div id="s01-c1" class="s01-pill"><i></i>Backyard · 8:13 PM</div>
+    <div id="s01-c2" class="s01-pill"><i></i><div>Driveway → Front Door → Backyard<small>8:03 PM · 8:08 PM · 8:13 PM</small></div></div>
+    <div id="s01-c3" class="s01-pill"><i></i>No later detections</div>
+
+    <!-- TITLE (13.0 – 14.4) -->
+    <div id="s01-title" class="s01-layer">
+      <div id="s01-tword">RECALL</div>
+      <div id="s01-tbar"></div>
+      <div id="s01-tsub">Persistent visual memory for caretaking and safety.</div>
+    </div>
+
+    <div id="s01-flash" class="s01-layer"></div>
+    <div id="s01-vig" class="s01-layer"></div>
+    <div id="s01-grain" class="s01-layer"></div>
+    <div id="s01-tag">Dramatization</div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // FT = fromTo whose "from" is applied only when the tween starts (immediateRender:false): a seek straight into the middle of the scene is safe
+    const FT = (t, a, b, pos) => tl.fromTo(t, a, { ...b, immediateRender: false }, pos);
+    const Q = (s) => document.querySelector(s);
+
+    // ---- helper: quick positional shake (seek-safe: explicit fromTo per step) ----
+    function shake(sel, t, amp, n) {
+      const step = 0.045;
+      for (let i = 0; i < n; i++) {
+        const a = amp * (1 - i / n) * (i % 2 ? -1 : 1);
+        FT(sel, { x: a }, { x: -a * 0.6, duration: step - 0.002, ease: "none" }, t + i * step);
+      }
+      tl.set(sel, { x: 0 }, t + n * step);
+    }
+
+    // ================= PART 1 · the phone =================
+    tl.set("#s01-p1", { opacity: 1 }, 0.2);
+    FT("#s01-phonewrap", { opacity: 0, y: 30, rotation: -1.2 }, { opacity: 1, y: 0, rotation: -1.2, duration: 0.9, ease: "power2.out" }, 0.2);
+    FT("#s01-tag", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 0.3);
+    // slow creeping push on the phone through the whole beat (dread)
+    FT("#s01-phonewrap", { scale: 0.88 }, { scale: 0.96, duration: 6.65, ease: "none" }, 0.2);
+    // vibrate at the start
+    shake("#s01-phonewrap", 0.15, 9, 10);
+
+    // b-roll cutaways behind the phone
+    FT("#s01-br1w", { opacity: 0 }, { opacity: 0.55, duration: 0.5, ease: "power1.out" }, 1.8);
+    tl.to("#s01-br1w", { opacity: 0, duration: 0.3, ease: "power1.in" }, 4.2);
+    FT("#s01-br2w", { opacity: 0 }, { opacity: 0.55, duration: 0.4, ease: "power1.out" }, 4.4);
+    tl.to("#s01-br2w", { opacity: 0, duration: 0.15, ease: "power1.in" }, 6.7);
+
+    // notification stack: 2.3 / 3.4 / 4.5 / 5.4
+    const badge = (n, t) => {
+      FT("#s01-bd" + n, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(3)" }, t);
+      if (n > 1) tl.to("#s01-bd" + (n - 1), { opacity: 0, duration: 0.1 }, t);
+      FT("#s01-nb" + n, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, t);
+      if (n > 1) tl.to("#s01-nb" + (n - 1), { opacity: 0, duration: 0.12 }, t);
+    };
+    FT("#s01-ncard", { opacity: 0, y: -170, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "expo.out" }, 2.3);
+    badge(1, 2.4);
+    shake("#s01-phonewrap", 2.3, 7, 6);
+    const bump = (t, peek, py) => {
+      FT("#s01-ncard", { scale: 1 }, { scale: 1.05, duration: 0.09, ease: "power2.out" }, t);
+      tl.to("#s01-ncard", { scale: 1, duration: 0.2, ease: "power2.inOut" }, t + 0.09);
+      if (peek) FT(peek, { opacity: 0, y: 0, scale: 1 }, { opacity: 1, y: py, scale: py > 20 ? 0.9 : 0.95, duration: 0.3, ease: "power2.out" }, t);
+    };
+    bump(3.4, "#s01-peek1", 18); badge(2, 3.4); shake("#s01-phonewrap", 3.4, 8, 7);
+    bump(4.5, "#s01-peek2", 36); badge(3, 4.5); shake("#s01-phonewrap", 4.5, 9, 8);
+    bump(5.4, null, 0); badge(4, 5.4); shake("#s01-phonewrap", 5.4, 11, 10);
+    FT("#s01-ncard", { boxShadow: "0 18px 40px rgba(0,0,0,.45)" }, { boxShadow: "0 0 0 3px rgba(229,72,77,.9), 0 0 60px rgba(229,72,77,.45)", duration: 0.35 }, 5.45);
+
+    // kinetic type synced to v01_hook (It's 1.00 · eight-twenty 1.23 · eighty-one 3.07 · alone 4.60 · not 5.77 · answering 6.03)
+    const punch = (sel, t, out, dx) => {
+      FT(sel, { opacity: 0, scale: 1.28, x: dx, filter: "blur(10px)" }, { opacity: 1, scale: 1, x: 0, filter: "blur(0px)", duration: 0.34, ease: "expo.out" }, t);
+      tl.to(sel, { opacity: 0, x: -dx * 0.4, duration: 0.22, ease: "power2.in" }, out);
+    };
+    punch("#s01-kA", 1.2, 2.25, -60);
+    FT("#s01-kAsub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.55);
+    tl.to("#s01-kAsub", { opacity: 0, duration: 0.2 }, 2.25);
+    punch("#s01-kB", 3.05, 4.15, 60);
+    FT("#s01-kBsub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 3.35);
+    tl.to("#s01-kBsub", { opacity: 0, duration: 0.2 }, 4.15);
+    punch("#s01-kC", 4.58, 5.55, -60);
+    punch("#s01-kD1", 5.75, 6.8, 60);
+    punch("#s01-kD2", 6.0, 6.8, 60);
+    FT("#s01-kDline", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "expo.out" }, 6.25);
+
+    // hard cut to black
+    tl.set("#s01-p1", { opacity: 0 }, 6.85);
+    tl.set("#s01-tag", { opacity: 0 }, 7.0);
+
+    // ================= PART 2 · the real product =================
+    // camera keyframes in 1920x1080 CSS px: x = 960 - cx*s, y = 540 - cy*s   (the page ends at y=1080; below it the wrapper shows paper)
+    const K0  = { scale: 1.9,  x: -370,  y: -1170 };          // typing: chat input sits at ~3/4 height
+    const K0b = { scale: 2.0,  x: -480,  y: -1360 };          // slow push while the question is typed
+    const K1w = { scale: 1.55, x: -528,  y: -64.5 };          // after Enter: the chat bubble + "thinking" card
+    const K1wb = { scale: 1.62, x: -587, y: -75.6 };          // tension creep while it thinks
+    const K1  = { scale: 2.3,  x: -742,  y: -81 };            // answer card (whip in on the landing)
+    const K2  = { scale: 3.0,  x: -3840, y: -135 };           // evidence video + tracking box
+    const K3  = { scale: 2.6,  x: -3073, y: -1228 };          // path across the three cameras
+    tl.set("#s01-camwrap", { opacity: 1 }, 7.2);
+    FT("#s01-cam", K0, { ...K0b, duration: 1.35, ease: "none" }, 7.2);
+    FT("#s01-cam", K0b, { ...K1w, duration: 0.4, ease: "power3.inOut" }, 8.55);
+    FT("#s01-cam", K1w, { ...K1wb, duration: 0.6, ease: "none" }, 8.95);
+    FT("#s01-cam", K1wb, { ...K1, duration: 0.3, ease: "expo.out" }, 9.55);
+    FT("#s01-cam", K1, { scale: 2.36, x: -770, y: -84, duration: 0.3, ease: "none" }, 9.85);
+    FT("#s01-cam", { scale: 2.36, x: -770, y: -84 }, { ...K2, duration: 0.45, ease: "power3.inOut" }, 10.15);
+    FT("#s01-cam", K2, { scale: 3.06, x: -3925, y: -138, duration: 1.0, ease: "none" }, 10.6);
+    FT("#s01-cam", { scale: 3.06, x: -3925, y: -138 }, { ...K3, duration: 0.5, ease: "power3.inOut" }, 11.62);
+    // the cinematic vignette/grain would muddy the bright product UI: ease them back while it is on screen
+    tl.set("#s01-vig", { opacity: 0.22 }, 7.2);
+    tl.set("#s01-grain", { opacity: 0.03 }, 7.2);
+    tl.set("#s01-vig", { opacity: 1 }, 12.6);
+    tl.set("#s01-grain", { opacity: 0.075 }, 12.6);
+    // impact at the answer landing (9.8): flash + micro-shake on the frame
+    FT("#s01-flash", { opacity: 0.45 }, { opacity: 0, duration: 0.28, ease: "power2.out" }, 9.8);
+    shake("#s01-camwrap", 9.8, 10, 8);
+
+    // floating callouts (screen space)
+    const pill = (sel, t, hold) => {
+      FT(sel, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, t);
+      tl.to(sel, { opacity: 0, duration: 0.15 }, t + hold);
+    };
+    pill("#s01-c1", 10.45, 1.3);
+    pill("#s01-c2", 12.0, 0.6);
+    pill("#s01-c3", 12.15, 0.45);
+
+    // hard cut to black, then the title slam
+    tl.set("#s01-camwrap", { opacity: 0 }, 12.6);
+    FT("#s01-title", { opacity: 0, scale: 1.42 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power4.out" }, 13.0);
+    shake("#s01-title", 13.02, 9, 8);
+    FT("#s01-flash", { opacity: 0.55 }, { opacity: 0, duration: 0.3, ease: "power2.out" }, 13.0);
+    FT("#s01-tbar", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 13.22);
+    FT("#s01-tsub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 13.4);
+
+    window.__timelines["s01-hook"] = tl;
+  </script>
+</template></body></html>

@@ -1,0 +1,349 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head><body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter", sans-serif; color:#fff; }
+    #root * { box-sizing:border-box; }
+    .abs { position:absolute; }
+
+    /* ---------- backdrop: warm dark, lamp-lit ---------- */
+    #s09-outro-bg { position:absolute; inset:0; background:#0e0b09; }
+    #s09-outro-table { position:absolute; left:0; right:0; bottom:0; height:300px;
+      background:linear-gradient(180deg, rgba(60,38,20,0) 0%, rgba(58,36,18,.55) 55%, rgba(30,18,10,.9) 100%); }
+    #s09-outro-lamp { position:absolute; left:-520px; top:120px; width:1300px; height:900px; opacity:0;
+      background:radial-gradient(closest-side, rgba(240,168,26,.34) 0%, rgba(240,140,26,.14) 45%, rgba(240,140,26,0) 100%); }
+    #s09-outro-vig { position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 52%, rgba(0,0,0,.72) 100%); z-index:14; }
+
+    /* ---------- B-roll (Dad, out back) ---------- */
+    #s09-outro-brollwrap { position:absolute; inset:0; opacity:0; z-index:2; overflow:hidden;
+      filter:sepia(.32) saturate(1.18) contrast(1.05) brightness(.9); }
+    #s09-outro-broll { position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; }
+    #s09-outro-brollglow { position:absolute; inset:0; z-index:3; opacity:0;
+      background:linear-gradient(180deg, rgba(240,168,26,.22), rgba(14,11,9,.18) 45%, rgba(14,11,9,.62) 100%); }
+    .s09-outro-bar { position:absolute; left:0; width:1920px; height:118px; background:#050403; z-index:4; }
+    #s09-outro-bar-t { top:0; } #s09-outro-bar-b { bottom:0; }
+
+    /* ---------- phone ---------- */
+    #s09-outro-phonewrap { position:absolute; left:720px; top:80px; width:480px; height:920px; opacity:0; z-index:6; isolation:isolate; }
+    #s09-outro-phone { position:relative; z-index:1; width:100%; height:100%; border-radius:68px; padding:13px;
+      background:linear-gradient(160deg,#2a221b,#120e0b); box-shadow:0 40px 110px rgba(0,0,0,.75), 0 0 0 2px #3a2e24 inset; }
+    #s09-outro-glow { position:absolute; inset:-30px; border-radius:90px; opacity:.25; z-index:0;
+      background:radial-gradient(closest-side, rgba(255,214,140,.45), rgba(255,214,140,0)); }
+    #s09-outro-screen { position:relative; width:100%; height:100%; border-radius:56px; overflow:hidden; background:#0b0d12; }
+    #s09-outro-notch { position:absolute; left:50%; top:12px; width:120px; height:30px; margin-left:-60px; border-radius:20px; background:#000; z-index:9; }
+    .s09-outro-scr { position:absolute; inset:0; }
+
+    /* answer screen (light Recall world) */
+    #s09-outro-scr-answer { background:#f6f5f1; color:#0d1117; padding:64px 26px 26px; }
+    #s09-outro-a-head { display:flex; align-items:center; gap:12px; font:700 27px/1 "Sora", sans-serif; letter-spacing:-.02em; }
+    #s09-outro-a-ring { width:26px; height:26px; border-radius:50%; border:5px solid #0f7fb8; position:relative; }
+    #s09-outro-a-ring::after { content:""; position:absolute; inset:4px; border-radius:50%; background:#0f7fb8; }
+    #s09-outro-ans-user { margin:34px 0 0 auto; width:max-content; max-width:88%; background:#0f7fb8; color:#fff;
+      font:500 22px/1.25 "Inter", sans-serif; padding:14px 18px; border-radius:20px 20px 4px 20px; opacity:0; }
+    #s09-outro-ans-card { margin-top:22px; background:#fff; border:1px solid #e4e1d8; border-radius:20px; padding:22px 22px 24px;
+      box-shadow:0 14px 34px rgba(13,17,23,.12); opacity:0; }
+    #s09-outro-ans-text { font:500 25px/1.3 "Inter", sans-serif; color:#0d1117; }
+    #s09-outro-ans-text b { font-weight:800; }
+    #s09-outro-conf { margin-top:14px; display:flex; align-items:center; gap:10px; font:500 18px/1 "Inter", sans-serif; color:#1f9d6b; }
+    #s09-outro-conf i { display:block; width:90px; height:6px; border-radius:3px; background:#1f9d6b; }
+    #s09-outro-path { position:relative; margin-top:34px; height:118px; }
+    #s09-outro-pline { position:absolute; left:52px; top:14px; width:344px; height:4px; border-radius:2px; background:#0f7fb8; transform-origin:0 50%; }
+    .s09-outro-pn { position:absolute; top:4px; width:24px; height:24px; margin-left:-12px; border-radius:50%; background:#0f7fb8; border:4px solid #fff; box-shadow:0 0 0 2px #0f7fb8; }
+    .s09-outro-pl { position:absolute; top:42px; width:130px; margin-left:-65px; text-align:center; font:600 18px/1.25 "Inter", sans-serif; color:#0d1117; }
+    .s09-outro-pl small { display:block; font:500 16px/1.3 "Inter", sans-serif; color:#55606b; }
+    #s09-outro-pend { position:absolute; left:396px; top:14px; width:46px; border-top:3px dashed #8a93a0; opacity:0; }
+
+    /* incoming call */
+    #s09-outro-scr-call { background:linear-gradient(180deg,#1d1713,#0b0d12 78%); opacity:0; text-align:center; padding-top:150px; }
+    #s09-outro-avatar-wrap { position:relative; width:170px; height:170px; margin:0 auto; }
+    .s09-outro-pulse { position:absolute; inset:0; border-radius:50%; border:3px solid rgba(255,214,140,.7); opacity:0; }
+    #s09-outro-avatar { position:absolute; inset:0; border-radius:50%; background:linear-gradient(145deg,#c98a3c,#7a4a1c);
+      display:flex; align-items:center; justify-content:center; font:800 84px/1 "Sora", sans-serif; color:#fff5e6; }
+    #s09-outro-callname { margin-top:36px; font:800 64px/1 "Sora", sans-serif; letter-spacing:-.02em; }
+    #s09-outro-callsub { margin-top:14px; font:500 27px/1 "Inter", sans-serif; color:#b8aa9a; }
+    #s09-outro-pills { position:absolute; left:0; right:0; bottom:74px; display:flex; justify-content:space-around; padding:0 46px; }
+    .s09-outro-pill { display:flex; flex-direction:column; align-items:center; gap:12px; font:600 21px/1 "Inter", sans-serif; color:#e8ddd0; }
+    .s09-outro-pill span { display:flex; align-items:center; justify-content:center; width:96px; height:96px; border-radius:50%; font-size:40px; }
+    #s09-outro-decline span { background:#d94848; } #s09-outro-accept span { background:#26b56b; }
+
+    /* connected call */
+    #s09-outro-scr-conn { background:linear-gradient(180deg,#221a14,#0b0d12 80%); opacity:0; text-align:center; padding-top:200px; }
+    #s09-outro-conn-av { width:150px; height:150px; margin:0 auto; border-radius:50%; background:linear-gradient(145deg,#c98a3c,#7a4a1c);
+      display:flex; align-items:center; justify-content:center; font:800 74px/1 "Sora", sans-serif; color:#fff5e6; }
+    #s09-outro-conn-name { margin-top:30px; font:800 56px/1 "Sora", sans-serif; }
+    #s09-outro-timer { position:relative; height:34px; margin-top:16px; }
+    #s09-outro-timer span { position:absolute; left:0; right:0; font:500 28px/1 "Inter", sans-serif; color:#b8aa9a; opacity:0; }
+    #s09-outro-wave { margin:52px auto 0; width:250px; height:90px; display:flex; align-items:center; justify-content:space-between; }
+    #s09-outro-wave i { display:block; width:14px; height:64px; border-radius:7px; background:#f0a81a; transform-origin:50% 50%; }
+
+    /* ---------- tag ---------- */
+    #s09-outro-tag { position:absolute; left:48px; top:40px; z-index:16; opacity:0; font:600 22px/1 "Inter", sans-serif; letter-spacing:.32em; color:#c9bfb2; }
+
+    /* ---------- subtitle ---------- */
+    #s09-outro-sub { position:absolute; left:160px; right:160px; bottom:196px; z-index:8; text-align:center; opacity:1;
+      font:500 46px/1.25 "Inter", sans-serif; color:#fff; text-shadow:0 3px 22px rgba(0,0,0,.85); }
+    #s09-outro-sub span { display:inline-block; opacity:0; margin:0 .13em; }
+
+    /* ---------- "Don't scrub. Ask." ---------- */
+    #s09-outro-type { position:absolute; inset:0; z-index:10; }
+    #s09-outro-l1 { position:absolute; left:0; right:0; top:262px; text-align:center; font:600 56px/1.2 "Inter", sans-serif; color:#d8cdbf; }
+    #s09-outro-l1 span { display:inline-block; opacity:0; margin:0 .14em; }
+    #s09-outro-l2 { position:absolute; left:0; right:0; top:388px; text-align:center; font:800 132px/1.05 "Sora", sans-serif; letter-spacing:-.03em; color:#fff; }
+    #s09-outro-l2 span { display:inline-block; opacity:0; margin:0 .12em; position:relative; }
+    #s09-outro-strike { position:absolute; left:-2%; top:56%; width:104%; height:9px; background:#e5484d; border-radius:5px; transform-origin:0 50%; }
+    #s09-outro-bloom { position:absolute; left:460px; top:520px; width:1000px; height:620px; opacity:0;
+      background:radial-gradient(closest-side, rgba(57,183,238,.55), rgba(57,183,238,0)); }
+    #s09-outro-ask { position:absolute; left:0; right:0; top:560px; text-align:center; opacity:0;
+      font:800 330px/1 "Sora", sans-serif; letter-spacing:-.04em; color:#39b7ee; text-shadow:0 0 90px rgba(57,183,238,.55); }
+
+    /* ---------- lockup + end card ---------- */
+    #s09-outro-lock { position:absolute; left:0; width:1920px; top:398px; height:420px; z-index:11; text-align:center; opacity:0; }
+    #s09-outro-recall { display:inline-block; font:800 204px/1 "Sora", sans-serif; letter-spacing:-.04em;
+      background:linear-gradient(100deg,#fff 0%,#fff 40%,#bfeaff 50%,#fff 60%,#fff 100%); background-size:260% 100%; background-position:100% 0;
+      -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+    #s09-outro-recall-glow { position:absolute; left:360px; top:-40px; width:1200px; height:330px; opacity:0;
+      background:radial-gradient(closest-side, rgba(57,183,238,.34), rgba(57,183,238,0)); }
+    #s09-outro-refl { position:absolute; left:0; right:0; top:196px; height:118px; overflow:hidden; opacity:0;
+      -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,0) 90%); mask-image:linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,0) 90%); }
+    #s09-outro-refl div { position:absolute; left:0; right:0; top:-8px; text-align:center; transform:scaleY(-1); transform-origin:50% 50%;
+      font:800 204px/1 "Sora", sans-serif; letter-spacing:-.04em; color:#8fdcf8; }
+    #s09-outro-subline { margin-top:128px; font:500 44px/1.3 "Inter", sans-serif; color:#e9dfd2; opacity:0; }
+    #s09-outro-repo { position:absolute; left:0; right:0; top:508px; text-align:center; z-index:12; opacity:0;
+      font:600 50px/1 monospace; letter-spacing:-.01em; color:#fff; }
+    #s09-outro-repo em { font-style:normal; color:#39b7ee; }
+    #s09-outro-badges { position:absolute; left:0; right:0; top:628px; z-index:12; display:flex; justify-content:center; gap:22px; }
+    .s09-outro-badge { opacity:0; padding:16px 30px; border-radius:999px; border:2px solid rgba(255,255,255,.42);
+      font:600 32px/1 "Inter", sans-serif; color:#fff; background:rgba(255,255,255,.06); }
+    #s09-outro-neg { position:absolute; left:0; right:0; top:762px; z-index:12; text-align:center; opacity:0;
+      font:500 30px/1.3 "Inter", sans-serif; color:#cbbfb0; letter-spacing:.01em; }
+    #s09-outro-foot { position:absolute; left:0; right:0; top:966px; z-index:12; text-align:center; opacity:0;
+      font:500 24px/1.2 "Inter", sans-serif; color:#a89c8e; letter-spacing:.06em; }
+    #s09-outro-black { position:absolute; inset:0; background:#000; z-index:30; opacity:1; }
+  </style>
+
+  <div id="root" data-composition-id="s09-outro" data-width="1920" data-height="1080">
+    <div id="s09-outro-bg"></div>
+    <div id="s09-outro-table"></div>
+    <div id="s09-outro-lamp"></div>
+
+    <div id="s09-outro-brollwrap">
+      <video id="s09-outro-broll" class="clip" src="assets/broll/12533.mp4" data-start="4.6" data-duration="4.6" data-media-start="4" data-track-index="2" muted playsinline></video>
+    </div>
+    <div id="s09-outro-brollglow"></div>
+    <div class="s09-outro-bar" id="s09-outro-bar-t"></div>
+    <div class="s09-outro-bar" id="s09-outro-bar-b"></div>
+
+    <div id="s09-outro-phonewrap">
+      <div id="s09-outro-glow"></div>
+      <div id="s09-outro-phone">
+        <div id="s09-outro-screen">
+          <div id="s09-outro-notch"></div>
+
+          <div class="s09-outro-scr" id="s09-outro-scr-answer">
+            <div id="s09-outro-a-head"><div id="s09-outro-a-ring"></div>Recall</div>
+            <div id="s09-outro-ans-user">Where was Dad last seen?</div>
+            <div id="s09-outro-ans-card">
+              <div id="s09-outro-ans-text">Dad was last seen today at <b>8:13 PM</b> in the Backyard.</div>
+              <div id="s09-outro-conf"><i></i>88% sure</div>
+              <div id="s09-outro-path">
+                <div id="s09-outro-pline"></div>
+                <div class="s09-outro-pn" id="s09-outro-pn1" style="left:52px"></div>
+                <div class="s09-outro-pn" id="s09-outro-pn2" style="left:224px"></div>
+                <div class="s09-outro-pn" id="s09-outro-pn3" style="left:396px"></div>
+                <div class="s09-outro-pl" id="s09-outro-pl1" style="left:52px">Driveway<small>8:03 PM</small></div>
+                <div class="s09-outro-pl" id="s09-outro-pl2" style="left:224px">Front Door<small>8:08 PM</small></div>
+                <div class="s09-outro-pl" id="s09-outro-pl3" style="left:396px">Backyard<small>8:13 PM</small></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="s09-outro-scr" id="s09-outro-scr-call">
+            <div id="s09-outro-avatar-wrap">
+              <div class="s09-outro-pulse" id="s09-outro-pulse1"></div>
+              <div class="s09-outro-pulse" id="s09-outro-pulse2"></div>
+              <div class="s09-outro-pulse" id="s09-outro-pulse3"></div>
+              <div id="s09-outro-avatar" data-layout-allow-overlap>D</div>
+            </div>
+            <div id="s09-outro-callname" data-layout-allow-overlap>Dad</div>
+            <div id="s09-outro-callsub" data-layout-allow-overlap>calling…</div>
+            <div id="s09-outro-pills">
+              <div class="s09-outro-pill" id="s09-outro-decline"><span>&#x2715;</span>Decline</div>
+              <div class="s09-outro-pill" id="s09-outro-accept"><span>&#x2706;</span>Answer</div>
+            </div>
+          </div>
+
+          <div class="s09-outro-scr" id="s09-outro-scr-conn">
+            <div id="s09-outro-conn-av" data-layout-allow-overlap>D</div>
+            <div id="s09-outro-conn-name">Dad</div>
+            <div id="s09-outro-timer"><span id="s09-outro-t1">00:01</span><span id="s09-outro-t2">00:02</span><span id="s09-outro-t3">00:03</span><span id="s09-outro-t4">00:04</span></div>
+            <div id="s09-outro-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s09-outro-sub"><span>&ldquo;Hey,</span><span>son.</span><span>Sorry</span><span>&mdash;</span><span>I</span><span>was</span><span>out</span><span>back.&rdquo;</span></div>
+
+    <div id="s09-outro-type">
+      <div id="s09-outro-l1"><span>Next</span><span>time</span><span>someone</span><span>you</span><span>love</span><span>goes</span><span>quiet&hellip;</span></div>
+      <div id="s09-outro-l2"><span id="s09-outro-w-dont">Don&rsquo;t</span><span id="s09-outro-w-scrub">scrub.<div id="s09-outro-strike"></div></span></div>
+      <div id="s09-outro-bloom"></div>
+      <div id="s09-outro-ask">Ask.</div>
+    </div>
+
+    <div id="s09-outro-lock">
+      <div id="s09-outro-recall-glow"></div>
+      <div id="s09-outro-recall">RECALL</div>
+      <div id="s09-outro-refl"><div>RECALL</div></div>
+      <div id="s09-outro-subline">Persistent visual memory for caretaking and safety.</div>
+    </div>
+
+    <div id="s09-outro-repo"><em>github.com/</em>Garinmckayl/recall</div>
+    <div id="s09-outro-badges">
+      <div class="s09-outro-badge" id="s09-outro-b1">Ring</div>
+      <div class="s09-outro-badge" id="s09-outro-b2">AWS Builder</div>
+      <div class="s09-outro-badge" id="s09-outro-b3">Open Source</div>
+      <div class="s09-outro-badge" id="s09-outro-b4">Alexa+ MCP</div>
+    </div>
+    <div id="s09-outro-neg">Not security AI. Not video search. Not facial recognition.</div>
+    <div id="s09-outro-foot">Dramatization &middot; Ring sandbox &middot; licensed stock footage</div>
+
+    <div id="s09-outro-tag">DRAMATIZATION</div>
+    <div id="s09-outro-vig" data-layout-allow-occlusion></div>
+    <div id="s09-outro-black"></div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const $ = (s) => s;
+
+    // ---- initial poses (GSAP owns every transform) ----
+    gsap.set("#s09-outro-phonewrap", { transformOrigin: "50% 50%", scale: 1, x: 0, y: 0, rotation: 0 });
+    gsap.set(["#s09-outro-pline"], { scaleX: 0 });
+    gsap.set([".s09-outro-pn"], { scale: 0 });
+    gsap.set([".s09-outro-pl"], { opacity: 0, y: 8 });
+    gsap.set("#s09-outro-lock", { transformOrigin: "50% 0", scale: 1, y: 0 });
+    gsap.set("#s09-outro-strike", { scaleX: 0 });
+    gsap.set("#s09-outro-wave i", { scaleY: 0.25 });
+    gsap.set(".s09-outro-pulse", { scale: 1 });
+    gsap.set("#s09-outro-bar-t", { y: -118 });
+    gsap.set("#s09-outro-bar-b", { y: 118 });
+    gsap.set("#s09-outro-ask", { scale: 1.3, transformOrigin: "50% 50%" });
+    gsap.set("#s09-outro-recall-glow", { scale: 0.7 });
+    gsap.set("#s09-outro-repo", { y: 16 });
+    gsap.set(".s09-outro-badge", { y: 14 });
+    gsap.set("#s09-outro-neg", { y: 10 });
+
+    // ---- 0.0–4.4  the phone, the answer (callback to the hook) ----
+    tl.fromTo("#s09-outro-black", { opacity: 1 }, { opacity: 0, duration: 0.7, ease: "power2.out" }, 0);
+    tl.fromTo("#s09-outro-lamp", { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power2.out" }, 0.1);
+    tl.to("#s09-outro-phonewrap", { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.1);
+    tl.fromTo("#s09-outro-tag", { opacity: 0 }, { opacity: 0.85, duration: 0.5 }, 0.4);
+    tl.to("#s09-outro-phonewrap", { scale: 1.06, duration: 4.4, ease: "sine.inOut" }, 0.2);   // slow push-in
+    tl.fromTo("#s09-outro-ans-user", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.35);
+    tl.fromTo("#s09-outro-ans-card", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.5);
+    tl.to("#s09-outro-pline", { scaleX: 1, duration: 0.7, ease: "power2.inOut" }, 1.0);
+    tl.to("#s09-outro-pn1", { scale: 1, duration: 0.25, ease: "back.out(2)" }, 1.0);
+    tl.to("#s09-outro-pn2", { scale: 1, duration: 0.25, ease: "back.out(2)" }, 1.28);
+    tl.to("#s09-outro-pn3", { scale: 1, duration: 0.25, ease: "back.out(2)" }, 1.56);
+    tl.to("#s09-outro-pl1", { opacity: 1, y: 0, duration: 0.3 }, 1.05);
+    tl.to("#s09-outro-pl2", { opacity: 1, y: 0, duration: 0.3 }, 1.33);
+    tl.to("#s09-outro-pl3", { opacity: 1, y: 0, duration: 0.3 }, 1.61);
+    tl.to("#s09-outro-glow", { opacity: 0.75, duration: 0.7, ease: "sine.inOut", yoyo: true, repeat: 1 }, 0.6);   // finite reading-glow pulse
+
+    // ---- 1.6–4.8  incoming call ----
+    tl.to("#s09-outro-scr-answer", { opacity: 0, duration: 0.3, ease: "power2.in" }, 1.6);
+    tl.to("#s09-outro-scr-call", { opacity: 1, duration: 0.3, ease: "power2.out" }, 1.7);
+    [1.75, 2.75, 3.75].forEach((t, i) => {
+      tl.fromTo("#s09-outro-pulse" + (i + 1), { scale: 1, opacity: 0.8 }, { scale: 1.9, opacity: 0, duration: 1.0, ease: "power1.out" }, t);
+      tl.to("#s09-outro-phonewrap", { keyframes: [
+        { rotation: 1.4, duration: 0.06, ease: "none" }, { rotation: -1.4, duration: 0.12, ease: "none" },
+        { rotation: 1.0, duration: 0.12, ease: "none" }, { rotation: 0, duration: 0.14, ease: "power2.out" }] }, t);
+    });
+    // answered ~4.8 (abs 153.8)
+    tl.to("#s09-outro-accept span", { scale: 0.86, duration: 0.1, ease: "power2.out" }, 4.65);
+    tl.to("#s09-outro-scr-call", { opacity: 0, duration: 0.25 }, 4.8);
+    tl.to("#s09-outro-scr-conn", { opacity: 1, duration: 0.25 }, 4.8);
+    ["#s09-outro-t1", "#s09-outro-t2", "#s09-outro-t3", "#s09-outro-t4"].forEach((sel, i) => {
+      tl.set(sel, { opacity: 1 }, 4.8 + i);
+      tl.set(sel, { opacity: 0 }, 5.8 + i);
+    });
+
+    // ---- 4.8–8.8  Dad speaks over warm B-roll; phone shrinks to a call bubble ----
+    tl.to("#s09-outro-phonewrap", { x: 780, y: -392, scale: 0.3, duration: 0.85, ease: "power3.inOut" }, 4.8);
+    tl.to("#s09-outro-brollwrap", { opacity: 1, duration: 0.9, ease: "power1.inOut" }, 4.8);
+    tl.to("#s09-outro-brollglow", { opacity: 1, duration: 0.9 }, 4.8);
+    tl.to("#s09-outro-bar-t", { y: 0, duration: 0.9, ease: "power3.out" }, 4.8);
+    tl.to("#s09-outro-bar-b", { y: 0, duration: 0.9, ease: "power3.out" }, 4.8);
+    tl.fromTo("#s09-outro-brollwrap", { scale: 1.06 }, { scale: 1.0, duration: 4.2, ease: "none" }, 4.7);
+    // subtitle, word by word (Dad's actual word times)
+    const subT = [5.0, 5.28, 5.89, 6.2, 6.57, 6.69, 6.86, 7.06];
+    document.querySelectorAll("#s09-outro-sub span").forEach((el, i) => {
+      tl.fromTo(el, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, subT[i]);
+    });
+    // Dad's voice: waveform bars driven by his words (finite, deterministic)
+    const wave = [[5.0, 5.7], [5.85, 6.45], [6.55, 7.7]];
+    document.querySelectorAll("#s09-outro-wave i").forEach((el, i) => {
+      wave.forEach(([a, b]) => {
+        const n = Math.max(2, Math.round((b - a) / 0.18));
+        const kf = [];
+        for (let k = 0; k < n; k++) kf.push({ scaleY: 0.35 + 0.65 * Math.abs(Math.sin((k + 1) * (i + 2) * 0.9)), duration: (b - a) / n, ease: "sine.inOut" });
+        kf.push({ scaleY: 0.25, duration: 0.15 });
+        tl.to(el, { keyframes: kf }, a);
+      });
+    });
+    // out
+    tl.to("#s09-outro-sub", { opacity: 0, duration: 0.4 }, 8.25);
+    tl.to("#s09-outro-phonewrap", { opacity: 0, duration: 0.5 }, 8.2);
+    tl.to("#s09-outro-brollwrap", { opacity: 0, duration: 0.6 }, 8.4);
+    tl.to("#s09-outro-brollglow", { opacity: 0, duration: 0.6 }, 8.4);
+    tl.to("#s09-outro-bar-t", { y: -118, duration: 0.6, ease: "power2.in" }, 8.5);
+    tl.to("#s09-outro-bar-b", { y: 118, duration: 0.6, ease: "power2.in" }, 8.5);
+    tl.to("#s09-outro-lamp", { opacity: 0.35, duration: 1.0 }, 8.4);
+
+    // ---- 9.0–14.0  "Next time someone you love goes quiet… don't scrub. Ask." ----
+    const l1 = [9.0, 9.25, 9.45, 9.73, 9.88, 10.12, 10.38];
+    document.querySelectorAll("#s09-outro-l1 span").forEach((el, i) => {
+      tl.fromTo(el, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, l1[i]);
+    });
+    tl.to("#s09-outro-l1", { opacity: 0.14, duration: 0.5 }, 11.15);
+    tl.fromTo("#s09-outro-w-dont", { opacity: 0, y: 30, scale: 1.06 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "expo.out" }, 11.33);
+    tl.fromTo("#s09-outro-w-scrub", { opacity: 0, y: 30, scale: 1.06 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "expo.out" }, 11.62);
+    tl.to("#s09-outro-strike", { scaleX: 1, duration: 0.28, ease: "power3.out" }, 11.98);        // struck as it is spoken
+    tl.to("#s09-outro-w-scrub", { filter: "blur(12px)", opacity: 0.2, duration: 0.5, ease: "power2.in" }, 12.15);
+    tl.to("#s09-outro-l2", { y: -46, scale: 0.72, opacity: 0.4, transformOrigin: "50% 50%", duration: 0.5, ease: "power3.inOut" }, 12.2);
+    tl.to("#s09-outro-bloom", { opacity: 1, duration: 0.45, ease: "power2.out" }, 12.37);
+    tl.to("#s09-outro-ask", { opacity: 1, scale: 1, duration: 0.34, ease: "expo.out" }, 12.37);
+    tl.to("#s09-outro-type", { opacity: 0, duration: 0.35, ease: "power2.in" }, 13.75);
+
+    // ---- 14.0–19.5  lockup (final chord) ----
+    tl.set("#s09-outro-lock", { opacity: 1 }, 14.0);
+    tl.fromTo("#s09-outro-recall", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 14.0);
+    tl.to("#s09-outro-lock", { keyframes: [{ x: 5, duration: 0.05, ease: "none" }, { x: -4, duration: 0.05, ease: "none" },
+      { x: 2, duration: 0.05, ease: "none" }, { x: 0, duration: 0.08, ease: "power2.out" }] }, 14.0);
+    tl.to("#s09-outro-recall-glow", { opacity: 1, scale: 1, duration: 1.4, ease: "power2.out" }, 14.0);
+    tl.to("#s09-outro-recall", { backgroundPosition: "0% 0", duration: 1.5, ease: "power2.inOut" }, 14.55);   // one light sweep
+    tl.to("#s09-outro-refl", { opacity: 0.16, duration: 0.8 }, 14.4);
+    tl.fromTo("#s09-outro-subline", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 14.6);
+    tl.to("#s09-outro-refl", { opacity: 0, duration: 0.4 }, 18.9);
+    tl.to("#s09-outro-recall-glow", { opacity: 0.45, duration: 0.6 }, 18.9);
+
+    // ---- 19.5–27.0  end card ----
+    tl.to("#s09-outro-subline", { opacity: 0, duration: 0.3 }, 19.4);
+    tl.to("#s09-outro-lock", { y: -326, scale: 0.5, duration: 0.85, ease: "power3.inOut" }, 19.5);
+    tl.to("#s09-outro-repo", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 20.0);
+    ["#s09-outro-b1", "#s09-outro-b2", "#s09-outro-b3", "#s09-outro-b4"].forEach((sel, i) => {
+      tl.to(sel, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.7)" }, 20.6 + i * 0.2);
+    });
+    tl.to("#s09-outro-neg", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 22.0);
+    tl.to("#s09-outro-foot", { opacity: 1, duration: 0.6 }, 20.0);
+    tl.to("#s09-outro-tag", { opacity: 0, duration: 0.4 }, 13.6);
+    tl.to("#s09-outro-black", { opacity: 1, duration: 1.2, ease: "power2.inOut" }, 25.8);            // fade to black, ends 27.0
+
+    window.__timelines["s09-outro"] = tl;
+  </script>
+</template></body></html>

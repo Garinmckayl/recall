@@ -21,6 +21,8 @@ Honest friction from building on the hackathon stack. 🔴 blocker · 🟡 annoy
 | 8 | 🟡 | **Titan Multimodal image embeddings are generic**, not person re-id. Same-clothing crops score high, but background and framing leak into the vector, so we blend it with a text embedding of appearance attributes and a token-overlap score (`identity.blended`). On our small set: same person across events scored 0.81–0.95, different people 0.33–0.50; `REID_MATCH=0.70`. That is 3 repeated + 8 distinct sightings — not a benchmark. |
 | 9 | 🟢 | Bedrock `Converse` with several `image` blocks works well for keyframe sequences (6 frames, ~1 s). Latency to a full structured record is dominated by the model call, not the frames. |
 | 10 | 🟢 | Region came from `AWS_REGION` in the environment (us-west-2 here); the code defaults to it via `config.AWS_REGION`, so inference profiles must exist there. |
+| 16 | 🟡 | An existing EC2 instance has **no Bedrock access until an instance profile is attached** — there is no one-click "let this instance call Bedrock". Deploying meant creating a role, an instance profile and associating it (`deploy/aws_setup.py` does it idempotently). |
+| 17 | 🟢 | The `us.` cross-region inference profiles need `bedrock:InvokeModel` on the *inference profile* **and** on foundation models in every region the profile can route to (`arn:aws:bedrock:*::foundation-model/*`); a region-scoped policy fails at call time, not at policy creation. |
 
 ## TypeSafe Jev (System One decisions)
 

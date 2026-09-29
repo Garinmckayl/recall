@@ -1,0 +1,217 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head><body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter", sans-serif; color:#fff; }
+    .s02-layer { position:absolute; inset:0; }
+    #s02-bg { background:#05070b; }
+
+    /* ---------- A · three stat rows ---------- */
+    .s02-row { position:absolute; left:70px; width:1780px; height:250px; opacity:0; border-radius:26px; overflow:hidden;
+      background:linear-gradient(90deg,#0e141c 0%,#0a0e14 100%); border:1px solid rgba(255,255,255,.08); }
+    .s02-row::before { content:""; position:absolute; left:0; top:0; bottom:0; width:8px; background:var(--acc); }
+    #s02-r1 { top:150px; --acc:#39b7ee; } #s02-r2 { top:424px; --acc:#39b7ee; } #s02-r3 { top:698px; --acc:#f0a81a; }
+    .s02-num { position:absolute; left:64px; top:0; bottom:0; width:640px; display:flex; align-items:center;
+      font-family:"Sora",sans-serif; font-weight:800; font-size:180px; letter-spacing:-.04em; color:var(--acc); line-height:1; white-space:nowrap; }
+    .s02-txt { position:absolute; left:740px; top:0; bottom:0; width:980px; display:flex; flex-direction:column; justify-content:center; }
+    .s02-main { font-weight:600; font-size:50px; line-height:1.15; letter-spacing:-.01em; color:#f2f5f9; }
+    .s02-src { margin-top:16px; font-weight:500; font-size:24px; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+    #s02-r3 .s02-txt { width:930px; }
+    #s02-clock { position:absolute; right:48px; top:75px; width:100px; height:100px; opacity:0; }
+
+    /* ---------- B · the wall ---------- */
+    #s02-B { opacity:0; }
+    #s02-persp { position:absolute; left:-520px; top:-620px; width:3000px; height:2400px;
+      transform: perspective(1700px) rotateX(48deg) rotateZ(-16deg); transform-origin:50% 50%; }
+    #s02-grid { position:absolute; left:0; top:0; width:3000px; height:3000px; display:flex; flex-wrap:wrap; gap:14px; align-content:flex-start; }
+    .s02-tile { width:300px; height:170px; border-radius:8px; background-size:cover; background-position:center; box-shadow:0 6px 20px rgba(0,0,0,.5); }
+    #s02-wallshade { background: linear-gradient(180deg, rgba(5,7,11,.82) 0%, rgba(5,7,11,.25) 35%, rgba(5,7,11,.30) 65%, rgba(5,7,11,.85) 100%); }
+    #s02-wallshade2 { background: linear-gradient(90deg, rgba(5,7,11,.85) 0%, rgba(5,7,11,0) 45%); }
+    #s02-count { position:absolute; left:80px; top:84px; opacity:0; }
+    #s02-count .lab { margin-bottom:12px; font-weight:700; font-size:26px; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.7); }
+    #s02-count .val { font-family:"Sora",sans-serif; font-weight:800; font-size:170px; letter-spacing:-.04em; line-height:1.35; padding:4px 0; color:#fff; }
+    #s02-count .ill { font-weight:500; font-size:22px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-top:16px; }
+    .s02-toast { position:absolute; left:1380px; width:480px; height:88px; border-radius:18px; opacity:0; background:rgba(14,19,27,.96);
+      border:1px solid rgba(255,255,255,.12); box-shadow:0 14px 34px rgba(0,0,0,.55); display:flex; align-items:center; gap:16px; padding:0 22px; }
+    .s02-toast i { flex:none; width:18px; height:18px; border-radius:9px; background:#e5484d; box-shadow:0 0 14px rgba(229,72,77,.8); }
+    .s02-toast b { display:block; font-weight:700; font-size:30px; color:#fff; }
+    .s02-toast span { display:block; font-weight:500; font-size:22px; color:rgba(255,255,255,.6); margin-top:2px; }
+    #s02-scrub { position:absolute; left:160px; top:900px; width:1600px; height:12px; border-radius:6px; background:rgba(255,255,255,.22); opacity:0; }
+    #s02-fill { position:absolute; left:0; top:0; height:12px; width:0; border-radius:6px; background:#39b7ee; }
+    #s02-head { position:absolute; left:0; top:-40px; width:6px; height:92px; margin-left:-3px; border-radius:3px; background:#fff; box-shadow:0 0 22px rgba(255,255,255,.7); }
+    #s02-prev { position:absolute; left:-110px; top:-176px; width:220px; height:124px; border-radius:10px; overflow:hidden; border:2px solid #fff; background:#111; }
+    .s02-pv { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; }
+
+    /* ---------- C · the help-page excerpt ---------- */
+    #s02-help { position:absolute; left:370px; top:170px; width:1180px; height:700px; border-radius:22px; background:#fbfaf6; color:#1c2129; opacity:0;
+      box-shadow:0 40px 140px rgba(0,0,0,.65); padding:52px 64px; }
+    #s02-hhead { font-weight:600; font-size:24px; letter-spacing:.02em; color:#6b7280; }
+    #s02-htitle { margin-top:14px; font-weight:800; font-size:48px; letter-spacing:-.015em; line-height:1.1; }
+    #s02-hlist { margin-top:34px; }
+    .s02-li { position:relative; height:78px; display:flex; align-items:center; font-weight:500; font-size:40px; letter-spacing:-.005em; color:#1c2129; }
+    .s02-li .dot { flex:none; width:12px; height:12px; border-radius:6px; background:#1c2129; margin-right:26px; }
+    .s02-li .txt { position:relative; z-index:2; }
+    .s02-li .mk { position:absolute; left:38px; top:18px; height:44px; width:0; background:#ffe45c; z-index:1; border-radius:6px; transform-origin:left center; transform:scaleX(0); }
+    #s02-hsrc { position:absolute; left:64px; bottom:38px; font-weight:500; font-size:22px; color:#6b7280; }
+
+    /* ---------- D · the closing line ---------- */
+    .s02-big { position:absolute; left:0; right:0; text-align:center; opacity:0; font-family:"Sora",sans-serif; font-weight:800; letter-spacing:-.03em; line-height:1.1; }
+    #s02-l1 { top:388px; font-size:92px; color:rgba(255,255,255,.9); }
+    #s02-l2 { top:522px; font-size:92px; color:#39b7ee; }
+    #s02-lbar { position:absolute; left:50%; margin-left:-130px; top:660px; width:260px; height:8px; border-radius:4px; background:#39b7ee; transform-origin:center; transform:scaleX(0); }
+
+    #s02-vig { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,.68) 100%); pointer-events:none; }
+    #s02-grain { opacity:.06; mix-blend-mode:screen; pointer-events:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      background-size:320px 320px; }
+  </style>
+
+  <div id="root" data-composition-id="s02-problem" data-width="1920" data-height="1080">
+    <div id="s02-bg" class="s02-layer"></div>
+
+    <!-- A -->
+    <div id="s02-r1" class="s02-row"><div class="s02-num" id="s02-n1">75%</div><div class="s02-txt"><div class="s02-main">of adults 50+ want to stay in their own home</div><div class="s02-src">AARP · Home &amp; Community Preferences, 2024</div></div></div>
+    <div id="s02-r2" class="s02-row"><div class="s02-num" id="s02-n2">1 in 4</div><div class="s02-txt"><div class="s02-main">older adults fall every year — over 14&nbsp;million people</div><div class="s02-src">CDC · Facts About Older Adult Falls</div></div></div>
+    <div id="s02-r3" class="s02-row"><div class="s02-num" id="s02-n3">30%</div><div class="s02-txt"><div class="s02-main">of over-90s who fall lie on the floor for an hour or more</div><div class="s02-src">BMJ 2008 · prospective cohort of people over 90</div></div>
+      <svg id="s02-clock" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#f0a81a" stroke-width="7"/><circle cx="60" cy="60" r="4" fill="#f0a81a"/><line id="s02-hand" x1="60" y1="60" x2="60" y2="22" stroke="#f0a81a" stroke-width="7" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- B -->
+    <div id="s02-B" class="s02-layer">
+      <div id="s02-persp"><div id="s02-grid"></div></div>
+      <div id="s02-wallshade" class="s02-layer"></div>
+      <div id="s02-wallshade2" class="s02-layer"></div>
+      <div id="s02-count"><div class="lab">Clips this month</div><div class="val" id="s02-cval">412</div><div class="ill">illustrative</div></div>
+      <div id="s02-toasts"></div>
+      <div id="s02-scrub"><div id="s02-fill"></div><div id="s02-head"><div id="s02-prev"></div></div></div>
+    </div>
+
+    <!-- C -->
+    <div id="s02-help">
+      <div id="s02-hhead">Ring Help · Getting started with Video Search</div>
+      <div id="s02-htitle">Searches that may not return results</div>
+      <div id="s02-hlist">
+        <div class="s02-li" id="s02-i1"><span class="mk" id="s02-m1"></span><span class="dot"></span><span class="txt">Specific people or characteristics</span></div>
+        <div class="s02-li" id="s02-i2"><span class="dot"></span><span class="txt">Small or fast moving objects</span></div>
+        <div class="s02-li" id="s02-i3"><span class="mk" id="s02-m3"></span><span class="dot"></span><span class="txt">Searches phrased as questions</span></div>
+        <div class="s02-li" id="s02-i4"><span class="dot"></span><span class="txt">Misspelled words</span></div>
+        <div class="s02-li" id="s02-i5"><span class="dot"></span><span class="txt">Vague or ambiguous descriptions</span></div>
+      </div>
+      <div id="s02-hsrc">Source: ring.com/support/articles/4l5lb/smart-video-search</div>
+    </div>
+
+    <!-- D -->
+    <div id="s02-l1" class="s02-big">A camera shows you a video.</div>
+    <div id="s02-l2" class="s02-big">A caregiver needs an answer.</div>
+    <div id="s02-lbar"></div>
+
+    <div id="s02-vig" class="s02-layer"></div>
+    <div id="s02-grain" class="s02-layer"></div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // FT = fromTo whose "from" is applied only when the tween starts (immediateRender:false): a seek straight into the middle of the scene is safe
+    const FT = (t, a, b, pos) => tl.fromTo(t, a, { ...b, immediateRender: false }, pos);
+    const Q = (s) => document.querySelector(s);
+    const O = 14.4;                              // scene start (absolute); everything below is written in ABSOLUTE seconds
+    const T = (abs) => +(abs - O).toFixed(3);    // -> scene-local
+
+    // ---------- build the wall (deterministic) ----------
+    const THUMBS = ["evt_0034cb6802ea","evt_04e753ecf845","evt_14b758b4beb1","evt_1a494ca888ad","evt_1cf5a19a4243","evt_2e99bd3ce29a","evt_30e41296f4df",
+      "evt_39d1a1cd8a9d","evt_3a7dd27c782e","evt_49acef75bee9","evt_6112336298af","evt_7b924ce86e1e","evt_81c44b46122e","evt_85fa2ba7ad53","evt_92530aeb2b71",
+      "evt_9831ac782f27","evt_9dc70a188454","evt_bf39fee3f3c0","evt_dbd21e6f94c7","evt_e3f8ed22bdab","evt_e946ba9b7cd2"];
+    const grid = Q("#s02-grid");
+    for (let i = 0; i < 9 * 10; i++) {
+      const d = document.createElement("div"); d.className = "s02-tile";
+      d.style.backgroundImage = `url("assets/thumbs/${THUMBS[(i * 7 + (i >> 3)) % THUMBS.length]}.jpg")`;
+      grid.appendChild(d);
+    }
+    const prev = Q("#s02-prev");
+    for (let i = 0; i < 5; i++) {
+      const d = document.createElement("div"); d.className = "s02-pv"; d.id = "s02-pv" + i;
+      d.style.backgroundImage = `url("assets/thumbs/${THUMBS[(i * 5 + 2) % THUMBS.length]}.jpg")`;
+      prev.appendChild(d);
+    }
+    const CAMS = ["Front Door", "Driveway", "Backyard", "Garage"];
+    const toastTimes = [24.7,25.1,25.4,25.65,25.9,26.1,26.3,26.5,26.7,26.9,27.1,27.3,27.5,27.7,27.9,28.1,28.3,28.5];
+    const toasts = Q("#s02-toasts");
+    toastTimes.forEach((t, i) => {
+      const d = document.createElement("div"); d.className = "s02-toast"; d.id = "s02-t" + i;
+      d.style.top = (110 + (i % 7) * 112) + "px";
+      d.innerHTML = `<i></i><div><b>Motion detected</b><span>${CAMS[i % 4]} · 8:${String(4 + (i * 3) % 50).padStart(2, "0")} PM</span></div>`;
+      toasts.appendChild(d);
+    });
+
+    // ================= A · three stat rows (14.5 – 24.0) =================
+    const rowIn = (sel, t) => {
+      FT(sel, { opacity: 0, y: 46, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }, T(t));
+    };
+    const countTo = (sel, to, t, dur, suffix) => {
+      const o = { v: 0 }, el = Q(sel);
+      FT(o, { v: 0 }, { v: to, duration: dur, ease: "power2.out", onUpdate() { el.textContent = Math.round(o.v) + suffix; } }, T(t));
+    };
+    rowIn("#s02-r1", 14.5); countTo("#s02-n1", 75, 14.6, 0.95, "%");
+    rowIn("#s02-r2", 18.8);
+    FT("#s02-n2", { opacity: 0.2, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, T(18.86));
+    rowIn("#s02-r3", 21.0); countTo("#s02-n3", 30, 21.1, 1.35, "%");
+    // "minutes matter" (22.59 – 23.74): the third row takes over, the others recede, a clock turns
+    tl.to(["#s02-r1", "#s02-r2"], { opacity: 0.32, duration: 0.4, ease: "power2.out" }, T(22.5));
+    tl.to("#s02-r3", { scale: 1.035, duration: 0.5, ease: "power2.out", boxShadow: "0 0 0 2px rgba(240,168,26,.85), 0 0 90px rgba(240,168,26,.35)" }, T(22.55));
+    FT("#s02-clock", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, T(22.55));
+    FT("#s02-hand", { rotation: 0, svgOrigin: "60 60" }, { rotation: 360, svgOrigin: "60 60", duration: 1.5, ease: "power1.inOut" }, T(22.6));
+    // out
+    tl.to(["#s02-r1", "#s02-r2", "#s02-r3"], { opacity: 0, y: -50, duration: 0.4, ease: "power2.in" }, T(23.95));
+
+    // ================= B · the wall (24.5 – 34.0) =================
+    FT("#s02-B", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, T(24.5));
+    FT("#s02-grid", { y: 0 }, { y: -900, duration: 9.4, ease: "none" }, T(24.5));
+    FT("#s02-persp", { scale: 1.0 }, { scale: 1.12, duration: 9.4, ease: "none" }, T(24.5));
+    // counter
+    const co = { v: 0 }, cv = Q("#s02-cval");
+    FT("#s02-count", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: "expo.out" }, T(24.55));
+    FT(co, { v: 0 }, { v: 412, duration: 8.8, ease: "power1.out", onUpdate() { cv.textContent = Math.round(co.v); } }, T(24.6));
+    // motion-detected toasts, faster and faster
+    toastTimes.forEach((t, i) => {
+      const s = "#s02-t" + i;
+      FT(s, { opacity: 0, x: 90, rotation: (i % 3 - 1) * 1.6 }, { opacity: 1, x: 0, rotation: (i % 3 - 1) * 1.6, duration: 0.22, ease: "power3.out" }, T(t));
+      tl.to(s, { opacity: 0, duration: 0.25, ease: "power1.in" }, T(t + 0.95 + (i % 4) * 0.12));
+    });
+    // "…scrubbing clips, hoping." : the scrub bar races, then stalls
+    FT("#s02-scrub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, T(29.05));
+    const stops = [[0, 29.3], [980, 29.55], [260, 29.85], [1400, 30.1], [640, 30.35], [1540, 30.6], [860, 30.85], [1190, 31.2]];
+    for (let i = 1; i < stops.length; i++) {
+      const [x, t] = stops[i], [px, pt] = stops[i - 1];
+      FT("#s02-head", { x: px }, { x, duration: t - pt, ease: "power2.inOut" }, T(pt));
+      FT("#s02-fill", { width: px }, { width: x, duration: t - pt, ease: "power2.inOut" }, T(pt));
+    }
+    for (let i = 0; i < 5; i++) {              // preview thumbnail flicks with the playhead
+      FT("#s02-pv" + i, { opacity: 0 }, { opacity: 1, duration: 0.001 }, T(29.3 + i * 0.36));
+      if (i < 4) tl.to("#s02-pv" + i, { opacity: 0, duration: 0.001 }, T(29.3 + i * 0.36 + 0.36));   // last frame stays through the stall
+    }
+    FT("#s02-head", { x: 1190 }, { x: 1196, duration: 0.5, ease: "sine.inOut" }, T(31.2));   // stalls ("hoping")
+    tl.to("#s02-wallshade", { opacity: 0.55, duration: 0.6 }, T(30.44));
+    // freeze + cut for the help card
+    tl.to("#s02-B", { opacity: 0, duration: 0.2, ease: "power1.in" }, T(33.9));
+
+    // ================= C · what Ring's own help page says (34.05 – 39.3) =================
+    FT("#s02-help", { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }, T(34.05));
+    tl.to(["#s02-i2", "#s02-i4", "#s02-i5"], { opacity: 0.32, duration: 0.4 }, T(35.3));
+    FT("#s02-m1", { scaleX: 0, width: 640 }, { scaleX: 1, width: 640, duration: 0.9, ease: "power2.out" }, T(35.39));
+    tl.to("#s02-i1", { x: 10, duration: 0.3, ease: "power2.out" }, T(35.39));
+    tl.to("#s02-i1", { opacity: 0.55, x: 0, duration: 0.4 }, T(36.9));
+    FT("#s02-m3", { scaleX: 0, width: 590 }, { scaleX: 1, width: 590, duration: 1.3, ease: "power2.out" }, T(37.02));
+    tl.to("#s02-i3", { x: 10, duration: 0.3, ease: "power2.out" }, T(37.02));
+    tl.to("#s02-help", { opacity: 0, scale: 0.97, duration: 0.3, ease: "power2.in" }, T(39.35));
+
+    // ================= D · the line (39.7 – 43.0) =================
+    FT("#s02-l1", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out" }, T(39.7));
+    FT("#s02-l2", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out" }, T(41.0));
+    FT("#s02-lbar", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, T(41.5));
+    tl.to("#s02-l1", { opacity: 0.55, duration: 0.5 }, T(41.2));
+
+    window.__timelines["s02-problem"] = tl;
+  </script>
+</template></body></html>

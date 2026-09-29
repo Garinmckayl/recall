@@ -1,0 +1,102 @@
+[
+ {
+  "t": 64.85,
+  "sfx": "swoosh_in",
+  "gain": 0.6
+ },
+ {
+  "t": 65.14,
+  "sfx": "card_flip",
+  "gain": 0.5
+ },
+ {
+  "t": 65.45,
+  "sfx": "card_flip",
+  "gain": 0.5
+ },
+ {
+  "t": 65.62,
+  "sfx": "tick",
+  "gain": 0.8
+ },
+ {
+  "t": 66.5,
+  "sfx": "whoosh",
+  "gain": 0.6
+ },
+ {
+  "t": 66.6,
+  "sfx": "swoosh_in",
+  "gain": 0.6
+ },
+ {
+  "t": 67.85,
+  "sfx": "whoosh",
+  "gain": 0.6
+ },
+ {
+  "t": 68.41,
+  "sfx": "node_pop",
+  "gain": 0.9
+ },
+ {
+  "t": 68.5,
+  "sfx": "lane_sweep",
+  "gain": 0.6
+ },
+ {
+  "t": 69.16,
+  "sfx": "node_pop",
+  "gain": 0.9
+ },
+ {
+  "t": 69.84,
+  "sfx": "node_pop",
+  "gain": 0.9
+ },
+ {
+  "t": 69.25,
+  "sfx": "lane_sweep",
+  "gain": 0.6
+ },
+ {
+  "t": 71.72,
+  "sfx": "sting_low",
+  "gain": 0.5
+ },
+ {
+  "t": 71.6,
+  "sfx": "swoosh_in",
+  "gain": 0.6
+ },
+ {
+  "t": 74.4,
+  "sfx": "whoosh",
+  "gain": 0.7
+ },
+ {
+  "t": 74.6,
+  "sfx": "swoosh_in",
+  "gain": 0.6
+ },
+ {
+  "t": 75.16,
+  "sfx": "box_lock",
+  "gain": 0.9
+ },
+ {
+  "t": 76.46,
+  "sfx": "box_lock",
+  "gain": 0.9
+ },
+ {
+  "t": 77.73,
+  "sfx": "box_lock",
+  "gain": 0.9
+ },
+ {
+  "t": 78.2,
+  "sfx": "tick",
+  "gain": 0.7
+ }
+]

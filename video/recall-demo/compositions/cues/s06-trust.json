@@ -1,0 +1,14 @@
+[
+  {"t": 94.95, "sfx": "whoosh", "gain": 0.5, "dur": 1.0},
+  {"t": 96.40, "sfx": "swoosh_in", "gain": 0.35},
+  {"t": 96.80, "sfx": "card_flip", "gain": 0.5},
+  {"t": 97.10, "sfx": "tick", "gain": 0.6},
+  {"t": 97.65, "sfx": "swoosh_in", "gain": 0.35},
+  {"t": 98.45, "sfx": "lane_sweep", "gain": 0.5, "dur": 1.0, "fade": 0.2},
+  {"t": 98.90, "sfx": "node_pop", "gain": 0.9},
+  {"t": 99.25, "sfx": "notify", "gain": 0.4},
+  {"t": 100.90, "sfx": "card_flip", "gain": 0.5},
+  {"t": 101.60, "sfx": "sting_low", "gain": 0.75, "dur": 2.2, "fade": 0.4},
+  {"t": 102.55, "sfx": "tick", "gain": 0.5},
+  {"t": 104.55, "sfx": "whoosh", "gain": 0.3, "dur": 0.9}
+]

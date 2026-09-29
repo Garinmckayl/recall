@@ -1,0 +1,66 @@
+[
+ {
+  "t": 106.85,
+  "sfx": "swoosh_in",
+  "gain": 0.5
+ },
+ {
+  "t": 108.7,
+  "sfx": "whoosh",
+  "gain": 0.8
+ },
+ {
+  "t": 112.9,
+  "sfx": "card_flip",
+  "gain": 0.9
+ },
+ {
+  "t": 113.6,
+  "sfx": "card_flip",
+  "gain": 0.8
+ },
+ {
+  "t": 115.1,
+  "sfx": "card_flip",
+  "gain": 0.9
+ },
+ {
+  "t": 116.7,
+  "sfx": "card_flip",
+  "gain": 0.9
+ },
+ {
+  "t": 119.4,
+  "sfx": "whoosh",
+  "gain": 0.6
+ },
+ {
+  "t": 122.0,
+  "sfx": "riser",
+  "gain": 0.5,
+  "dur": 2.0,
+  "fade": 0.3
+ },
+ {
+  "t": 123.15,
+  "sfx": "whoosh",
+  "gain": 0.8
+ },
+ {
+  "t": 125.55,
+  "sfx": "lane_sweep",
+  "gain": 0.6
+ },
+ {
+  "t": 127.62,
+  "sfx": "bass_hit",
+  "gain": 0.55,
+  "dur": 1.8,
+  "fade": 0.6
+ },
+ {
+  "t": 129.0,
+  "sfx": "tick",
+  "gain": 0.8
+ }
+]

@@ -1,0 +1,199 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head><body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root{position:absolute;inset:0;font-family:Inter,sans-serif;color:#0d1117;overflow:hidden}
+    #s04-bg{position:absolute;inset:0;background:#f6f5f1}
+    #s04-grid{position:absolute;inset:0;background-image:radial-gradient(#d8d4c6 1.6px,transparent 1.7px);background-size:44px 44px;opacity:.55}
+
+    .s04-title{position:absolute;left:90px;top:60px;white-space:nowrap;font:800 104px/1.05 Sora,sans-serif;letter-spacing:-.03em;transform-origin:0 0}
+    #s04-t1{color:#0d1117}
+    #s04-t1 b{color:#e5484d;font-weight:800}
+    #s04-t2{color:#0f7fb8}
+    #s04-q{position:absolute;left:90px;top:128px;font:600 26px/1 Inter;letter-spacing:.14em;text-transform:uppercase;color:#6b7280}
+
+    .s04-tile{position:absolute;top:400px;width:480px;height:270px;border-radius:16px;overflow:hidden;background:#fff;border:1px solid #e4e1d8;box-shadow:0 20px 60px rgba(13,17,23,.18)}
+    .s04-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.7)}
+    .s04-tile .play{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center}
+    .s04-tile .play i{width:74px;height:74px;border-radius:50%;background:rgba(13,17,23,.62);display:flex;align-items:center;justify-content:center}
+    .s04-tile .x{position:absolute;right:14px;top:14px;width:54px;height:54px;border-radius:50%;background:#e5484d;color:#fff;font:800 32px/54px Inter;text-align:center}
+    .s04-tile .n{position:absolute;left:14px;bottom:12px;padding:6px 12px;border-radius:8px;background:rgba(13,17,23,.7);color:#fff;font:600 20px/1 Inter}
+
+    .s04-win{position:absolute;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(13,17,23,.18);border:1px solid #e4e1d8}
+    .s04-winbar{height:34px;background:#f1efe8;display:flex;align-items:center;gap:8px;padding:0 14px;font:600 15px/1 Inter;color:#6b7280}
+    .s04-winbar i{width:11px;height:11px;border-radius:50%;background:#d6d2c5;display:block}
+    .s04-winbar b{margin-left:8px;font-weight:600}
+    .s04-vp{position:absolute;left:0;right:0;top:34px;bottom:0;overflow:hidden;background:#f6f5f1}
+    .s04-cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+    .s04-cam video{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover}
+    .s04-pane{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block}
+    .s04-push{position:absolute;left:0;top:0;right:0;bottom:0;transform-origin:50% 50%}
+
+    #s04-map{position:absolute;left:90px;top:170px;width:1000px;height:800px;transform-origin:0 0}
+    #s04-map svg{position:absolute;left:0;top:0;width:1000px;height:800px}
+    #s04-map .tag{position:absolute;left:24px;bottom:16px;font:500 20px/1 Inter;color:#8a8f99}
+
+    .s04-chip{position:absolute;top:832px;height:92px;padding:0 34px;border-radius:46px;background:#fff;border:1px solid #e4e1d8;box-shadow:0 14px 40px rgba(13,17,23,.16);display:flex;align-items:center;gap:16px;font:800 38px/1 Sora;letter-spacing:-.01em;color:#0d1117}
+    .s04-chip svg{flex:none}
+    .s04-chip em{font-style:normal;color:#0f7fb8}
+  </style>
+
+  <div id="root" data-composition-id="s04-hero" data-width="1920" data-height="1080">
+    <div id="s04-bg"></div><div id="s04-grid"></div>
+
+    <!-- PHASE A -->
+    <div class="s04-title" id="s04-t1">Not three matching <b>videos.</b></div>
+    <div class="s04-tile" id="s04-tl1" style="left:200px"><img src="assets/thumbs/evt_bf39fee3f3c0.jpg" alt=""/><div class="play"><i><svg width="28" height="28" viewBox="0 0 28 28"><path d="M9 5l15 9-15 9z" fill="#fff"/></svg></i></div><span class="n">Driveway · 8:03 PM</span><span class="x">✕</span></div>
+    <div class="s04-tile" id="s04-tl2" style="left:720px"><img src="assets/thumbs/evt_9dc70a188454.jpg" alt=""/><div class="play"><i><svg width="28" height="28" viewBox="0 0 28 28"><path d="M9 5l15 9-15 9z" fill="#fff"/></svg></i></div><span class="n">Front Door · 8:08 PM</span><span class="x">✕</span></div>
+    <div class="s04-tile" id="s04-tl3" style="left:1240px"><img src="assets/thumbs/evt_92530aeb2b71.jpg" alt=""/><div class="play"><i><svg width="28" height="28" viewBox="0 0 28 28"><path d="M9 5l15 9-15 9z" fill="#fff"/></svg></i></div><span class="n">Backyard · 8:13 PM</span><span class="x">✕</span></div>
+    <div class="s04-title" id="s04-t2">One reconstructed answer.</div>
+    <div id="s04-q">Where was Dad last seen?</div>
+
+    <!-- PHASE B : the map -->
+    <div class="s04-win" id="s04-map">
+      <svg viewBox="0 0 1000 800">
+        <defs>
+          <filter id="s04-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>
+          <pattern id="s04-hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="14" stroke="#e3dfd2" stroke-width="3"/></pattern>
+        </defs>
+        <rect width="1000" height="800" fill="#fbfaf6"/>
+        <!-- lawn + driveway -->
+        <rect x="24" y="24" width="952" height="752" rx="10" fill="none" stroke="#e4e1d8" stroke-width="2" stroke-dasharray="4 10"/>
+        <path d="M40 780 L40 700 L200 545 L250 545 L250 780 Z" fill="url(#s04-hatch)" stroke="#d6d2c5" stroke-width="2"/>
+        <!-- house -->
+        <rect x="300" y="250" width="460" height="310" fill="#fff" stroke="#0d1117" stroke-width="3.5"/>
+        <path d="M300 400 H470 M470 250 V400 M560 400 V560 M560 400 H760" stroke="#0d1117" stroke-width="2" fill="none" opacity=".45"/>
+        <!-- doors -->
+        <path d="M470 560 H540" stroke="#fbfaf6" stroke-width="8"/><path d="M470 560 q35 -34 70 0" fill="none" stroke="#0d1117" stroke-width="2"/>
+        <path d="M600 250 H670" stroke="#fbfaf6" stroke-width="8"/><path d="M600 250 q35 34 70 0" fill="none" stroke="#0d1117" stroke-width="2"/>
+        <!-- garage -->
+        <rect x="150" y="345" width="150" height="200" fill="#fff" stroke="#0d1117" stroke-width="3" stroke-dasharray="12 8" opacity=".55"/>
+        <text x="225" y="452" text-anchor="middle" font-family="Inter" font-weight="600" font-size="22" fill="#8a8f99">Garage</text>
+        <text x="530" y="335" text-anchor="middle" font-family="Inter" font-weight="600" font-size="22" fill="#9aa0aa">House</text>
+
+        <!-- path (glow + line) -->
+        <path id="s04-seg1g" d="M130 650 C240 690 380 690 500 610" fill="none" stroke="#39b7ee" stroke-width="22" stroke-linecap="round" opacity=".35" filter="url(#s04-glow)"/>
+        <path id="s04-seg2g" d="M500 610 C640 620 850 590 850 420 C850 300 750 205 630 172" fill="none" stroke="#39b7ee" stroke-width="22" stroke-linecap="round" opacity=".35" filter="url(#s04-glow)"/>
+        <path id="s04-seg1" d="M130 650 C240 690 380 690 500 610" fill="none" stroke="#0f7fb8" stroke-width="7" stroke-linecap="round"/>
+        <path id="s04-seg2" d="M500 610 C640 620 850 590 850 420 C850 300 750 205 630 172" fill="none" stroke="#0f7fb8" stroke-width="7" stroke-linecap="round"/>
+        <!-- terminator -->
+        <path id="s04-term" d="M630 172 L630 96" fill="none" stroke="#0d1117" stroke-width="4" stroke-dasharray="7 9" stroke-linecap="round"/>
+        <path id="s04-bar" d="M598 88 H662" stroke="#0d1117" stroke-width="7" stroke-linecap="round"/>
+        <text id="s04-none" x="682" y="98" font-family="Inter" font-weight="800" font-size="28" fill="#0d1117">No later detections</text>
+
+        <!-- camera nodes -->
+        <g id="s04-n1"><circle cx="130" cy="650" r="30" fill="#c9ccd2"/><circle class="on" cx="130" cy="650" r="30" fill="#0f7fb8"/><path d="M118 642h16l3 -5h6v26h-25z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><text x="130" y="710" text-anchor="middle" font-family="Inter" font-weight="700" font-size="24" fill="#0d1117">Driveway</text></g>
+        <g id="s04-n2"><circle cx="500" cy="610" r="30" fill="#c9ccd2"/><circle class="on" cx="500" cy="610" r="30" fill="#0f7fb8"/><path d="M488 602h16l3 -5h6v26h-25z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><text x="500" y="672" text-anchor="middle" font-family="Inter" font-weight="700" font-size="24" fill="#0d1117">Front Door</text></g>
+        <g id="s04-n3"><circle cx="630" cy="172" r="30" fill="#c9ccd2"/><circle class="on" cx="630" cy="172" r="30" fill="#0f7fb8"/><path d="M618 164h16l3 -5h6v26h-25z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><text x="700" y="196" font-family="Inter" font-weight="700" font-size="24" fill="#0d1117">Backyard</text></g>
+        <g id="s04-n4"><circle cx="225" cy="395" r="24" fill="#d6d9de"/><path d="M215 388h12l2 -4h5v20h-19z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></g>
+
+        <!-- timestamp bubbles -->
+        <g id="s04-b1"><rect x="176" y="600" width="130" height="44" rx="22" fill="#0d1117"/><text x="241" y="630" text-anchor="middle" font-family="Inter" font-weight="800" font-size="24" fill="#fff">8:03 PM</text></g>
+        <g id="s04-b2"><rect x="536" y="560" width="130" height="44" rx="22" fill="#0d1117"/><text x="601" y="590" text-anchor="middle" font-family="Inter" font-weight="800" font-size="24" fill="#fff">8:08 PM</text></g>
+        <g id="s04-b3"><rect x="470" y="118" width="130" height="44" rx="22" fill="#0d1117"/><text x="535" y="148" text-anchor="middle" font-family="Inter" font-weight="800" font-size="24" fill="#fff">8:13 PM</text></g>
+
+        <!-- traveller -->
+        <g id="s04-dot"><circle r="26" fill="#39b7ee" opacity=".35"/><circle r="13" fill="#fff" stroke="#0f7fb8" stroke-width="5"/></g>
+      </svg>
+      <div class="tag">Illustrative layout</div>
+    </div>
+
+    <!-- real footage -->
+    <div class="s04-win" id="s04-v1" style="left:1140px;top:170px;width:690px;height:430px">
+      <div class="s04-winbar"><i></i><i></i><i></i><b>The clip, with Dad tracked</b></div>
+      <div class="s04-vp"><video id="s04-vid1" class="clip s04-pane" src="assets/s04/pane.mp4" data-start="4.1" data-duration="2.2" data-track-index="1" muted playsinline></video></div>
+    </div>
+    <div class="s04-win" id="s04-v2" style="left:1140px;top:630px;width:690px;height:340px">
+      <div class="s04-winbar"><i></i><i></i><i></i><b>The path, reconstructed</b></div>
+      <div class="s04-vp"><div class="s04-cam" id="s04-cam2">
+        <video id="s04-vid2" class="clip" src="assets/cap/t_hero.mp4" data-start="6.6" data-duration="3.9" data-media-start="9.2" data-track-index="2" muted playsinline></video>
+      </div></div>
+    </div>
+
+    <!-- PHASE C : proof -->
+    <div class="s04-win" id="s04-v3" style="left:620px;top:110px;width:1200px;height:680px">
+      <div class="s04-winbar"><i></i><i></i><i></i><b>Backyard · 8:13 PM · the exact clip</b></div>
+      <div class="s04-vp"><div class="s04-push" id="s04-push"><video id="s04-vid3" class="clip s04-pane" src="assets/s04/pane_slow.mp4" data-start="10.7" data-duration="5.2" data-track-index="3" muted playsinline></video></div></div>
+    </div>
+    <div class="s04-chip" id="s04-k1" style="left:640px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#0f7fb8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="28" height="20" rx="4"/><path d="M14 12l8 5-8 5z" fill="#0f7fb8"/></svg><span>exact <em>clip</em></span></div>
+    <div class="s04-chip" id="s04-k2" style="left:1010px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#0f7fb8" stroke-width="3" stroke-linecap="round"><circle cx="17" cy="17" r="13"/><path d="M17 9v8l5 3"/></svg><span>exact <em>second</em></span></div>
+    <div class="s04-chip" id="s04-k3" style="left:1420px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#0f7fb8" stroke-width="3" stroke-linecap="round"><circle cx="17" cy="11" r="6"/><path d="M5 30c1-7 6-11 12-11s11 4 12 11"/></svg><span>exact <em>person</em></span></div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const $ = (s) => document.querySelector(s);
+
+    /* ---------- PHASE A : "Not three matching videos." (v06 local: Not .50 three .80 matching 1.14 videos 1.56 One 2.61 answer 3.76) ---------- */
+    tl.fromTo("#s04-t1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.45);
+    [["#s04-tl1", 0.85], ["#s04-tl2", 1.14], ["#s04-tl3", 1.45]].forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: 0, y: 60, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, t);
+      tl.fromTo(id + " .x", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 1.62 + (t - 0.85) * 0.5);
+    });
+    tl.to("#s04-t1", { opacity: 0, y: -40, duration: 0.35, ease: "power2.in" }, 2.15);
+    ["#s04-tl1", "#s04-tl3"].forEach((id, i) => tl.to(id, { x: i === 0 ? 520 : -520, opacity: 0, scale: 0.7, duration: 0.5, ease: "power3.in" }, 2.4));
+    tl.to("#s04-tl2", { scale: 0.6, opacity: 0, duration: 0.5, ease: "power3.in" }, 2.5);
+    tl.fromTo("#s04-t2", { opacity: 0, y: 50, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 2.6);
+    // title settles to a header, question label appears
+    tl.to("#s04-t2", { scale: 0.5, duration: 0.55, ease: "power3.inOut" }, 3.35);
+    tl.fromTo("#s04-q", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 3.75);
+
+    /* ---------- PHASE B : the map (Driveway 4.41 · Front door 5.47 · Back door 6.14 · nothing 7.72) ---------- */
+    tl.fromTo("#s04-map", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 3.3);
+    // all four cameras appear grey, then "activate" on their spoken word
+    tl.fromTo(["#s04-n1", "#s04-n2", "#s04-n3", "#s04-n4"], { opacity: 0 }, { opacity: 1, duration: 0.45, stagger: 0.1 }, 3.7);
+    ["#s04-n1", "#s04-n2", "#s04-n3"].forEach((id) => gsap.set(id + " .on", { opacity: 0 }));
+    const seg1 = $("#s04-seg1"), seg2 = $("#s04-seg2"), seg1g = $("#s04-seg1g"), seg2g = $("#s04-seg2g");
+    const L1 = seg1.getTotalLength(), L2 = seg2.getTotalLength();
+    [seg1, seg1g].forEach((p) => { p.style.strokeDasharray = L1; });
+    [seg2, seg2g].forEach((p) => { p.style.strokeDasharray = L2; });
+    const g1 = { o: L1 }, g2 = { o: L2 };
+    tl.to(g1, { o: 0, duration: 0.62, ease: "power1.inOut", onUpdate() { seg1.style.strokeDashoffset = g1.o; seg1g.style.strokeDashoffset = g1.o; } }, 4.5);
+    tl.to(g2, { o: 0, duration: 0.6, ease: "power1.inOut", onUpdate() { seg2.style.strokeDashoffset = g2.o; seg2g.style.strokeDashoffset = g2.o; } }, 5.25);
+    seg1.style.strokeDashoffset = L1; seg1g.style.strokeDashoffset = L1; seg2.style.strokeDashoffset = L2; seg2g.style.strokeDashoffset = L2;
+    // travelling dot follows the drawn path
+    const dot = $("#s04-dot"); gsap.set(dot, { opacity: 0 });
+    const p1 = seg1.getPointAtLength(0); gsap.set(dot, { x: p1.x, y: p1.y });
+    const trav = { u: 0 };
+    tl.to(dot, { opacity: 1, duration: 0.2 }, 4.4);
+    tl.to(trav, { u: 1, duration: 0.62, ease: "power1.inOut", onUpdate() { const p = seg1.getPointAtLength(trav.u * L1); gsap.set(dot, { x: p.x, y: p.y }); } }, 4.5);
+    const trav2 = { u: 0 };
+    tl.to(trav2, { u: 1, duration: 0.6, ease: "power1.inOut", onUpdate() { const p = seg2.getPointAtLength(trav2.u * L2); gsap.set(dot, { x: p.x, y: p.y }); } }, 5.25);
+    tl.to(dot, { opacity: 0.0, duration: 0.3 }, 8.4);
+    // activation + timestamp bubbles on the words
+    [["#s04-n1", "#s04-b1", 130, 650, 4.41], ["#s04-n2", "#s04-b2", 500, 610, 5.16], ["#s04-n3", "#s04-b3", 630, 172, 5.84]].forEach(([n, b, cx, cy, t]) => {
+      tl.fromTo(n + " .on", { opacity: 0 }, { opacity: 1, duration: 0.25 }, t);
+      tl.fromTo(n, { scale: 1 }, { scale: 1.22, svgOrigin: cx + " " + cy, duration: 0.22, yoyo: true, repeat: 1, ease: "power2.out" }, t);
+      tl.fromTo(b, { opacity: 0, scale: 0.4, svgOrigin: cx + " " + cy }, { opacity: 1, scale: 1, svgOrigin: cx + " " + cy, duration: 0.4, ease: "back.out(2)" }, t + 0.05);
+    });
+    // "And then nothing." → dashed terminator + label
+    const term = $("#s04-term"), LT = term.getTotalLength();
+    term.style.strokeDasharray = "7 9";
+    tl.fromTo("#s04-term", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 6.72);
+    tl.fromTo("#s04-bar", { opacity: 0, scaleX: 0, svgOrigin: "630 88" }, { opacity: 1, scaleX: 1, svgOrigin: "630 88", duration: 0.35, ease: "power3.out" }, 7.6);
+    tl.fromTo("#s04-none", { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 7.72);
+
+    // real footage cards beside the map
+    tl.fromTo("#s04-v1", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 4.0);
+    tl.to("#s04-v1", { opacity: 0, x: 30, duration: 0.4, ease: "power2.in" }, 6.3);
+    const z2 = 690 / 370;
+    gsap.set("#s04-cam2", { scale: z2, x: -1535 * z2, y: -572 * z2 });
+    tl.fromTo("#s04-v2", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 6.55);
+    tl.to("#s04-v2", { opacity: 0, x: 30, duration: 0.4, ease: "power2.in" }, 10.4);
+
+    /* ---------- PHASE C : proof (Every step 8.63 · proof 10.25 · exact clip 11.16 · exact second 12.46 · exact person 13.73) ---------- */
+    tl.to("#s04-map", { scale: 0.5, x: -30, y: 430, duration: 0.7, ease: "power3.inOut" }, 10.4);
+    tl.to(["#s04-t2", "#s04-q"], { opacity: 0, duration: 0.4 }, 10.4);
+    tl.fromTo("#s04-v3", { opacity: 0, y: 50, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 10.6);
+    tl.fromTo("#s04-push", { scale: 1 }, { scale: 1.06, duration: 5.2, ease: "none" }, 10.7);
+    [["#s04-k1", 11.16], ["#s04-k2", 12.46], ["#s04-k3", 13.73]].forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.8)" }, t);
+    });
+    // final beat: chips glow once on "person."
+    tl.fromTo("#s04-k3", { boxShadow: "0 14px 40px rgba(13,17,23,.16)" }, { boxShadow: "0 0 0 6px rgba(15,127,184,.35), 0 20px 50px rgba(15,127,184,.35)", duration: 0.4, yoyo: true, repeat: 1 }, 14.2);
+
+    window.__timelines["s04-hero"] = tl;
+  </script>
+</template></body></html>

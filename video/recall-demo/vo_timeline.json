@@ -1,0 +1,50 @@
+{
+ "v01_hook": {
+  "start": 1.0,
+  "end": 6.85
+ },
+ "v02_answer": {
+  "start": 10.2,
+  "end": 12.15
+ },
+ "v03_stats": {
+  "start": 14.5,
+  "end": 23.74
+ },
+ "v04_problem": {
+  "start": 24.5,
+  "end": 39.27
+ },
+ "v05_memory": {
+  "start": 43.0,
+  "end": 63.16
+ },
+ "v06_hero": {
+  "start": 64.5,
+  "end": 78.99
+ },
+ "v07_routine": {
+  "start": 81.0,
+  "end": 93.31
+ },
+ "v08_trust": {
+  "start": 95.0,
+  "end": 105.08
+ },
+ "v09_biz": {
+  "start": 107.0,
+  "end": 130.87
+ },
+ "v10_stack": {
+  "start": 132.0,
+  "end": 147.84
+ },
+ "v12_dad": {
+  "start": 154.0,
+  "end": 156.69
+ },
+ "v11_outro": {
+  "start": 158.0,
+  "end": 162.18
+ }
+}

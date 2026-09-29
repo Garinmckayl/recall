@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter",sans-serif; color:#0d1117; }
+    #s06-trust-bg { position:absolute; inset:0; background:radial-gradient(1300px 900px at 72% 12%, #fdfcfa 0%, #f6f5f1 55%, #ebe8df 100%); }
+
+    #s06-trust-title { position:absolute; left:0; right:0; top:380px; text-align:center; font-family:"Sora",sans-serif; font-weight:800; font-size:132px; line-height:1.05; letter-spacing:-0.03em; }
+    #s06-trust-title .w { display:inline-block; margin:0 .14em; }
+    #s06-trust-title .hl { color:#0f7fb8; }
+
+    /* app window (left) */
+    #s06-trust-lbl { position:absolute; left:70px; top:206px; font-size:20px; font-weight:700; letter-spacing:.14em; color:#7a828d; }
+    #s06-trust-win { position:absolute; left:70px; top:250px; width:1220px; height:686px; border-radius:16px; overflow:hidden; background:#fff; box-shadow:0 24px 70px rgba(13,17,23,.24), 0 0 0 1px rgba(13,17,23,.06); }
+    #s06-trust-cam { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; }
+    #s06-trust-vid { position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; }
+
+    /* right column */
+    #s06-trust-col { position:absolute; left:1350px; top:190px; width:520px; height:760px; }
+    .s06-card { position:absolute; left:0; width:520px; background:#fff; border-radius:22px; box-shadow:0 20px 60px rgba(13,17,23,.16); }
+    .s06-eyebrow { font-size:20px; font-weight:800; letter-spacing:.14em; color:#0f7fb8; }
+
+    /* correction diagram */
+    #s06-trust-fix { top:60px; height:640px; opacity:0; }
+    #s06-trust-fix .eyebrow { position:absolute; left:32px; top:30px; }
+    .s06-chip { position:absolute; left:40px; width:440px; height:92px; border-radius:20px; background:#f6f5f1; border:2px solid #e4e1d8; display:flex; align-items:center; gap:16px; padding:0 22px; font-size:26px; font-weight:600; }
+    .s06-chip small { display:block; font-size:19px; font-weight:500; color:#6b7480; margin-top:2px; }
+    .s06-av { width:56px; height:56px; border-radius:50%; background:linear-gradient(180deg,#cfe3ef,#9fc4dc); position:relative; flex:none; overflow:hidden; }
+    .s06-av:before { content:""; position:absolute; left:19px; top:9px; width:18px; height:18px; border-radius:50%; background:#fff; opacity:.95; }
+    .s06-av:after { content:""; position:absolute; left:8px; top:30px; width:40px; height:40px; border-radius:50%; background:#fff; opacity:.95; }
+    #s06-trust-chipA { top:120px; }
+    #s06-trust-chipB { top:420px; }
+    #s06-trust-merged { position:absolute; left:40px; top:262px; width:440px; height:112px; border-radius:22px; background:#fff; border:3px solid #1f9d6b; display:flex; align-items:center; gap:16px; padding:0 22px; font-size:28px; font-weight:800; opacity:0; box-shadow:0 12px 34px rgba(31,157,107,.25); }
+    #s06-trust-merged small { display:block; font-size:20px; font-weight:600; color:#1f7d58; margin-top:2px; }
+    #s06-trust-link { position:absolute; left:266px; top:212px; width:4px; height:0; background:#0f7fb8; border-radius:2px; }
+    #s06-trust-learn { position:absolute; left:32px; right:32px; top:560px; font-size:28px; font-weight:700; line-height:1.25; text-align:center; opacity:0; }
+    #s06-trust-learn em { font-style:normal; color:#0f7fb8; }
+
+    /* unverified flag (the only red on screen) */
+    #s06-trust-flag { top:90px; height:520px; opacity:0; border:2px solid rgba(229,72,77,.35); }
+    #s06-trust-flag .eyebrow { position:absolute; left:32px; top:30px; color:#e5484d; }
+    #s06-trust-flagchip { position:absolute; left:32px; right:32px; top:82px; padding:22px 24px; border-radius:16px; background:rgba(229,72,77,.08); border:2px solid #e5484d; color:#b5292e; font-size:26px; font-weight:700; line-height:1.3; }
+    #s06-trust-flagchip small { display:block; font-size:21px; font-weight:500; color:#5b6470; margin-top:6px; }
+    #s06-trust-stamp { position:absolute; left:40px; top:262px; padding:6px 24px; border:7px solid #e5484d; border-radius:12px; color:#e5484d; font-family:"Sora",sans-serif; font-weight:800; font-size:56px; letter-spacing:.02em; transform:rotate(-6deg); opacity:0; }
+    #s06-trust-truth { position:absolute; left:32px; right:32px; top:392px; font-family:"Sora",sans-serif; font-weight:800; font-size:42px; line-height:1.15; letter-spacing:-.01em; color:#0d1117; opacity:0; }
+
+    /* closing */
+    #s06-trust-close { position:absolute; left:0; right:0; top:410px; text-align:center; opacity:0; }
+    #s06-trust-close .l1 { font-family:"Sora",sans-serif; font-weight:800; font-size:78px; letter-spacing:-.02em; }
+    #s06-trust-close .l2 { font-family:"Sora",sans-serif; font-weight:800; font-size:78px; letter-spacing:-.02em; color:#0f7fb8; margin-top:8px; }
+    #s06-trust-close .l3 { font-size:30px; font-weight:500; color:#5b6470; margin-top:22px; letter-spacing:.02em; }
+  </style>
+
+  <div id="root" data-composition-id="s06-trust" data-width="1920" data-height="1080">
+    <div id="s06-trust-bg"></div>
+
+    <div id="s06-trust-title"><span class="w">You</span><span class="w">stay</span><span class="w">in</span><span class="w hl">control.</span></div>
+
+    <div id="s06-trust-lbl">LIVE IN RECALL · RING SANDBOX</div>
+    <div id="s06-trust-win">
+      <div id="s06-trust-cam">
+        <video id="s06-trust-vid" class="clip" src="assets/cap/t_trust.mp4" data-start="1.7" data-duration="7.8" data-media-start="2.0" data-hf-media-start-basis="local" data-track-index="2" muted playsinline></video>
+      </div>
+    </div>
+
+    <div id="s06-trust-col">
+      <div id="s06-trust-fix" class="s06-card">
+        <div class="eyebrow s06-eyebrow">OWNER CORRECTION</div>
+        <div id="s06-trust-chipA" class="s06-chip" data-layout-allow-overlap><div class="s06-av"></div><div>woman in blue shirt<small>Driveway · sighting 1</small></div></div>
+        <div id="s06-trust-chipB" class="s06-chip" data-layout-allow-overlap><div class="s06-av"></div><div>woman in blue shirt<small>Backyard · sighting 2</small></div></div>
+        <div id="s06-trust-link"></div>
+        <div id="s06-trust-merged" data-layout-allow-overlap><div class="s06-av"></div><div>Same person<small>2 sightings linked · 2 cameras</small></div></div>
+        <div id="s06-trust-learn">Recall will <em>recognise them</em> next time.</div>
+      </div>
+      <div id="s06-trust-flag" class="s06-card">
+        <div class="eyebrow s06-eyebrow">SAFETY FLAG</div>
+        <div id="s06-trust-flagchip">Suspicious behavior · Front Door · 12:40 AM<small>A person in a black jacket and mask, holding a flashlight</small></div>
+        <div id="s06-trust-stamp">UNVERIFIED</div>
+        <div id="s06-trust-truth">The clip is the ground truth.</div>
+      </div>
+    </div>
+
+    <div id="s06-trust-close">
+      <div class="l1">No face recognition.</div>
+      <div class="l2">No face templates.</div>
+      <div class="l3">Recall remembers what happened — it doesn't identify who you are.</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const s0 = 1220 / 1920;
+      gsap.set("#s06-trust-cam", { scale: s0, x: 0, y: 0, transformOrigin: "0 0" });
+      gsap.set(["#s06-trust-win","#s06-trust-lbl","#s06-trust-fix","#s06-trust-flag","#s06-trust-close"], { opacity: 0 });
+      gsap.set("#s06-trust-title .w", { opacity: 0, y: 60 });
+
+      // 0 – 2.4  "You stay in control."  (spoken 0.50 / 0.77 / 1.06 / 1.21)
+      const wt = [0.50, 0.77, 1.06, 1.21];
+      document.querySelectorAll("#s06-trust-title .w").forEach((el, i) => {
+        tl.to(el, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, wt[i] - 0.1);
+      });
+      tl.to("#s06-trust-title", { y: -50, opacity: 0, duration: 0.4, ease: "power2.in" }, 1.85);
+
+      // 1.7 → app window: Dad's event, then the "Not them?" popover (recording ≈ 2.8 → local 2.5)
+      tl.fromTo(["#s06-trust-win","#s06-trust-lbl"], { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 2.28);
+      // popover lives at the right panel: punch in ≈ "Correct a mistake" (2.45–3.4)
+      tl.to("#s06-trust-cam", { scale: 3, x: -4526, y: -1517, duration: 0.7, ease: "power3.inOut" }, 2.75);
+      tl.to("#s06-trust-cam", { scale: s0, x: 0, y: 0, duration: 0.7, ease: "power3.inOut" }, 5.4);
+
+      // 3.4 – 5.6 "…and Recall learns": two sightings of one person snap into one
+      tl.fromTo("#s06-trust-fix", { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 3.15);
+      tl.fromTo("#s06-trust-chipA", { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 3.4);
+      tl.fromTo("#s06-trust-chipB", { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 3.55);
+      tl.to("#s06-trust-chipA", { y: 122, duration: 0.5, ease: "power3.inOut" }, 3.95);       // slide toward each other
+      tl.to("#s06-trust-chipB", { y: -122, duration: 0.5, ease: "power3.inOut" }, 3.95);
+      tl.fromTo("#s06-trust-link", { height: 0 }, { height: 96, duration: 0.3, ease: "power2.out" }, 3.85);
+      tl.to(["#s06-trust-chipA","#s06-trust-chipB"], { opacity: 0, scale: 0.9, duration: 0.25, ease: "power2.in" }, 4.4);
+      tl.fromTo("#s06-trust-merged", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.4)" }, 4.4);
+      tl.to("#s06-trust-link", { opacity: 0, duration: 0.2 }, 4.4);
+      tl.fromTo("#s06-trust-learn", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 4.75);
+      tl.to("#s06-trust-fix", { x: 40, opacity: 0, duration: 0.4, ease: "power2.in" }, 6.0);
+
+      // 6.4 – 9.6 "flagged as unverified … the clip is always the ground truth"
+      tl.to("#s06-trust-cam", { scale: 3, x: -4526, y: -300, duration: 0.7, ease: "power3.inOut" }, 6.9);
+      tl.fromTo("#s06-trust-flag", { x: 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 6.45);
+      tl.fromTo("#s06-trust-flagchip", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 6.7);
+      // stamp slams on "unverified" (7.14)
+      tl.fromTo("#s06-trust-stamp", { opacity: 0, scale: 1.9, rotation: -14 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.22, ease: "power4.in" }, 7.1);
+      tl.to("#s06-trust-flag", { x: 4, duration: 0.04, yoyo: true, repeat: 3, ease: "none" }, 7.32);
+      tl.to("#s06-trust-flag", { x: 0, duration: 0.05 }, 7.5);
+      tl.fromTo("#s06-trust-truth", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 8.05);
+
+      // 10.0 – 12.0  calm close, then cut to the business scene
+      tl.to(["#s06-trust-win","#s06-trust-lbl","#s06-trust-flag"], { opacity: 0, y: 30, duration: 0.4, ease: "power2.in" }, 9.05);
+      tl.fromTo("#s06-trust-close", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 9.7);
+      tl.to("#s06-trust-close", { opacity: 0, duration: 0.35, ease: "power1.in" }, 11.65);
+
+      window.__timelines["s06-trust"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

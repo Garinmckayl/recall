@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter",sans-serif; color:#0d1117; }
+    #s05-routine-bg { position:absolute; inset:0; background:radial-gradient(1300px 900px at 28% 18%, #fdfcfa 0%, #f6f5f1 52%, #ece9e0 100%); }
+
+    /* headline */
+    #s05-routine-title { position:absolute; left:0; right:0; top:318px; text-align:center; font-family:"Sora",sans-serif; font-weight:800; font-size:118px; line-height:1.1; letter-spacing:-0.025em; }
+    #s05-routine-title .w { display:inline-block; margin:0 .13em; }
+    #s05-routine-title .hl { color:#0f7fb8; }
+
+    /* week strip card */
+    #s05-routine-week { position:absolute; left:300px; top:170px; width:1320px; height:700px; background:#fff; border-radius:22px; box-shadow:0 20px 60px rgba(13,17,23,.18); }
+    #s05-routine-week .hdr { position:absolute; left:48px; top:36px; font-size:24px; font-weight:700; letter-spacing:.12em; color:#0f7fb8; }
+    #s05-routine-week .leg { position:absolute; right:48px; top:34px; font-size:22px; font-weight:500; color:#5b6470; display:flex; gap:28px; align-items:center; }
+    #s05-routine-week .leg i { display:inline-block; width:16px; height:16px; border-radius:50%; margin-right:10px; vertical-align:-2px; }
+    #s05-routine-week .ax { position:absolute; left:20px; width:112px; text-align:right; font-size:22px; font-weight:600; color:#4f5865; transform:translateY(-50%); }
+    #s05-routine-week .ax.mid { color:#0f7fb8; font-weight:800; }
+    #s05-routine-week .grid { position:absolute; left:150px; width:1122px; height:2px; background:#e4e1d8; transform-origin:0 50%; }
+    #s05-routine-week .grid.mid { background:#0f7fb8; opacity:.55; }
+    #s05-routine-week .band { position:absolute; left:150px; top:200px; width:1122px; height:180px; background:rgba(240,168,26,.13); border-top:2px dashed rgba(240,168,26,.75); border-bottom:2px dashed rgba(240,168,26,.75); transform-origin:0 50%; }
+    #s05-routine-week .bandlbl { position:absolute; left:162px; top:206px; font-size:20px; font-weight:700; letter-spacing:.06em; color:#b97a06; }
+    #s05-routine-week .today { position:absolute; top:110px; width:150px; height:360px; background:rgba(240,168,26,.18); border-radius:14px; }
+    #s05-routine-week .dot { position:absolute; width:30px; height:30px; border-radius:50%; background:#0f7fb8; box-shadow:0 0 0 6px rgba(15,127,184,.16); }
+    #s05-routine-week .dot.empty { background:transparent; border:3px dashed #e8a317; box-shadow:none; width:34px; height:34px; }
+    #s05-routine-week .day { position:absolute; top:490px; width:150px; text-align:center; font-size:24px; font-weight:600; color:#5b6470; }
+    #s05-routine-week .day.tod { color:#b97a06; font-weight:800; }
+    #s05-routine-week .nothing { position:absolute; top:334px; width:190px; text-align:center; font-size:22px; font-weight:700; color:#b97a06; }
+    #s05-routine-week .cap { position:absolute; left:48px; top:566px; font-family:"Sora",sans-serif; font-weight:800; font-size:50px; letter-spacing:-.02em; }
+    #s05-routine-week .sub { position:absolute; left:48px; top:634px; font-size:26px; font-weight:500; color:#5b6470; }
+
+    /* chip (persists after the card leaves) */
+    #s05-routine-chip { position:absolute; left:80px; top:64px; display:flex; align-items:center; gap:14px; padding:14px 26px 14px 20px; background:#fff; border-radius:999px; box-shadow:0 10px 30px rgba(13,17,23,.14); font-size:26px; font-weight:600; }
+    #s05-routine-chip i { width:16px; height:16px; border-radius:50%; background:#e8a317; display:inline-block; }
+
+    /* app window */
+    #s05-routine-lbl { position:absolute; left:70px; top:206px; font-size:20px; font-weight:700; letter-spacing:.14em; color:#7a828d; }
+    #s05-routine-win { position:absolute; left:70px; top:250px; width:1220px; height:686px; border-radius:16px; overflow:hidden; background:#fff; box-shadow:0 24px 70px rgba(13,17,23,.24), 0 0 0 1px rgba(13,17,23,.06); }
+    #s05-routine-cam { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; }
+    #s05-routine-vid { position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; }
+    #s05-routine-ring { position:absolute; left:80px; top:246px; width:110px; height:24px; border-radius:8px; border:0 solid #e8a317; opacity:0; }
+
+    /* phone */
+    #s05-routine-phone { position:absolute; left:1400px; top:56px; width:420px; height:930px; border-radius:64px; background:#0d1117; padding:10px; box-shadow:0 40px 90px rgba(13,17,23,.38); }
+    #s05-routine-screen { position:relative; width:100%; height:100%; border-radius:54px; overflow:hidden; background:linear-gradient(180deg,#22385c 0%,#0e1c34 70%); color:#fff; }
+    #s05-routine-screen .notch { position:absolute; left:50%; top:16px; width:120px; height:32px; margin-left:-60px; border-radius:20px; background:#05070b; }
+    #s05-routine-screen .date { position:absolute; left:0; right:0; top:112px; text-align:center; font-size:26px; font-weight:600; opacity:.85; }
+    #s05-routine-screen .clock { position:absolute; left:0; right:0; top:146px; text-align:center; font-family:"Sora",sans-serif; font-weight:800; font-size:128px; letter-spacing:-.03em; }
+    #s05-routine-notif { position:absolute; left:20px; right:20px; top:420px; padding:22px 24px 26px; border-radius:28px; background:rgba(255,255,255,.94); color:#0d1117; box-shadow:0 14px 40px rgba(0,0,0,.35); }
+    #s05-routine-notif .top { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    #s05-routine-notif .ico { width:40px; height:40px; border-radius:11px; background:#0f7fb8; display:flex; align-items:center; justify-content:center; }
+    #s05-routine-notif .ico b { width:20px; height:20px; border-radius:50%; border:4px solid #fff; display:block; }
+    #s05-routine-notif .app { font-size:20px; font-weight:800; letter-spacing:.1em; }
+    #s05-routine-notif .now { margin-left:auto; font-size:19px; color:#6b7480; }
+    #s05-routine-notif .body { font-size:27px; font-weight:600; line-height:1.28; }
+    #s05-routine-notif .body em { font-style:normal; color:#b97a06; }
+    #s05-routine-screen .home { position:absolute; left:50%; bottom:20px; width:140px; height:6px; margin-left:-70px; border-radius:4px; background:rgba(255,255,255,.55); }
+    #s05-routine-plbl { position:absolute; left:1400px; top:12px; width:420px; text-align:center; font-size:20px; font-weight:700; letter-spacing:.14em; color:#7a828d; }
+  </style>
+
+  <div id="root" data-composition-id="s05-routine" data-width="1920" data-height="1080">
+    <div id="s05-routine-bg"></div>
+
+    <div id="s05-routine-title"><span class="w">Recall</span><span class="w">doesn't</span><span class="w hl">wait</span><span class="w hl">to</span><span class="w hl">be</span><span class="w hl">asked.</span></div>
+
+    <div id="s05-routine-week">
+      <div class="hdr" id="s05-routine-hdr">MOM · FIRST SIGHTING EACH DAY</div>
+      <div class="leg" id="s05-routine-leg"><span><i style="background:#0f7fb8"></i>seen</span><span><i style="background:rgba(240,168,26,.35);border:2px dashed #e8a317"></i>usual window</span></div>
+      <div class="today" id="s05-routine-tcol" style="left:1117px"></div>
+      <div class="grid" style="top:110px" data-g="1"></div>
+      <div class="grid mid" style="top:290px" data-g="2" id="s05-routine-g730"></div>
+      <div class="grid" style="top:470px" data-g="3"></div>
+      <div class="band" id="s05-routine-band"></div>
+      <div class="bandlbl" id="s05-routine-bandlbl">USUAL WINDOW · 6:45–8:15 AM</div>
+      <div class="ax" style="top:110px">6:00</div>
+      <div class="ax mid" style="top:290px">7:30</div>
+      <div class="ax" style="top:470px">9:00</div>
+      <div id="s05-routine-dots"></div>
+      <div id="s05-routine-days"></div>
+      <div class="dot empty" id="s05-routine-tdot" style="left:1175px;top:273px"></div>
+      <div class="nothing" id="s05-routine-nothing" style="left:1097px">Nothing yet</div>
+      <div class="cap" id="s05-routine-cap">7:30 AM · 6 of the last 6 days</div>
+      <div class="sub" id="s05-routine-sub">Recall learns each person's routine from their own history.</div>
+    </div>
+
+    <div id="s05-routine-chip"><i></i>Mom · usually 7:30 AM · 6 of 6 days</div>
+
+    <div id="s05-routine-lbl">LIVE IN RECALL · RING SANDBOX</div>
+    <div id="s05-routine-win">
+      <div id="s05-routine-cam">
+        <video id="s05-routine-vid" class="clip" src="assets/cap/t_routine.mp4" data-start="8.3" data-duration="6.2" data-media-start="3.7" data-hf-media-start-basis="local" data-track-index="2" muted playsinline></video>
+        <div id="s05-routine-ring"></div>
+      </div>
+    </div>
+
+    <div id="s05-routine-plbl">PUSH NOTIFICATION</div>
+    <div id="s05-routine-phone">
+      <div id="s05-routine-screen">
+        <div class="notch"></div>
+        <div class="date">Tuesday, September 29</div>
+        <div class="clock">8:16</div>
+        <div id="s05-routine-notif">
+          <div class="top"><div class="ico"><b></b></div><div class="app">RECALL</div><div class="now">now</div></div>
+          <div class="body"><em>Check-in:</em> Mom usually appears around 7:30 AM (6 of the last 6 days). Nothing yet today.</div>
+        </div>
+        <div class="home"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const $ = (s) => document.querySelector(s);
+      // ---- build the week strip deterministically (columns Wed..Tue, first-sighting minutes from the real history)
+      const days = ["Wed","Thu","Fri","Sat","Sun","Mon","Tue"];
+      const mins = [34,26,31,38,29,30];           // minutes past 7:00 AM, days -6 .. -1
+      const colX = (i) => 150 + 80 + i * (1122 / 7);
+      const yOf = (h) => 110 + (h - 6) * 120;
+      const dotsBox = $("#s05-routine-dots"), daysBox = $("#s05-routine-days");
+      days.forEach((d, i) => {
+        const el = document.createElement("div");
+        el.className = "day" + (i === 6 ? " tod" : ""); el.style.left = (colX(i) - 75) + "px";
+        el.textContent = i === 6 ? "Tue · TODAY" : d; daysBox.appendChild(el);
+      });
+      mins.forEach((m, i) => {
+        const el = document.createElement("div"); el.className = "dot"; el.id = "s05-routine-d" + i;
+        el.style.left = (colX(i) - 15) + "px"; el.style.top = (yOf(7 + m / 60) - 15) + "px"; dotsBox.appendChild(el);
+      });
+      // exact positions for today column / marker
+      $("#s05-routine-tcol").style.left = (colX(6) - 75) + "px";
+      $("#s05-routine-tdot").style.left = (colX(6) - 17) + "px";
+      $("#s05-routine-nothing").style.left = (colX(6) - 95) + "px";
+
+      const tl = gsap.timeline({ paused: true });
+      const s0 = 1220 / 1920;
+      gsap.set("#s05-routine-cam", { scale: s0, x: 0, y: 0, transformOrigin: "0 0" });
+      gsap.set(["#s05-routine-week","#s05-routine-win","#s05-routine-lbl","#s05-routine-phone","#s05-routine-plbl","#s05-routine-chip"], { opacity: 0 });
+      gsap.set("#s05-routine-title .w", { opacity: 0, y: 60 });
+
+      // 0 – 4.0  headline, word by word on the spoken words
+      const wt = [1.21, 1.97, 2.39, 2.67, 2.81, 2.98];
+      document.querySelectorAll("#s05-routine-title .w").forEach((el, i) => {
+        tl.to(el, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, wt[i] - 0.12);
+      });
+      tl.to("#s05-routine-title", { y: -50, opacity: 0, duration: 0.5, ease: "power2.in" }, 3.7);
+
+      // 4.05 – 9.3  the routine, drawn as it is described
+      tl.fromTo("#s05-routine-week", { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 4.05);
+      tl.fromTo(["#s05-routine-hdr","#s05-routine-leg"], { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" }, 4.4);
+      tl.fromTo("#s05-routine-week .grid", { scaleX: 0 }, { scaleX: 1, duration: 0.6, stagger: 0.08, ease: "power3.out" }, 4.45);
+      tl.fromTo("#s05-routine-week .ax", { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.08 }, 4.5);
+      tl.fromTo("#s05-routine-band", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 4.95);
+      tl.fromTo("#s05-routine-bandlbl", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.35);
+      tl.fromTo("#s05-routine-week .day", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.07 }, 5.0);
+      mins.forEach((m, i) => {
+        tl.fromTo("#s05-routine-d" + i, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2.2)" }, 5.75 + i * 0.22);
+      });
+      tl.fromTo("#s05-routine-cap", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 6.95);
+      tl.fromTo("#s05-routine-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 7.2);
+      // "This morning she isn't."
+      tl.fromTo("#s05-routine-tcol", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 7.5);
+      tl.fromTo("#s05-routine-tdot", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 7.55);
+      tl.fromTo("#s05-routine-nothing", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, 8.15);
+      tl.to("#s05-routine-tdot", { scale: 1.35, duration: 0.35, yoyo: true, repeat: 2, ease: "sine.inOut" }, 8.15);
+      tl.to("#s05-routine-week", { y: -40, opacity: 0, scale: 0.97, duration: 0.4, ease: "power2.in" }, 8.9);
+      tl.fromTo("#s05-routine-chip", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 9.15);
+
+      // 8.4 – 14.5  the real product: the overdue check-in lands, then the answer
+      tl.fromTo("#s05-routine-win", { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 9.0);
+      tl.fromTo("#s05-routine-lbl", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 9.35);
+      // toast lands in the recording at local 9.6 → punch in on the top-right corner
+      tl.to("#s05-routine-cam", { scale: 2.4, x: -3389, y: 0, duration: 0.65, ease: "power3.inOut" }, 9.5);
+      // pan to the Needs-attention row (left panel) while the phone receives the same alert
+      tl.to("#s05-routine-cam", { scale: 2.4, x: 0, y: -480, duration: 0.75, ease: "power3.inOut" }, 10.9);
+      // the row + "Ask about this" click (recording ≈ 12.1) → ring the row briefly
+      // after the click, widen to the answer in the chat
+      tl.to("#s05-routine-cam", { scale: 1.6, x: -574, y: -73, duration: 0.85, ease: "power3.inOut" }, 12.3);
+
+      // phone: slides in as the alert lands, push notification arrives, then a short buzz
+      tl.fromTo("#s05-routine-phone", { x: 520, opacity: 0 }, { x: 0, opacity: 1, duration: 0.85, ease: "expo.out" }, 10.2);
+      tl.fromTo("#s05-routine-plbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 10.7);
+      tl.fromTo("#s05-routine-notif", { y: -50, opacity: 0, scale: 0.92 }, { y: 0, opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 10.6);
+      tl.to("#s05-routine-phone", { x: 7, duration: 0.05, yoyo: true, repeat: 5, ease: "none" }, 11.05);
+      tl.to("#s05-routine-phone", { x: 0, duration: 0.05 }, 11.4);
+      // final composed hold: gentle push on the phone and window
+      tl.to("#s05-routine-phone", { scale: 1.03, duration: 2.2, ease: "sine.inOut", transformOrigin: "50% 50%" }, 12.2);
+
+      window.__timelines["s05-routine"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

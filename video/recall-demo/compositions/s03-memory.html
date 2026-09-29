@@ -1,0 +1,231 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head><body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+    #root{position:absolute;inset:0;font-family:Inter,sans-serif;color:#0d1117;overflow:hidden}
+    #s03-bg{position:absolute;inset:0;background:#f6f5f1}
+    #s03-grid{position:absolute;inset:0;background-image:radial-gradient(#d8d4c6 1.6px,transparent 1.7px);background-size:44px 44px;opacity:.55}
+    #s03-glow{position:absolute;left:-200px;top:-260px;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(15,127,184,.16),rgba(15,127,184,0) 65%)}
+
+    /* phase 1 — negations */
+    #s03-neg{position:absolute;left:0;top:0;width:1920px;height:1080px}
+    .s03-neg{position:absolute;left:180px;white-space:nowrap;font:800 120px/1 Sora,sans-serif;letter-spacing:-.03em;color:#0d1117}
+    .s03-neg .t{display:inline-block}
+    .s03-neg .strike{position:absolute;left:-16px;right:-16px;top:54%;height:12px;border-radius:6px;background:#e5484d;transform-origin:0 50%}
+    #s03-n1{top:230px}#s03-n2{top:420px}#s03-n3{top:610px}
+    .s03-tag{position:absolute;left:186px;top:160px;font:600 26px/1 Inter;letter-spacing:.18em;text-transform:uppercase;color:#6b7280}
+    #s03-mem{position:absolute;left:180px;top:250px;width:1560px}
+    #s03-mem .eyebrow{font:600 28px/1 Inter;letter-spacing:.18em;text-transform:uppercase;color:#6b7280;margin-bottom:26px}
+    #s03-mem .h{display:block;font:800 170px/1.12 Sora;letter-spacing:-.035em;color:#0f7fb8;margin-bottom:6px}
+    #s03-mem .u{display:block;width:760px;height:12px;border-radius:6px;background:#0d1117;margin:22px 0 26px;transform-origin:0 50%}
+    #s03-mem .sub{display:block;font:500 46px/1.2 Inter;color:#3a4250}
+
+    /* phase 2 — pipeline */
+    .s03-win{position:absolute;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(13,17,23,.18);border:1px solid #e4e1d8}
+    .s03-winbar{height:34px;background:#f1efe8;display:flex;align-items:center;gap:8px;padding:0 14px;font:600 15px/1 Inter;color:#6b7280}
+    .s03-winbar i{width:11px;height:11px;border-radius:50%;background:#d6d2c5;display:block}
+    .s03-winbar b{margin-left:8px;font-weight:600}
+    .s03-vp{position:absolute;left:0;right:0;top:34px;bottom:0;overflow:hidden;background:#f6f5f1}
+    .s03-cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+    .s03-cam video{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover}
+
+    .s03-chip{position:absolute;left:780px;width:1050px;height:96px;background:#fff;border-radius:16px;border:1px solid #e4e1d8;box-shadow:0 14px 40px rgba(13,17,23,.12);display:flex;align-items:center;gap:22px;padding:0 30px}
+    .s03-chip .k{font:800 22px/1 Inter;letter-spacing:.18em;color:#0f7fb8;width:110px}
+    .s03-chip .v{font:700 36px/1.1 Inter;color:#0d1117}
+    .s03-chip .v small{font:500 26px/1 Inter;color:#5a6270;margin-left:10px}
+
+    .s03-node{position:absolute;top:490px;width:300px;height:150px;background:#fff;border-radius:16px;border:1px solid #e4e1d8;box-shadow:0 20px 60px rgba(13,17,23,.14);padding:20px 24px}
+    .s03-node .ic{width:46px;height:46px;border-radius:12px;background:#e6f3fa;display:flex;align-items:center;justify-content:center}
+    .s03-node h3{font:800 30px/1.05 Sora;letter-spacing:-.01em;margin-top:12px}
+    .s03-node p{font:500 21px/1.25 Inter;color:#566070;margin-top:6px}
+    .s03-node .ok{color:#1f9d6b;font-weight:700}
+    .s03-arrow{position:absolute;top:551px;width:60px;height:28px}
+
+
+    .s03-code{position:absolute;left:90px;top:60px;width:620px;height:380px;border-radius:16px;background:#0d1117;box-shadow:0 20px 60px rgba(13,17,23,.3);overflow:hidden}
+    .s03-code .bar{height:34px;background:#161b22;display:flex;align-items:center;gap:8px;padding:0 14px;font:600 15px/1 Inter;color:#8b95a5}
+    .s03-code .bar i{width:11px;height:11px;border-radius:50%;background:#30363d;display:block}
+    .s03-code .bar b{margin-left:8px;font-weight:600}
+    .s03-code pre{position:absolute;left:28px;top:60px;right:20px;font:500 23px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c9d1d9;white-space:pre}
+    .s03-code .ln{display:block}
+    .s03-code .k{color:#79c0ff}.s03-code .g{color:#3fb950;font-weight:700}.s03-code .d{color:#8b95a5}
+    #s03-graph{position:absolute;left:90px;top:680px;width:1000px;height:320px}
+    #s03-graph .lbl{position:absolute;top:14px;font:700 18px/1 Inter;letter-spacing:.16em;color:#6b7280;text-transform:uppercase}
+    .s03-pill{position:absolute;white-space:nowrap;display:flex;align-items:center;gap:12px;background:#f6f5f1;border:1px solid #e4e1d8;border-radius:12px;font:600 22px/1 Inter;padding:0 16px}
+    .s03-pill i{width:12px;height:12px;border-radius:50%;background:#0f7fb8;display:block;flex:none}
+    .s03-pill em{font-style:normal;font-weight:500;color:#566070;margin-left:auto}
+    .s03-face{position:absolute;width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:4px solid #fff;box-shadow:0 0 0 3px #0f7fb8,0 14px 30px rgba(13,17,23,.25)}
+    .s03-facelbl{position:absolute;width:200px;text-align:center;font:700 20px/1.1 Inter;color:#0d1117}
+    #s03-graph svg{position:absolute;left:0;top:0;width:1000px;height:320px;overflow:visible}
+    #s03-cap{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;align-items:center;justify-content:center;background:#e6f3fa;font:700 24px/1 Inter;color:#0a5f8a}
+
+    #s03-stat{position:absolute;left:1560px;top:670px;width:290px}
+    #s03-stat .n{font:800 150px/1.15 Sora;letter-spacing:-.04em;color:#0f7fb8}
+    #s03-stat .l{font:700 30px/1.15 Inter;color:#0d1117;margin-top:14px}
+    #s03-stat .s{font:500 22px/1.3 Inter;color:#566070;margin-top:10px}
+  </style>
+
+  <div id="root" data-composition-id="s03-memory" data-width="1920" data-height="1080">
+    <div id="s03-bg"></div><div id="s03-grid"></div><div id="s03-glow"></div>
+
+    <!-- PHASE 1 -->
+    <div id="s03-neg">
+      <div class="s03-tag">Recall is</div>
+      <div class="s03-neg" id="s03-n1"><span class="t">Not security AI.</span><i class="strike"></i></div>
+      <div class="s03-neg" id="s03-n2"><span class="t">Not video search.</span><i class="strike"></i></div>
+      <div class="s03-neg" id="s03-n3"><span class="t">Not facial recognition.</span><i class="strike"></i></div>
+    </div>
+    <div id="s03-mem">
+      <div class="eyebrow">It's</div>
+      <span class="h">Persistent</span>
+      <span class="h">visual memory.</span>
+      <i class="u"></i>
+      <span class="sub">for caretaking and safety</span>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="s03-win" id="s03-cardA" style="left:90px;top:60px;width:620px;height:380px">
+      <div class="s03-winbar"><i></i><i></i><i></i><b>Live · a Ring event arrives</b></div>
+      <div class="s03-vp"><div class="s03-cam" id="s03-camA">
+        <video id="s03-vidA" class="clip" src="assets/cap/t_pipeline.mp4" data-start="8.2" data-duration="8.4" data-media-start="1.0" data-playback-rate="1.5" data-track-index="1" muted playsinline></video>
+      </div></div>
+    </div>
+
+    <div class="s03-code" id="s03-code">
+      <div class="bar"><i></i><i></i><i></i><b>Every Ring event is verified before Recall trusts it</b></div>
+      <pre><span class="ln" id="s03-l1"><span class="k">POST</span> /ring/webhook</span><span class="ln" id="s03-l2"><span class="d">X-Signature:</span> sha256=9f2c…  <span class="g">✓ verified</span></span><span class="ln" id="s03-l3"><span class="d">meta.request_id</span> → new  <span class="g">✓ idempotent</span></span><span class="ln" id="s03-l4"><span class="d">→</span> <span class="g">200</span> accepted · processing</span><span class="ln" id="s03-l5"><span class="d">→</span> clip → Nova → memory</span></pre>
+    </div>
+    <div class="s03-chip" id="s03-c1" style="top:60px"><span class="k">WHO</span><span class="v">Dad<small>man in a military uniform</small></span></div>
+    <div class="s03-chip" id="s03-c2" style="top:186px"><span class="k">WHAT</span><span class="v">approaches the door<small>hugs a family member</small></span></div>
+    <div class="s03-chip" id="s03-c3" style="top:312px"><span class="k">WHERE</span><span class="v">Backyard<small>8:13 PM · Sep 29</small></span></div>
+
+    <div class="s03-node" id="s03-nd1" style="left:90px"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#0f7fb8" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="4"/><path d="M13 2v4M13 20v4M2 13h4M20 13h4"/></svg></div><h3>Ring event</h3><p><span class="ok">✓ signed webhook</span></p></div>
+    <div class="s03-node" id="s03-nd2" style="left:450px"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#0f7fb8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13c3-6 7-9 11-9s8 3 11 9c-3 6-7 9-11 9S5 19 2 13z"/><circle cx="13" cy="13" r="3.5"/></svg></div><h3>Amazon Nova</h3><p>sees the clip</p></div>
+    <div class="s03-node" id="s03-nd3" style="left:810px"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#0f7fb8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h20l-7.5 9v7l-5-2.5V14z"/></svg></div><h3>Decision model</h3><p>classifies who &amp; what</p></div>
+    <div class="s03-node" id="s03-nd4" style="left:1170px"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#0f7fb8" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="3"/><circle cx="13" cy="13" r="7.5"/><circle cx="13" cy="13" r="11.5" stroke-dasharray="3 4"/></svg></div><h3>Amazon Titan</h3><p>recognizes the person</p></div>
+    <div class="s03-node" id="s03-nd5" style="left:1530px"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#0f7fb8" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="20" cy="8" r="3"/><circle cx="12" cy="20" r="3"/><path d="M8.5 7l8.5 1M7.5 8.5l3 9.5M18.5 10.5l-5 8"/></svg></div><h3>Memory graph</h3><p>who · what · where</p></div>
+
+    <svg class="s03-arrow" id="s03-ar1" style="left:390px" viewBox="0 0 60 28"><path pathLength="1" d="M4 14H48M39 5l10 9-10 9" fill="none" stroke="#0f7fb8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/></svg>
+    <svg class="s03-arrow" id="s03-ar2" style="left:750px" viewBox="0 0 60 28"><path pathLength="1" d="M4 14H48M39 5l10 9-10 9" fill="none" stroke="#0f7fb8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/></svg>
+    <svg class="s03-arrow" id="s03-ar3" style="left:1110px" viewBox="0 0 60 28"><path pathLength="1" d="M4 14H48M39 5l10 9-10 9" fill="none" stroke="#0f7fb8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/></svg>
+    <svg class="s03-arrow" id="s03-ar4" style="left:1470px" viewBox="0 0 60 28"><path pathLength="1" d="M4 14H48M39 5l10 9-10 9" fill="none" stroke="#0f7fb8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0"/></svg>
+
+    <div class="s03-win" id="s03-graph">
+      <div class="lbl" style="left:30px">Same person · 3 cameras</div>
+      <div class="lbl" style="left:540px">Same person · 4 days</div>
+      <svg viewBox="0 0 1000 320">
+        <g fill="none" stroke="#0f7fb8" stroke-width="3" stroke-linecap="round">
+          <path class="s03-e" pathLength="1" d="M320 84 C350 84 345 150 368 150" stroke-dasharray="1" />
+          <path class="s03-e" pathLength="1" d="M320 148 C340 148 345 150 368 150" stroke-dasharray="1" />
+          <path class="s03-e" pathLength="1" d="M320 212 C350 212 345 150 368 150" stroke-dasharray="1" />
+          <path class="s03-e2" pathLength="1" d="M672 150 C720 150 720 65 778 65" stroke-dasharray="1" />
+          <path class="s03-e2" pathLength="1" d="M672 150 C720 150 730 117 778 117" stroke-dasharray="1" />
+          <path class="s03-e2" pathLength="1" d="M672 150 C720 150 730 169 778 169" stroke-dasharray="1" />
+          <path class="s03-e2" pathLength="1" d="M672 150 C720 150 720 221 778 221" stroke-dasharray="1" />
+        </g>
+      </svg>
+      <div class="s03-pill s03-cp" style="left:30px;top:58px;width:290px;height:52px"><i></i>Driveway<em>8:03 PM</em></div>
+      <div class="s03-pill s03-cp" style="left:30px;top:122px;width:290px;height:52px"><i></i>Front Door<em>8:08 PM</em></div>
+      <div class="s03-pill s03-cp" style="left:30px;top:186px;width:290px;height:52px"><i></i>Backyard<em>8:13 PM</em></div>
+      <div class="s03-face" id="s03-fdad" style="left:368px;top:98px;background-image:url('assets/s03/dad.jpg')"></div>
+      <div class="s03-facelbl" id="s03-ldad" style="left:320px;top:212px">Dad</div>
+      <div class="s03-face" id="s03-fcour" style="left:620px;top:98px;background-image:url('assets/s03/courier.jpg')"></div>
+      <div class="s03-facelbl" id="s03-lcour" style="left:572px;top:212px">man in blue shirt</div>
+      <div class="s03-pill s03-dp" style="left:780px;top:44px;width:190px;height:42px"><i></i>Sep 17</div>
+      <div class="s03-pill s03-dp" style="left:780px;top:96px;width:190px;height:42px"><i></i>Sep 22</div>
+      <div class="s03-pill s03-dp" style="left:780px;top:148px;width:190px;height:42px"><i></i>Sep 26</div>
+      <div class="s03-pill s03-dp" style="left:780px;top:200px;width:190px;height:42px"><i></i>Sep 28</div>
+      <div id="s03-cap">20 events → 18 people, linked across cameras and days</div>
+    </div>
+
+    <div class="s03-win" id="s03-cardB" style="left:1130px;top:660px;width:400px;height:340px">
+      <div class="s03-winbar"><i></i><i></i><i></i><b>People the home has learned</b></div>
+      <div class="s03-vp"><div class="s03-cam" id="s03-camB">
+        <video id="s03-vidB" class="clip" src="assets/cap/t_people.mp4" data-start="17.0" data-duration="4.0" data-media-start="3.0" data-track-index="2" muted playsinline></video>
+      </div></div>
+    </div>
+    <div id="s03-stat"><div class="n" id="s03-num">0</div><div class="l">people &amp; pets learned</div><div class="s">from 20 events, none identified by face</div></div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+    /* ---------- PHASE 1: negations (v05_memory starts local 0.0) ---------- */
+    tl.fromTo("#s03-glow", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power2.out" }, 0);
+    tl.fromTo(".s03-tag", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 0.3);
+    [["#s03-n1", 0.66, 2.55], ["#s03-n2", 3.22, 4.4], ["#s03-n3", 4.82, 6.0]].forEach(([id, inT, strikeT]) => {
+      tl.fromTo(id, { opacity: 0, x: -70 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, inT);
+      tl.fromTo(id + " .strike", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.out" }, strikeT);
+      tl.to(id + " .t", { color: "#9aa0aa", duration: 0.3, ease: "none" }, strikeT + 0.1);
+    });
+    tl.to("#s03-neg", { opacity: 0, y: -60, duration: 0.45, ease: "power2.in" }, 6.5);
+    tl.fromTo("#s03-mem", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.65, ease: "expo.out" }, 6.7);
+    tl.fromTo("#s03-mem .u", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power3.out" }, 7.0);
+    tl.to("#s03-mem", { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 7.95);
+
+    /* ---------- PHASE 2: pipeline ---------- */
+    // Card A: live proof (t_pipeline @1.5x from source 1.0). Camera regions in CSS px of the 1920x1080 capture.
+    const zA = 620 / 520;
+    const camA = $("#s03-camA");
+    gsap.set(camA, { scale: zA, x: -1400 * zA, y: -50 * zA });            // R1a: drawer top
+    tl.fromTo("#s03-cardA", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 8.05);
+    tl.to(camA, { y: -240 * zA, duration: 0.7, ease: "power2.inOut" }, 9.7);        // R1b: Kind/Clip/Emit
+    tl.to(camA, { x: -1150 * zA, y: 0, duration: 0.7, ease: "power2.inOut" }, 11.0);  // R2: header status
+    tl.to(camA, { x: 0, y: -660 * zA, duration: 0.7, ease: "power2.inOut" }, 15.2);   // R3: new card lands
+    tl.to("#s03-cardA", { opacity: 0, y: -20, duration: 0.5, ease: "power2.in" }, 16.75);
+
+    // nodes + arrows land on the spoken words
+    const nodes = [["#s03-nd1", 8.32], ["#s03-nd2", 13.3], ["#s03-nd3", 14.4], ["#s03-nd4", 15.29], ["#s03-nd5", 17.05]];
+    nodes.forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: 0, y: 34, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, t);
+    });
+    [["#s03-ar1", 9.0], ["#s03-ar2", 13.75], ["#s03-ar3", 14.85], ["#s03-ar4", 16.5]].forEach(([id, t]) => {
+      tl.fromTo(id + " path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, t);
+    });
+
+    // WHO / WHAT / WHERE knowledge chips (words: who 10.30, what 11.01, where 12.07)
+    [["#s03-c1", 10.3], ["#s03-c2", 11.01], ["#s03-c3", 12.07]].forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, t);
+    });
+
+    // Titan: same person across cameras (recognizes 15.76 · the same person 16.73-17.4 · across cameras 17.44)
+    tl.fromTo("#s03-graph", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 15.35);
+    $$("#s03-graph .lbl").forEach((l, i) => tl.fromTo(l, { opacity: 0 }, { opacity: 1, duration: 0.4 }, 15.6 + i * 3.0));
+    $$(".s03-cp").forEach((p, i) => tl.fromTo(p, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 15.76 + i * 0.28));
+    tl.fromTo("#s03-fdad", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)" }, 16.55);
+    tl.fromTo("#s03-ldad", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 16.75);
+    $$(".s03-e").forEach((p, i) => tl.fromTo(p, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 16.73 + i * 0.18));
+    tl.fromTo(".s03-e", { strokeWidth: 3 }, { strokeWidth: 6, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut", stagger: 0.12 }, 17.6);
+
+    // across days (18.84…)
+    tl.fromTo("#s03-fcour", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)" }, 18.55);
+    tl.fromTo("#s03-lcour", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 18.75);
+    $$(".s03-dp").forEach((p, i) => tl.fromTo(p, { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 18.84 + i * 0.22));
+    $$(".s03-e2").forEach((p, i) => tl.fromTo(p, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, 18.9 + i * 0.22));
+    tl.fromTo("#s03-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 19.55);
+
+
+    // webhook verification card takes the top-left once the live card leaves
+    tl.fromTo("#s03-code", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 16.9);
+    [["#s03-l1", 17.2], ["#s03-l2", 17.65], ["#s03-l3", 18.3], ["#s03-l4", 18.95], ["#s03-l5", 19.5]].forEach(([id, t]) => {
+      tl.fromTo(id, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, t);
+    });
+
+    // Card B: People tab scrolling, stat count-up
+    const zB = 1.5;
+    gsap.set("#s03-camB", { scale: zB, x: -8 * zB, y: -105 * zB });
+    tl.fromTo("#s03-cardB", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 16.95);
+    tl.fromTo("#s03-stat", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 19.25);
+    const cnt = { v: 0 };
+    tl.to(cnt, { v: 18, duration: 1.1, ease: "power2.out", onUpdate() { $("#s03-num").textContent = Math.round(cnt.v); } }, 19.3);
+
+    // tail: everything holds; gentle glow drift so the last frame is alive
+    tl.to("#s03-glow", { x: 120, y: 40, duration: 4, ease: "none" }, 17);
+
+    window.__timelines["s03-memory"] = tl;
+  </script>
+</template></body></html>

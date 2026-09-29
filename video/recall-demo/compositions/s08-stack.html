@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head><meta charset="UTF-8" /></head>
+<body>
+<template>
+  <style>
+    @font-face{font-family:"Inter";src:url("assets/fonts/Inter-400.woff2") format("woff2");font-weight:100 900;font-display:block}
+    @font-face{font-family:"Sora";src:url("assets/fonts/Sora-800.woff2") format("woff2");font-weight:100 900;font-display:block}
+
+    #root { position:absolute; inset:0; overflow:hidden; font-family:"Inter", sans-serif; color:#0d1117; }
+    #s08-stack-bg { position:absolute; inset:0; background:#f6f5f1; }
+    #s08-stack-bg::after { content:""; position:absolute; inset:0;
+        background-image:radial-gradient(rgba(13,17,23,.07) 1.5px, transparent 1.6px); background-size:38px 38px; }
+
+    #s08-stack-title { position:absolute; left:111px; top:58px; width:1700px; font-family:"Sora", sans-serif; font-weight:800; font-size:56px; letter-spacing:-0.02em; line-height:1.1; }
+    #s08-stack-title b { font-weight:800; color:#0d1117; }
+
+    /* ---- architecture strip ---- */
+    #s08-stack-strip { position:absolute; left:0; top:0; width:1920px; height:1080px; }
+    .s8-node { position:absolute; top:190px; width:290px; height:160px; border-radius:22px; background:#fff; border:1.5px solid #e4e1d8;
+               box-shadow:0 18px 44px rgba(13,17,23,.10); padding:24px 22px; }
+    .s8-node .s8-nt { font-weight:800; font-size:30px; letter-spacing:-0.01em; line-height:1.1; }
+    .s8-node .s8-ns { margin-top:10px; font-weight:500; font-size:21px; line-height:1.3; color:#465063; }
+    .s8-node.s8-main { background:#0f7fb8; border-color:#0f7fb8; color:#fff; box-shadow:0 22px 54px rgba(15,127,184,.42); }
+    .s8-node.s8-main .s8-ns { color:#d7eefa; }
+    .s8-node .s8-no { position:absolute; right:16px; top:14px; font-weight:800; font-size:14px; letter-spacing:.14em; color:#8a94a4; }
+    .s8-node.s8-main .s8-no { color:#bfe6f8; }
+    #s08-stack-arrows { position:absolute; left:0; top:0; width:1920px; height:1080px; overflow:visible; }
+
+    /* ---- checklist ---- */
+    #s08-stack-check { position:absolute; left:111px; top:412px; width:860px; height:560px; }
+    #s08-stack-check .s8-h { font-weight:800; font-size:22px; letter-spacing:.18em; color:#0f7fb8; margin-bottom:14px; }
+    .s8-row { position:absolute; left:0; height:64px; width:860px; display:flex; align-items:center; gap:20px; font-weight:700; font-size:31px; }
+    .s8-row svg { width:44px; height:44px; flex:none; overflow:visible; }
+    .s8-row .s8-rt { line-height:1.15; }
+
+    /* ---- code panel ---- */
+    #s08-stack-code { position:absolute; left:1010px; top:412px; width:800px; height:568px; background:#0a1626; border-radius:22px; padding:0; box-shadow:0 30px 80px rgba(10,22,38,.35); overflow:hidden; }
+    #s08-stack-code .s8-bar { height:52px; background:#0e2036; display:flex; align-items:center; gap:10px; padding-left:22px; }
+    #s08-stack-code .s8-dot { width:13px; height:13px; border-radius:50%; background:#28405f; }
+    #s08-stack-code .s8-blk { position:absolute; left:30px; width:740px; }
+    #s08-stack-code .s8-bl { font-weight:700; font-size:15px; letter-spacing:.16em; color:#7f9bc0; margin-bottom:14px; }
+    #s08-stack-code .s8-ln { font-family:monospace; font-size:23px; line-height:1.55; color:#e9f2ff; white-space:pre; }
+    #s08-stack-code .s8-ok { color:#4be3a9; }
+    #s08-stack-code .s8-mut { color:#8fb1da; }
+    #s08-stack-code .s8-str { color:#ffd479; }
+
+    /* ---- lockup + wipe ---- */
+    #s08-stack-lock { position:absolute; left:0; top:590px; width:1920px; text-align:center; }
+    #s08-stack-lock .s8-l1 { font-family:"Sora", sans-serif; font-weight:800; font-size:60px; letter-spacing:-0.02em; }
+    #s08-stack-lock .s8-l2 { margin-top:22px; font-weight:700; font-size:38px; color:#0f7fb8; }
+    #s08-stack-wipe { position:absolute; inset:0; background:#0e0b09; clip-path:inset(100% 0 0 0); }
+  </style>
+
+  <div id="root" data-composition-id="s08-stack" data-width="1920" data-height="1080">
+    <div id="s08-stack-bg"></div>
+
+    <div id="s08-stack-title">Built on <b id="s08-stack-t1">Amazon Bedrock</b> and <b id="s08-stack-t2">Ring&rsquo;s APIs</b>.</div>
+
+    <div id="s08-stack-strip">
+      <div class="s8-node" id="s08-stack-n0" style="left:111px"><div class="s8-nt">Ring Partner API</div><div class="s8-ns">events, clips and devices</div></div>
+      <div class="s8-node" id="s08-stack-n1" style="left:463px"><div class="s8-nt">Signed webhook</div><div class="s8-ns">HMAC-SHA256, idempotent</div></div>
+      <div class="s8-node s8-main" id="s08-stack-n2" style="left:815px"><div class="s8-nt">Amazon Bedrock</div><div class="s8-ns">Nova sees, Titan recognizes</div></div>
+      <div class="s8-node" id="s08-stack-n3" style="left:1167px"><div class="s8-nt">Memory graph</div><div class="s8-ns">people, events, routines</div></div>
+      <div class="s8-node" id="s08-stack-n4" style="left:1519px"><div class="s8-nt">MCP server</div><div class="s8-ns">Alexa+ and any agent</div></div>
+      <svg id="s08-stack-arrows" viewBox="0 0 1920 1080" fill="none" stroke="#0f7fb8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <g id="s08-stack-a01"><path d="M407 265H457"/><path d="M447 254 458 265 447 276"/></g>
+        <g id="s08-stack-a12"><path d="M759 265H809"/><path d="M799 254 810 265 799 276"/></g>
+        <g id="s08-stack-a23"><path d="M1111 265H1161"/><path d="M1151 254 1162 265 1151 276"/></g>
+        <g id="s08-stack-a34"><path d="M1463 265H1513"/><path d="M1503 254 1514 265 1503 276"/></g>
+      </svg>
+    </div>
+
+    <div id="s08-stack-check">
+      <div class="s8-h" id="s08-stack-checkh">ENTERPRISE-READY</div>
+    </div>
+
+    <div id="s08-stack-code">
+      <div class="s8-bar"><span class="s8-dot"></span><span class="s8-dot"></span><span class="s8-dot"></span></div>
+      <div class="s8-blk" id="s08-stack-b1" style="top:78px">
+        <div class="s8-bl">SIGNED INGEST</div>
+        <div class="s8-ln" id="s08-stack-b1l1"><span class="s8-mut">POST</span> /ring/webhook</div>
+        <div class="s8-ln" id="s08-stack-b1l2"><span class="s8-mut">X-Signature:</span> sha256=9f2c&hellip;e41a</div>
+        <div class="s8-ln s8-ok" id="s08-stack-b1l3">&#10003; signature verified &middot; request_id new</div>
+      </div>
+      <div class="s8-blk" id="s08-stack-b2" style="top:318px">
+        <div class="s8-bl">MCP TOOL CALL</div>
+        <div class="s8-ln" id="s08-stack-b2l1"><span class="s8-mut">tools/call</span> ask_home</div>
+        <div class="s8-ln s8-str" id="s08-stack-b2l2">{"question":"Where was Dad last seen?"}</div>
+        <div class="s8-ln s8-ok" id="s08-stack-b2l3">&rarr; "Dad was last seen today at 8:13 PM</div>
+        <div class="s8-ln s8-ok" id="s08-stack-b2l4">   in the Backyard&hellip;"</div>
+      </div>
+    </div>
+
+    <div id="s08-stack-lock">
+      <div class="s8-l1" id="s08-stack-l1">Open source &middot; Deployable in your AWS account</div>
+      <div class="s8-l2" id="s08-stack-l2">github.com/Garinmckayl/recall</div>
+    </div>
+
+    <div id="s08-stack-wipe"></div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+      /* ---- checklist rows (built in JS, deterministic) ---- */
+      const items = [
+        ["Signed & idempotent webhooks", 3.9, 5.3],
+        ["Rate-limited public API", 5.7, 6.05],
+        ["Human-in-the-loop safety flags", 6.3, 7.05],
+        ["Owner corrections that teach the system", 7.5, 8.6],
+        ["No face recognition, no face templates", 9.9, 10.3],
+        ["Open source (MIT)", 12.75, 13.2],
+        ["Deployable in your own AWS account", 13.6, 14.85]
+      ];
+      const host = $("#s08-stack-check");
+      items.forEach((it, i) => {
+        const r = document.createElement("div");
+        r.className = "s8-row"; r.id = "s08-stack-row" + i; r.style.top = (54 + i * 70) + "px";
+        r.innerHTML =
+          '<svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#d3d0c6" stroke-width="3.5"/>' +
+          '<circle id="s08-stack-rc' + i + '" cx="22" cy="22" r="18" stroke="#1f9d6b" stroke-width="3.5" stroke-linecap="round" transform="rotate(-90 22 22)"/>' +
+          '<path id="s08-stack-rk' + i + '" d="m13 23 6 6 12-14" stroke="#1f9d6b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '<span class="s8-rt">' + it[0].replace("&", "&amp;") + '</span>';
+        host.appendChild(r);
+      });
+
+      /* ---- initial states ---- */
+      gsap.set(["#s08-stack-title", ".s8-node", "#s08-stack-arrows g", ".s8-row", "#s08-stack-checkh", "#s08-stack-code", "#s08-stack-lock"], { opacity: 0 });
+      const codeLines = ["#s08-stack-b1l1", "#s08-stack-b1l2", "#s08-stack-b1l3", "#s08-stack-b2l1", "#s08-stack-b2l2", "#s08-stack-b2l3", "#s08-stack-b2l4"];
+      gsap.set(codeLines, { clipPath: "inset(0 100% 0 0)" });
+      gsap.set([".s8-bl"], { opacity: 0 });
+
+      /* ---- title: 'Built on Amazon Bedrock and Ring's APIs.'  (Bedrock 1.03-1.63, Ring's 2.30) ---- */
+      tl.fromTo("#s08-stack-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+      tl.to("#s08-stack-t1", { color: "#0f7fb8", duration: 0.3, ease: "power2.out" }, 1.03);
+      tl.to("#s08-stack-t2", { color: "#0f7fb8", duration: 0.3, ease: "power2.out" }, 2.3);
+
+      /* ---- nodes land in spoken order: Bedrock (anchor) -> Ring -> webhook -> memory -> MCP ---- */
+      const land = [["#s08-stack-n2", 1.05], ["#s08-stack-n0", 2.3], ["#s08-stack-n1", 3.85], ["#s08-stack-n3", 5.5], ["#s08-stack-n4", 7.95]];
+      land.forEach(([sel, t]) => tl.fromTo(sel, { opacity: 0, y: 34, scale: 0.9, transformOrigin: "50% 50%" }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.5)" }, t));
+      [["#s08-stack-a01", 4.1], ["#s08-stack-a12", 4.35], ["#s08-stack-a23", 5.8], ["#s08-stack-a34", 8.2]].forEach(([sel, t]) => {
+        tl.fromTo(sel, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, t);
+      });
+
+      /* ---- checklist: rows appear, then their check draws on the spoken beat ---- */
+      tl.fromTo("#s08-stack-checkh", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 3.75);
+      items.forEach((it, i) => {
+        tl.fromTo("#s08-stack-row" + i, { opacity: 0, x: -26 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, it[1]);
+        tl.fromTo("#s08-stack-rc" + i, { strokeDasharray: 113, strokeDashoffset: 113 }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, it[2]);
+        tl.fromTo("#s08-stack-rk" + i, { strokeDasharray: 30, strokeDashoffset: 30 }, { strokeDashoffset: 0, duration: 0.25, ease: "power2.out" }, it[2] + 0.15);
+        tl.fromTo("#s08-stack-row" + i, { color: "#0d1117" }, { color: "#0d1117", duration: 0.01 }, it[2]);
+      });
+
+      /* ---- code panel: signed ingest (4.1-4.9), MCP call (8.4-9.6) ---- */
+      tl.fromTo("#s08-stack-code", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.9);
+      tl.fromTo("#s08-stack-b1 .s8-bl", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.05);
+      [["#s08-stack-b1l1", 4.15], ["#s08-stack-b1l2", 4.5], ["#s08-stack-b1l3", 4.9]].forEach(([sel, t]) =>
+        tl.to(sel, { clipPath: "inset(0 0% 0 0)", duration: 0.4, ease: "power2.out" }, t));
+      tl.fromTo("#s08-stack-b1l3", { textShadow: "0 0 0px rgba(75,227,169,0)" }, { textShadow: "0 0 18px rgba(75,227,169,.9)", duration: 0.35, yoyo: true, repeat: 1 }, 5.0);
+      tl.fromTo("#s08-stack-b2 .s8-bl", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.3);
+      [["#s08-stack-b2l1", 8.4], ["#s08-stack-b2l2", 8.75], ["#s08-stack-b2l3", 9.55], ["#s08-stack-b2l4", 9.9]].forEach(([sel, t]) =>
+        tl.to(sel, { clipPath: "inset(0 0% 0 0)", duration: 0.45, ease: "power2.out" }, t));
+      tl.fromTo("#s08-stack-b2l3", { textShadow: "0 0 0px rgba(75,227,169,0)" }, { textShadow: "0 0 18px rgba(75,227,169,.9)", duration: 0.35, yoyo: true, repeat: 1 }, 9.6);
+
+      /* ---- 15.2 checklist + code exit; strip drops to centre; lockup lands ---- */
+      tl.to(["#s08-stack-check", "#s08-stack-code"], { opacity: 0, y: 36, duration: 0.45, ease: "power2.in" }, 15.2);
+      tl.to("#s08-stack-title", { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 15.2);
+      tl.to("#s08-stack-strip", { y: 120, duration: 0.7, ease: "power3.inOut" }, 15.3);
+      tl.set("#s08-stack-lock", { opacity: 1 }, 15.5);
+      tl.fromTo("#s08-stack-l1", { opacity: 0, y: 34, scale: 1.05 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }, 15.55);
+      tl.fromTo("#s08-stack-l2", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 15.95);
+
+      /* ---- 16.85 wipe to the warm dark of the outro ---- */
+      tl.to("#s08-stack-wipe", { clipPath: "inset(0% 0 0 0)", duration: 0.65, ease: "power2.inOut" }, 16.85);
+
+      window.__timelines["s08-stack"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

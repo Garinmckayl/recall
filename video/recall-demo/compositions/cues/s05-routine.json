@@ -1,0 +1,21 @@
+[
+  {"t": 80.30, "sfx": "whoosh", "gain": 0.55, "dur": 1.0},
+  {"t": 83.75, "sfx": "swoosh_in", "gain": 0.35},
+  {"t": 84.10, "sfx": "card_flip", "gain": 0.6},
+  {"t": 84.30, "sfx": "clock_tick", "gain": 0.32, "dur": 3.0, "fade": 0.4},
+  {"t": 84.95, "sfx": "whoosh", "gain": 0.28, "dur": 0.9},
+  {"t": 85.75, "sfx": "tick", "gain": 0.7},
+  {"t": 85.97, "sfx": "tick", "gain": 0.7},
+  {"t": 86.19, "sfx": "tick", "gain": 0.7},
+  {"t": 86.41, "sfx": "tick", "gain": 0.7},
+  {"t": 86.63, "sfx": "tick", "gain": 0.7},
+  {"t": 86.85, "sfx": "tick", "gain": 0.85},
+  {"t": 87.40, "sfx": "clock_tick", "gain": 0.3, "dur": 1.6, "fade": 0.3},
+  {"t": 88.20, "sfx": "sting_low", "gain": 0.45, "dur": 2.0, "fade": 0.4},
+  {"t": 89.00, "sfx": "card_flip", "gain": 0.5},
+  {"t": 89.60, "sfx": "notify", "gain": 0.5},
+  {"t": 90.30, "sfx": "swoosh_in", "gain": 0.4},
+  {"t": 90.60, "sfx": "notify", "gain": 0.85},
+  {"t": 91.05, "sfx": "phone_vibrate", "gain": 0.5, "dur": 1.0, "fade": 0.2},
+  {"t": 92.10, "sfx": "tick", "gain": 0.5}
+]
