@@ -77,7 +77,8 @@ Target **2:56**, 1920×1080 (mastered from 4K screen captures so zooms stay shar
 ## Production notes
 - **Screen footage** is recorded from the real UI (isolated capture database): the hero question, the path lanes, boxes tracking Dad across three clips, the reasoning steps, the proactive check-in, corrections. Nothing on screen is mocked except the phone frames, which show the *real* alert text, and the home-map graphic, which is labelled illustrative.
 - **B-roll** (older man at a window, empty chair, door) is licensed stock, used only in dramatized cutaways.
-- **Score** (ElevenLabs Music): heartbeat pulse → held tension under the problem → warm, rising build under the solution → confident peak in the business section → a single warm note for the callback → resolving chord. 
+- **Score** (ElevenLabs Music): tender and slightly wistful → a gentle, reassuring build under the solution → a confident, uplifting peak in the business section → a single warm piano melody for the callback → a resolved final chord. Piano and strings only; no drones, risers or trailer hits. Effects are a subtle, ducked layer (ominous effects removed).
+- **Lesson:** the first score prompt asked for "tense, uneasy, ticking" music and produced a sub-bass drone (61% of its energy below 80 Hz) that read as horror for a caregiving story; the current score has none below 80 Hz.
 - **SFX**: phone vibrate/ring, heartbeat, typing, riser, bass hits, box lock-on, lane energise, notification, card flips, ticks, room tone.
 - **Honest guardrails**: "Dramatization" and "Ring sandbox · licensed stock footage" are on screen; statistics carry sources; no customer claims; no facial-recognition claims.
 
