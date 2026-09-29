@@ -26,11 +26,11 @@ button:hover{background:#243044}small{color:#7d8899}</style>
 def index():
     return PAGE
 
-@app.get("/final.mp4")
+@app.api_route("/final.mp4", methods=["GET", "HEAD"])
 def final():
     return FileResponse(R / "recall-demo-final.mp4", media_type="video/mp4")
 
 
-@app.get("/draft.mp4")
+@app.api_route("/draft.mp4", methods=["GET", "HEAD"])
 def draft():
     return FileResponse(R / "draft.mp4", media_type="video/mp4")

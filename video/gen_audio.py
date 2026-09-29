@@ -46,11 +46,15 @@ SFX = {
  "lane_sweep": ("electric energy sweep whoosh rising, short", 1.5),
  "swoosh_in": ("fast swoosh in for graphic element", 0.8),
 }
-MUSIC = ("Cinematic modern trailer-style instrumental, no vocals, about 2 minutes 56 seconds. Opens on a low heartbeat-like pulse "
-         "and a single tense synth note. A huge bass hit at 0:13 followed by a beat of silence. From 0:13 to 0:40 sparse, uneasy, ticking "
-         "percussion and low drones. From 0:40 a hopeful, driving build: arpeggiated synths, pulsing bass, strings rising, becoming warmer "
-         "and more human. Confident bright peak around 1:58 to 2:28. At 2:30 the music drops away to a single warm piano note, hushed and "
-         "emotional, then swells into a resolving triumphant final chord by 2:48 with a clean tail.")
+MUSIC = (
+    'Warm, hopeful, emotional cinematic score for a documentary about family and caring for a parent, instrumental,'
+    ' about 2 minutes 56 seconds, around 72 beats per minute. Soft felt piano and gentle strings with a warm, airy '
+    'pad. It begins tender, quiet and slightly wistful, like a worried but loving thought. From about 0:40 it gentl'
+    'y and optimistically builds: light arpeggiated piano, acoustic guitar, and strings swelling with reassurance. '
+    'A confident, bright, uplifting and human peak from about 1:55 to 2:25. At about 2:30 it hushes to a single war'
+    'm piano melody, intimate and emotional, then blossoms into a warm, resolved, hopeful final chord by 2:50 with '
+    'a clean tail. No horror, no drones, no ominous or dark tension, no heartbeat, no trailer hits, no risers, no s'
+    'ub-bass booms, no percussion until the build, no vocals.')
 
 def vo():
     (A/"vo").mkdir(parents=True, exist_ok=True)
