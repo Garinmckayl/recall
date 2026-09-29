@@ -1,0 +1,115 @@
+{
+  "events": [
+    {
+      "clip": "delivery_pizza_1.mp4",
+      "camera": "Front Door",
+      "kind": "doorbell",
+      "days_ago": 12,
+      "time": "18:42",
+      "label": "Pizza delivery",
+      "expect": {
+        "carrying": [
+          "pizza"
+        ],
+        "role": "delivery_driver",
+        "min_actors": 1
+      }
+    },
+    {
+      "clip": "delivery_foodbag.mp4",
+      "camera": "Front Door",
+      "kind": "doorbell",
+      "days_ago": 8,
+      "time": "12:15",
+      "label": "Food delivery"
+    },
+    {
+      "clip": "delivery_package.mp4",
+      "camera": "Front Door",
+      "kind": "doorbell",
+      "days_ago": 3,
+      "time": "19:05",
+      "label": "Package"
+    },
+    {
+      "clip": "delivery_pizza_2.mp4",
+      "camera": "Front Door",
+      "kind": "doorbell",
+      "days_ago": 1,
+      "time": "18:55",
+      "label": "Pizza delivery"
+    },
+    {
+      "clip": "neighbour.mp4",
+      "camera": "Front Door",
+      "kind": "motion",
+      "days_ago": 10,
+      "time": "16:20",
+      "label": "Neighbour"
+    },
+    {
+      "clip": "knock.mp4",
+      "camera": "Front Door",
+      "kind": "motion",
+      "days_ago": 6,
+      "time": "17:30",
+      "label": "Someone knocks",
+      "expect": {
+        "actions": [
+          "knocks"
+        ],
+        "min_actors": 1
+      }
+    },
+    {
+      "clip": "prop.mp4",
+      "camera": "Front Door",
+      "kind": "motion",
+      "days_ago": 4,
+      "time": "21:10",
+      "label": "Staged prop incident",
+      "expect": {
+        "actions": [
+          "raises_object"
+        ],
+        "flag": "possible_weapon"
+      }
+    },
+    {
+      "clip": "dad_backyard.mp4",
+      "camera": "Backyard",
+      "kind": "motion",
+      "days_ago": 0,
+      "time": "18:37",
+      "label": "Dad to the garage",
+      "name": "Dad",
+      "relation": "father"
+    },
+    {
+      "clip": "dad_garage.mp4",
+      "camera": "Garage",
+      "kind": "motion",
+      "days_ago": 0,
+      "time": "18:42",
+      "label": "Dad in the garage",
+      "expect": {
+        "actions": [
+          "enters_building"
+        ]
+      }
+    },
+    {
+      "clip": "car_leaves.mp4",
+      "camera": "Driveway",
+      "kind": "motion",
+      "days_ago": 0,
+      "time": "18:45",
+      "label": "Car leaves",
+      "expect": {
+        "actions": [
+          "vehicle_departs"
+        ]
+      }
+    }
+  ]
+}

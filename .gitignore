@@ -1,0 +1,12 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+media/
+data/
+.DS_Store
+data/
+everyday-agents-ranker/
+*.db
+.pytest_cache/

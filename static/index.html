@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recall</title>
+<style>
+:root{
+  --bg:#f7f6f3; --card:#ffffff; --line:#e6e3dc; --line2:#d9d5cb; --ink:#1b1b1a; --dim:#5f5e5a; --faint:#8a8880;
+  --accent:#0f7fb8; --accent-ink:#0b5f8c; --accent-soft:#e6f3fa; --accent-line:#b7dcef;
+  --amber:#e9b949; --amber-ink:#8a5a00; --amber-soft:#fff6e0;
+  --red:#c62b45; --red-soft:#fdecef; --red-line:#f3b9c4;
+  --green:#1f7a55; --green-soft:#e6f4ee; --green-line:#b5dcca;
+  --radius:12px; --shadow:0 1px 2px rgba(30,28,20,.05),0 4px 14px rgba(30,28,20,.06);
+  --hh:52px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{letter-spacing:-.01em}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* top bar */
+header{height:var(--hh);display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+.brand svg{flex:none}
+.pillbar{display:flex;gap:6px;align-items:center;flex:1;min-width:0}
+.ringpill{font-size:12px;padding:2px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.ringpill.live{background:var(--green-soft);border-color:var(--green-line);color:var(--green)}
+.counts{font-size:12.5px;color:var(--dim);white-space:nowrap}
+.status{font-size:12.5px;color:var(--dim);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{background:var(--card);border:1px solid var(--line2);border-radius:9px;padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.sm{padding:3px 10px;font-size:12px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--dim)}
+.btn.ghost:hover{background:var(--bg);color:var(--ink);border-color:var(--line)}
+
+/* layout */
+main{height:calc(100vh - var(--hh));display:grid;grid-template-columns:330px minmax(0,1fr) 400px;min-width:0}
+.panel{min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.panel:last-child{border-right:0}
+.scroll{overflow-y:auto;min-height:0;flex:1;padding:14px}
+
+/* left */
+.tabs{display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--line)}
+.tab{padding:8px 12px;background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);font-weight:600;font-size:13px;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected=true]{color:var(--accent-ink);border-bottom-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 0}
+.chip{border:1px solid var(--line2);background:var(--card);border-radius:99px;padding:3px 11px;font-size:12.5px;color:var(--dim)}
+.chip:hover{border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.day{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:18px 2px 8px;font-weight:700}
+.day:first-child,.dg + .day{margin-top:6px}
+.ev{display:grid;grid-template-columns:88px 1fr;gap:10px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:8px;margin-bottom:9px;box-shadow:var(--shadow)}
+.ev:hover{border-color:var(--accent-line)}
+.ev[aria-current=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.thumb{width:88px;height:58px;border-radius:8px;background:linear-gradient(135deg,#ebe8e0,#d8d4c9);object-fit:cover;display:block;position:relative;overflow:hidden}
+.ev.processing .thumb::after,.shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:translateX(-100%);animation:sh 1.4s infinite}
+@keyframes sh{to{transform:translateX(100%)}}
+.ev .t1{font-size:12px;color:var(--dim);display:flex;justify-content:space-between;gap:6px}
+.ev .t1 b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev .sum{font-size:13px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pills{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
+.pill{font-size:11.5px;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent-line)}
+.pill.flag{background:var(--red-soft);color:var(--red);border-color:var(--red-line);font-weight:600}
+.pill.warn{background:var(--amber-soft);color:var(--amber-ink);border-color:var(--amber)}
+.pill.ok{background:var(--green-soft);color:var(--green);border-color:var(--green-line)}
+.empty{color:var(--dim);font-size:13px;padding:22px 8px;text-align:center}
+
+/* today digest */
+.dg{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:6px;box-shadow:var(--shadow)}
+.dg .k{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--accent-ink);font-weight:700}
+.dg .hl{font-size:15px;font-weight:650;line-height:1.35;margin-top:3px;letter-spacing:-.01em}
+.dg .st{font-size:12px;color:var(--dim);margin-top:3px}
+.dg ul{list-style:none;padding:0;margin-top:9px;border-top:1px solid var(--line)}
+.dg li{display:flex;gap:9px;padding:8px 0 0;align-items:flex-start;font-size:13px}
+.dg .dot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--amber)}
+.dg li.flag .dot{background:var(--red)}
+.dg .bd{flex:1;min-width:0}
+.dg .lnk{background:none;border:0;padding:0;text-align:left;color:var(--ink);font-size:13px;line-height:1.4}
+.dg .lnk:hover{color:var(--accent-ink);text-decoration:underline}
+.dg .tm{color:var(--faint);font-size:11.5px;margin-left:6px;white-space:nowrap}
+.dg form{display:flex;gap:6px;margin-top:6px}
+
+.person{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px;margin-bottom:10px;display:grid;grid-template-columns:56px 1fr;gap:12px;box-shadow:var(--shadow)}
+.person .thumb{width:56px;height:56px;border-radius:50%}
+.person h4{font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.person .meta{font-size:12px;color:var(--dim);margin-top:3px}
+.person form{grid-column:1/-1;display:flex;gap:6px}
+input[type=text],select{background:var(--card);border:1px solid var(--line2);border-radius:9px;padding:6px 10px;min-width:0;width:100%}
+input[type=text]:focus,select:focus{border-color:var(--accent);outline:2px solid var(--accent-soft)}
+.rule{display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;margin-bottom:8px;font-size:13px}
+.rule span{flex:1}
+.alert{border-left:3px solid var(--amber);background:var(--amber-soft);padding:8px 12px;border-radius:0 9px 9px 0;margin-bottom:8px;font-size:13px}
+.alert small{display:block;color:var(--dim);font-size:11.5px}
+h3.sec{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:14px 2px 8px}
+
+/* center */
+.chat{display:flex;flex-direction:column;min-height:0;height:100%}
+.log{flex:1;overflow-y:auto;padding:22px 26px;display:flex;flex-direction:column;gap:16px;min-height:0}
+.msg{max-width:760px;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;max-width:80%;background:var(--accent);color:#fff;padding:9px 14px;border-radius:16px 16px 4px 16px;font-weight:500}
+.msg.bot{align-self:flex-start;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.msg.err{border-color:var(--red-line);background:var(--red-soft);color:var(--red)}
+.answer{white-space:pre-wrap;font-size:15px;line-height:1.55}
+.meta-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.op{color:var(--dim)}
+.op::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.meter{display:inline-flex;align-items:center;gap:6px}
+.meter i{display:block;width:44px;height:4px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i b{display:block;height:100%;background:var(--green)}
+.meter.mid i b{background:var(--amber)} .meter.low i b{background:var(--red)}
+.cites{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.cite{display:inline-flex;align-items:center;gap:8px;max-width:100%;font-size:12.5px;padding:3px 11px 3px 3px;border-radius:99px;background:var(--bg);border:1px solid var(--line2);color:var(--ink)}
+.cite:hover{border-color:var(--accent);background:var(--accent-soft)}
+.cite .thumb{width:38px;height:26px;border-radius:99px;flex:none}
+.cite span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
+details.how{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+details.how summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent-ink);list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::before{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+details.how[open] summary::before{transform:rotate(45deg)}
+.steps-mini{list-style:none;padding:0;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.steps-mini li{padding-left:22px;position:relative;color:var(--dim)}
+.steps-mini li b{color:var(--ink);font-weight:600}
+.steps-mini li::before{content:attr(data-n);position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:700 10px/16px var(--font);text-align:center}
+.watchcard{margin-top:12px;border:1px solid var(--amber);background:var(--amber-soft);border-radius:10px;padding:9px 12px;font-size:13.5px}
+.watchcard b{color:var(--amber-ink);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.dots{display:inline-flex;gap:4px;padding:4px 0}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:bl 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.compose{border-top:1px solid var(--line);padding:12px 22px 16px;background:var(--card)}
+.sugg{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;scrollbar-width:thin}
+.sugg .chip{white-space:nowrap;flex:none;background:var(--bg)}
+.compose form{display:flex;gap:8px}
+.compose input{flex:1;padding:10px 14px;border-radius:11px;font-size:14.5px}
+.compose .btn{padding:8px 18px}
+.hello{margin:auto;text-align:center;color:var(--dim);max-width:440px;padding:0 10px}
+.hello h2{color:var(--ink);font-size:24px;margin-bottom:8px;font-weight:700}
+
+/* right */
+.vidwrap{position:relative;background:#0d0d0c;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;box-shadow:var(--shadow)}
+.vidwrap video{width:100%;height:100%;display:block;object-fit:contain;background:#0d0d0c}
+.vidwrap .ov{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.66);color:#fff;padding:3px 9px;border-radius:7px;font-size:12px;pointer-events:none}
+.vidwrap .none{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#c9c6bd;font-size:13px;text-align:center;padding:18px;background:#0d0d0c}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-top:14px;box-shadow:var(--shadow)}
+.card h3{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:9px}
+.stepper{list-style:none;padding:0;position:relative}
+.stepper li{position:relative;padding:0 0 11px 28px}
+.stepper li::before{content:"";position:absolute;left:8px;top:18px;bottom:-2px;width:2px;background:var(--line)}
+.stepper li:last-child::before{display:none}
+.stepper li i{position:absolute;left:0;top:1px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font:700 11px/18px var(--font);text-align:center;font-style:normal}
+.stepper b{display:block;font-size:13px}
+.stepper span{color:var(--dim);font-size:12.5px;overflow-wrap:anywhere}
+.pathlist{margin:8px 0 0;padding:0;list-style:none;font-size:12.5px}
+.pathlist li{display:flex;gap:8px;padding:4px 0;cursor:pointer}
+.pathlist li:hover{color:var(--accent-ink)}
+.pathlist em{font-style:normal;flex:none;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;text-align:center;font-size:11px;line-height:18px;font-weight:700}
+svg.lanes{width:100%;height:auto;display:block}
+svg.lanes text{fill:var(--dim);font:10.5px var(--font)}
+svg.lanes .lane{stroke:var(--line2);stroke-width:1}
+svg.lanes .link{stroke:var(--accent);stroke-width:2;fill:none}
+svg.lanes .end{stroke:var(--red);stroke-width:2;stroke-dasharray:4 4;fill:none}
+svg.lanes .endt{fill:var(--red)}
+svg.lanes .dot{fill:var(--accent);stroke:#fff;stroke-width:2;cursor:pointer}
+svg.lanes .dotn{fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle}
+.kv{font-size:12.5px;color:var(--dim);display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+.kv b{color:var(--ink);font-weight:500}
+.pc{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:5px 0}
+.pc .thumb{width:44px;height:44px;border-radius:50%}
+.pc .n{font-weight:600}
+
+/* evidence overlay */
+.boxes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.bx{position:absolute;display:none;box-sizing:border-box;border-radius:4px;border:1px dashed #d8d6cf}
+.bx>span{position:absolute;left:-1px;bottom:100%;margin-bottom:3px;font-size:11px;line-height:1.35;padding:1px 7px;border-radius:5px;white-space:nowrap;background:rgba(50,49,46,.88);color:#fff;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.bx.in>span{bottom:auto;top:0;margin:0;border-radius:0 0 5px 0}
+.bx.focus{border:2px solid var(--accent);box-shadow:0 0 0 1px rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.5)}
+.bx.focus>span{background:var(--accent);font-weight:600}
+.bx.role{border:2px solid #d8d6cf;box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.vidbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12.5px;color:var(--dim)}
+.vidbar label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.vidbar input{accent-color:var(--accent)}
+.alist{display:flex;flex-direction:column;gap:2px;margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.arow{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:12.5px;padding:3px 0}
+.arow .who{color:var(--ink)}
+.arow .who small{color:var(--dim)}
+.lnkbtn{background:none;border:0;padding:0;color:var(--accent-ink);font-size:12px;white-space:nowrap;text-decoration:underline;text-decoration-color:var(--accent-line);text-underline-offset:2px}
+.lnkbtn:hover{text-decoration-color:currentColor}
+.fix{margin:4px 0 8px;padding:10px;border:1px solid var(--line2);border-radius:10px;background:var(--card);box-shadow:0 8px 22px rgba(30,28,20,.12);display:flex;flex-direction:column;gap:8px}
+.fix .row{display:flex;gap:6px;align-items:center}
+.fix .ttl{font-size:12px;font-weight:600}
+.ferr{font-size:12px;color:var(--red);background:var(--red-soft);border:1px solid var(--red-line);border-radius:8px;padding:5px 8px}
+.confirm{font-size:12.5px;background:var(--amber-soft);border:1px solid var(--amber);border-radius:8px;padding:7px 9px}
+.dg .ico{flex:none;width:14px;height:14px;margin-top:3px;color:var(--amber-ink)}
+.person .mrg{grid-column:1/-1;display:flex;flex-direction:column;gap:6px}
+.person .mrg .row{display:flex;gap:6px}
+.ic{display:none}
+
+/* toasts / drawers */
+#toasts{position:fixed;right:16px;top:calc(var(--hh) + 10px);display:flex;flex-direction:column;gap:8px;z-index:60;max-width:min(400px,calc(100vw - 32px))}
+.toast{background:var(--card);border:1px solid var(--line2);border-radius:12px;padding:10px 14px;box-shadow:0 10px 30px rgba(30,28,20,.16);animation:in .25s both;font-size:13.5px}
+@keyframes in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.toast.alert{border-color:var(--amber);background:var(--amber-soft);font-weight:600}
+.toast.alert::before{content:"WATCH ALERT";display:block;color:var(--amber-ink);font-size:10.5px;letter-spacing:.09em;margin-bottom:2px}
+.toast.error{border-color:var(--red-line);background:var(--red-soft);color:var(--red)}
+.drawer{position:fixed;top:var(--hh);right:0;bottom:0;width:min(380px,100vw);background:var(--card);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(30,28,20,.08);transform:translateX(104%);transition:transform .2s;z-index:50;padding:18px;overflow-y:auto}
+.drawer.open{transform:none}
+.drawer h2{font-size:17px}
+.drawer label{display:block;font-size:12px;color:var(--dim);margin:12px 0 4px}
+.drawer .note{font-size:12.5px;color:var(--dim);margin-top:10px}
+.drawer pre{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px;font-size:11px;white-space:pre-wrap;max-height:180px;overflow:auto}
+.flow{list-style:none;padding:0;margin-top:14px}
+.flow li{position:relative;padding:0 0 16px 34px}
+.flow li::before{content:"";position:absolute;left:12px;top:26px;bottom:0;width:2px;background:var(--accent-line)}
+.flow li:last-child::before{display:none}
+.flow li i{position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent-ink);font:700 12px/24px var(--font);text-align:center;font-style:normal}
+.flow b{display:block;font-size:14px}
+.flow p{font-size:12.5px;color:var(--dim);margin-top:1px}
+.flow code{display:inline-block;margin-top:4px;font:11.5px ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--ink);max-width:100%;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media (max-width:480px){
+  .lbl{display:none} .ic{display:inline} header .btn{padding:6px 11px;min-width:38px} .status{display:none}
+}
+@media (max-width:900px){
+  :root{--hh:auto}
+  body{overflow:auto}
+  header{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px 10px}
+  .pillbar{order:5;flex-basis:100%}
+  header #howBtn{margin-left:auto}
+  .counts{display:none}
+  main{display:flex;flex-direction:column;height:auto}
+  .panel{border-right:0;border-bottom:1px solid var(--line)}
+  .panel.center{order:1;height:78vh} .panel.right{order:2} .panel.left{order:3;max-height:85vh}
+  .log{padding:16px}
+  .compose{padding:10px 14px 14px}
+  .msg.user{max-width:92%}
+  .cite span{max-width:200px}
+  #toasts{top:auto;bottom:12px}
+  .drawer{top:0;width:100vw}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#0f7fb8" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="#0f7fb8"/><path d="M12 2a10 10 0 0 1 10 10" stroke="#0b5f8c" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    Recall
+  </div>
+  <div class="pillbar"><span class="ringpill" id="ringPill" hidden></span><span class="counts" id="counts"></span></div>
+  <span class="status" id="status" aria-live="polite"></span>
+  <button class="btn ghost" id="howBtn" type="button" aria-label="How it works" aria-expanded="false" aria-controls="how"><span class="lbl">How it works</span><span class="ic" aria-hidden="true">?</span></button>
+  <button class="btn" id="syncBtn" type="button" aria-label="Sync Ring"><span class="lbl">Sync Ring</span><span class="ic" aria-hidden="true">↻</span></button>
+  <button class="btn" id="demoBtn" type="button" aria-label="Demo controls" aria-expanded="false" aria-controls="drawer"><span class="lbl">Demo</span><span class="ic" aria-hidden="true">▶</span></button>
+</header>
+
+<main>
+  <section class="panel left" aria-label="Camera timeline">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="timeline" aria-selected="true">Timeline</button>
+      <button class="tab" role="tab" data-tab="people" aria-selected="false">People</button>
+      <button class="tab" role="tab" data-tab="watching" aria-selected="false">Watching</button>
+    </div>
+    <div id="pane-timeline" style="display:flex;flex-direction:column;min-height:0;flex:1">
+      <div class="chips" id="camChips" role="group" aria-label="Filter by camera"></div>
+      <div class="scroll" id="evList"></div>
+    </div>
+    <div id="pane-people" class="scroll" hidden></div>
+    <div id="pane-watching" class="scroll" hidden></div>
+  </section>
+
+  <section class="panel center" aria-label="Ask Recall">
+    <div class="chat">
+      <div class="log" id="log" aria-live="polite">
+        <div class="hello" id="hello">
+          <h2>Ask about your home</h2>
+          <p>Recall remembers what your Ring cameras saw and answers in plain language, with the exact clip as proof.</p>
+        </div>
+      </div>
+      <div class="compose">
+        <div class="sugg" id="sugg"></div>
+        <form id="askForm" autocomplete="off">
+          <label class="sr" for="q">Question</label>
+          <input type="text" id="q" placeholder="Ask about people, deliveries, or where someone was last seen…  ( / )">
+          <button class="btn primary" id="askBtn" type="submit">Ask</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel right" aria-label="Evidence">
+    <div class="scroll" id="evidence">
+      <div class="vidwrap" id="vidwrap">
+        <video id="vid" muted playsinline controls preload="metadata"></video>
+        <div class="boxes" id="boxes" aria-hidden="true"></div>
+        <div class="ov" id="vidOv" hidden></div>
+        <div class="none" id="vidNone">Select an event or ask a question — the exact clip opens here.</div>
+      </div>
+      <div class="vidbar"><label><input type="checkbox" id="whoTog" checked> Show who</label><span id="vidHint"></span></div>
+      <div id="evDetail"></div>
+      <div id="reasoning"></div>
+      <div id="path"></div>
+      <div id="whoCards"></div>
+    </div>
+  </section>
+</main>
+
+<div id="toasts" aria-live="assertive"></div>
+
+<aside id="how" class="drawer" aria-label="How Recall works">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>How Recall works</h2><button class="btn ghost sm" id="howClose" type="button">Close</button></div>
+  <p class="note" style="margin-top:6px">Every event moves through the same pipeline. Live components come from this server.</p>
+  <ol class="flow" id="flow"></ol>
+  <p class="note">Confidence figures are stored posteriors computed across events, not language-model guesses. Security flags are unverified observations; the clip is the ground truth.</p>
+</aside>
+
+<aside id="drawer" class="drawer" aria-label="Demo controls">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Demo controls</h2><button class="btn ghost sm" id="demoClose" type="button">Close</button></div>
+  <p class="note" style="margin-top:6px">Populate history, then fire a live Ring event.</p>
+  <div style="margin-top:12px"><button class="btn primary" id="seedBtn" type="button">Seed demo history</button></div>
+  <h3 class="sec" style="margin-top:22px">Emit Ring event</h3>
+  <form id="emitForm">
+    <label for="emCam">Camera</label><select id="emCam"></select>
+    <label for="emKind">Kind</label>
+    <select id="emKind"><option value="motion">motion</option><option value="doorbell">doorbell</option></select>
+    <label for="emClip">Clip</label><select id="emClip"></select>
+    <div style="margin-top:14px"><button class="btn primary" type="submit">Emit event</button></div>
+  </form>
+  <p class="note">Events are delivered through the signed Ring webhook path.</p>
+  <pre id="demoOut" hidden></pre>
+</aside>
+
+<script>
+"use strict";
+const MOCK = new URLSearchParams(location.search).has("mock");
+
+/* ---------- tiny helpers ---------- */
+function safeUrl(u){ return (typeof u==="string" && /^(\/|https?:\/\/)/.test(u)) ? u : ""; }
+function h(tag, props, ...kids){
+  const e = document.createElement(tag);
+  for (const k in (props||{})){
+    const v = props[k];
+    if (v==null || v===false) continue;
+    if (k==="class") e.className = v;
+    else if (k==="text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v===true ? "" : String(v));
+  }
+  for (const c of kids.flat(Infinity)){ if (c==null||c===false) continue; e.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return e;
+}
+const SVGNS = "http://www.w3.org/2000/svg";
+function sv(tag, attrs, text){
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in (attrs||{})) e.setAttribute(k, String(attrs[k]));
+  if (text!=null) e.textContent = text;
+  return e;
+}
+const $ = id => document.getElementById(id);
+function clear(el){ while (el.firstChild) el.removeChild(el.firstChild); }
+function pct(x){ if (x==null || isNaN(x)) return null; x = Number(x); return Math.round((x>1 ? x : x*100)); }
+function fmtTime(ts){ return new Date(ts*1000).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}); }
+function fmtFull(ts){ return new Date(ts*1000).toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}); }
+function fmtShort(ts){ return new Date(ts*1000).toLocaleDateString([], {month:"short", day:"numeric"}); }
+function dayKey(ts){ const d = new Date(ts*1000); return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function dayLabel(ts){
+  const now = new Date(), d = new Date(ts*1000);
+  const a = new Date(now.getFullYear(), now.getMonth(), now.getDate()), b = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((a-b)/86400000);
+  if (diff===0) return "Today"; if (diff===1) return "Yesterday";
+  return d.toLocaleDateString([], {weekday:"short", month:"short", day:"numeric"});
+}
+function nice(s){ return String(s||"").replace(/_/g," "); }
+function personName(p){ return p.name || p.label || p.id || "Someone"; }
+
+/* ---------- mock backend ---------- */
+const Mock = (() => {
+  const at = (daysAgo, hh, mm) => { const d = new Date(); d.setDate(d.getDate()-daysAgo); d.setHours(hh, mm, 0, 0); return d.getTime()/1000; };
+  const cams = [
+    {id:"front_door", name:"Front Door", zone:"entry"}, {id:"backyard", name:"Backyard", zone:"exterior"},
+    {id:"garage", name:"Garage", zone:"interior"}, {id:"driveway", name:"Driveway", zone:"exterior"}];
+  const camName = id => (cams.find(c=>c.id===id)||{}).name || id;
+  const P = {
+    p_dad:{id:"p_dad", name:"Dad", relation:"father", kind:"person", label:"man in a grey cardigan", role:"resident_or_family", role_conf:0.97, is_resident:true},
+    p_del:{id:"p_del", name:null, relation:null, kind:"person", label:"man in a blue jacket", role:"delivery_driver", role_conf:0.94, is_resident:false},
+    p_vis:{id:"p_vis", name:null, relation:null, kind:"person", label:"hooded visitor", role:"unknown", role_conf:0.55, is_resident:false}};
+  // a box that drifts left→right across ~4 keyframes (0-1000 scale, relative to the full frame)
+  const moving = (k) => [0,1,2,3].map(i => ({t: 1 + i*2.2, bbox: [120 + k*260 + i*90, 180, 300 + k*260 + i*90, 900]}));
+  const ev = (id, cam, ts, kind, sub, summary, actors, flags, objects) => {
+    (actors||[]).forEach((a,i) => { a.actor_id = id+"_a"+i; a.boxes = moving(i); });
+    return {id, camera_id:cam, camera_name:camName(cam), ts, kind, sub_type:sub, summary, thumb_url:"", clip_url:"", duration:12,
+      status:"done", source:"mock", flags:flags||[], actors:actors||[], objects:objects||[], scene:"", raw:{}};
+  };
+  const A = (pid, actions, carrying) => { const p = P[pid]; return {person_id:pid, label:p.label, name:p.name, role:p.role, role_conf:p.role_conf, actions, carrying:carrying||[]}; };
+  const today = new Date(); const todayHr = today.getHours();
+  const events = [
+    ev("e0","front_door",at(0,Math.max(todayHr-1,0),5),"motion","human","Man in a blue jacket carrying a cardboard package walks up to the door.",[A("p_del",["approaches_door"],["package"])],[],[{label:"package",note:""}]),
+    ev("e1","front_door",at(1,19,42),"doorbell","human","Man in a blue jacket carrying a pizza box rings the doorbell and hands it over.",[A("p_del",["approaches_door","rings_doorbell"],["pizza_box"])],[],[{label:"pizza_box",note:""}]),
+    ev("e2","backyard",at(1,18,37),"motion","human","Dad walks across the yard and enters the garage.",[A("p_dad",["enters_building"])]),
+    ev("e3","garage",at(1,18,42),"motion","human","Dad gets into the car.",[A("p_dad",["enters_vehicle"])]),
+    ev("e4","driveway",at(1,18,45),"motion","vehicle","A car with Dad inside backs out and drives away.",[A("p_dad",["vehicle_departs"])]),
+    ev("e5","front_door",at(3,23,50),"motion","human","Hooded visitor lingers at the door and raises an object toward the camera.",[A("p_vis",["lingers","raises_object"])],["possible weapon (unverified)"]),
+    ev("e6","backyard",at(2,15,5),"motion","animal","A small dog runs across the lawn.",[]),
+    ev("e7","front_door",at(6,20,11),"doorbell","human","Visitor knocks and waits at the door, then leaves.",[A("p_vis",["knocks"])]),
+    ev("e8","front_door",at(8,12,10),"doorbell","human","Man in a blue jacket leaves a paper food bag at the door.",[A("p_del",["places_package"],["food_bag"])],[],[{label:"food_bag",note:""}]),
+    ev("e9","front_door",at(11,15,20),"motion","human","Man in a blue jacket drops a package and leaves right away.",[A("p_del",["places_package","leaves_immediately"],["package"])],[],[{label:"package",note:""}]),
+    ev("e10","garage",at(5,9,2),"motion","human","Dad opens the garage door and takes out the bins.",[A("p_dad",["exits_building"])])
+  ].sort((a,b)=>b.ts-a.ts);
+  let rules = [], alerts = [], feed = [], feedId = 0, ruleId = 0, newId = 0;
+  const pushFeed = (type, message, data) => feed.push({id:++feedId, ts:Date.now()/1000, type, message, data:data||{}});
+  const cite = (e, off, label, pid) => { const a = e.actors.find(x=>!pid || x.person_id===pid) || e.actors[0] || {};
+    return {event_id:e.id, ts:e.ts, camera_id:e.camera_id, camera_name:e.camera_name, label:label||e.summary, clip_url:e.clip_url, thumb_url:e.thumb_url, t_offset:off||0, person_id:a.person_id||null, boxes:a.boxes||[]}; };
+  const byId = id => events.find(e=>e.id===id);
+  const tl = e => ({ts:e.ts, camera_id:e.camera_id, camera_name:e.camera_name, text:e.summary, event_id:e.id, thumb_url:e.thumb_url});
+  const peopleOut = ids => ids.map(i => ({id:i, name:P[i].name, label:P[i].label, role:P[i].role, role_conf:P[i].role_conf}));
+  function ask(body){
+    const q = (body.q||"").toLowerCase();
+    const base = {engine:{decide:"jev-1.13", narrate:"nova-pro"}, latency_ms:420, watch_rule:null, timeline:[], people:[], citations:[], steps:[]};
+    if (/father|dad/.test(q) && /(last|where)/.test(q) && !/after/.test(q)){
+      const path = [byId("e2"), byId("e3"), byId("e4")];
+      return {...base, operator:"last_seen", confidence:0.91, no_subsequent_detections:true,
+        answer:"Dad was last seen at "+fmtTime(path[2].ts)+" leaving in his car.\n"+path.map(e=>fmtTime(e.ts)+" — "+e.camera_name+": "+e.summary).join("\n")+"\nNo detections since.",
+        citations:path.map(e=>cite(e,2,e.summary.slice(0,40),"p_dad")), timeline:path.map(tl), people:peopleOut(["p_dad"]), focus:{person_id:"p_dad"},
+        steps:[{title:"Resolve “my father”", detail:"Matched enrolled person Dad (relation: father)."},{title:"Retrieve events", detail:"3 events involving Dad in the last 24 h."},
+               {title:"Order across cameras", detail:"Backyard → Garage → Driveway, 8 minutes total."},{title:"Last reliable observation", detail:"Driveway "+fmtTime(path[2].ts)+" — vehicle leaves property, confidence 91%."}]};
+    }
+    if (/after/.test(q) && /(enter|left|leave)/.test(q)){
+      return {...base, operator:"after_departure", confidence:0.88, no_subsequent_detections:false,
+        answer:"No. After Dad left at "+fmtTime(byId("e4").ts)+", no other person was detected entering through the Front Door or Garage.",
+        citations:[cite(byId("e4"),3)], timeline:[tl(byId("e4"))], people:peopleOut(["p_dad"]), focus:{person_id:"p_dad"},
+        steps:[{title:"Anchor time", detail:"Dad's departure: "+fmtTime(byId("e4").ts)+", Driveway."},{title:"Scan entry cameras after anchor", detail:"Front Door, Garage: 1 event (the delivery), no entry."},{title:"Answer", detail:"No entries after departure."}]};
+    }
+    if (/delivery guy|which guy|who.*deliver/.test(q)){
+      const es = ["e1","e8","e9"].map(byId);
+      return {...base, operator:"identify_person", confidence:0.94,
+        answer:"The man in the blue jacket. He appears in 3 events over the last 12 days. Each time he arrived carrying a food bag or package, approached the front door, and left immediately.",
+        citations:es.map(e=>cite(e,2,nice(e.objects[0].label)+" delivery","p_del")), timeline:es.map(tl), people:peopleOut(["p_del","p_vis"]), focus:{person_id:"p_del"},
+        steps:[{title:"Candidate people", detail:"4 people seen at the Front Door in 12 days."},{title:"Events per candidate", detail:"p_del: 3 events · p_vis: 2 events."},
+               {title:"Delivery-associated actions", detail:"p_del carried pizza_box / food_bag / package in 3 of 3 events."},{title:"Cross-event consistency", detail:"Role posterior for delivery_driver: 0.94."},{title:"Ranking", detail:"p_del ranked first, p_vis unknown (0.55)."}]};
+    }
+    if (/routine|normal today|day normal/.test(q)){
+      const pid = (body.context||{}).focus_person_id || "p_dad";
+      return {...base, operator:"routine_check", confidence:0.8, answer:personName(P[pid])+" usually leaves the garage around 6:40 PM on weekdays. Today the pattern matches, so nothing looks unusual.", people:peopleOut([pid]), focus:{person_id:pid},
+        citations:[cite(byId("e3"),2,"Usual evening departure",pid)], timeline:[tl(byId("e2")),tl(byId("e3")),tl(byId("e4"))],
+        steps:[{title:"Learn the usual pattern", detail:"14 comparable days for "+personName(P[pid])+"."},{title:"Compare with today", detail:"Departure within 6 minutes of the usual time."}]};
+    }
+    if (/pizza/.test(q)){
+      const e = byId("e1");
+      return {...base, operator:"find_events", confidence:0.96, answer:"The last pizza delivery was yesterday at "+fmtTime(e.ts)+" at the Front Door.", citations:[cite(e,4,"Pizza delivery","p_del")], timeline:[tl(e)], people:peopleOut(["p_del"]), focus:{person_id:"p_del"},
+        steps:[{title:"Filter events", detail:"object ≈ pizza, role = delivery."},{title:"Pick latest", detail:"1 match; opened at the doorbell press."}]};
+    }
+    if (/knock/.test(q)){
+      const e = byId("e7");
+      return {...base, operator:"find_events", confidence:0.82, answer:"Six days ago at "+fmtTime(e.ts)+", a visitor knocked at the Front Door. They are not enrolled; they appear in 2 events.", citations:[cite(e,3,"Visitor knocks")], timeline:[tl(e)], people:peopleOut(["p_vis"]), focus:{person_id:"p_vis"},
+        steps:[{title:"Resolve date", detail:"“six days ago” → "+fmtShort(e.ts)+"."},{title:"Doorbell / knock events in window", detail:"1 event."},{title:"Link to visual identity", detail:"Matches p_vis (2 sightings)."}]};
+    }
+    if (/gun|weapon/.test(q)){
+      const e = byId("e5");
+      return {...base, operator:"security_incident", confidence:0.6, answer:"One event shows a visitor who appears to raise an object consistent with a handgun. Please review the clip; this is unverified. The same hooded visitor also appears on "+fmtShort(byId("e7").ts)+".", citations:[cite(e,5,"⚠ Hooded visitor raises an object"),cite(byId("e7"),3,"Visitor knocks")], timeline:[tl(byId("e7")),tl(e)], people:peopleOut(["p_vis"]), focus:{person_id:"p_vis"},
+        steps:[{title:"Events with weapon flag", detail:"1 event flagged possible_weapon (unverified)."},{title:"Re-identify visitor", detail:"Same person in 1 earlier event."}]};
+    }
+    if (/tell me|watch|notify/.test(q)){
+      const pid = (body.context||{}).focus_person_id || "p_del";
+      const r = {id:++ruleId, text:"Notify me next time "+personName(P[pid])+" arrives", kind:"person_arrives", person_id:pid, active:true, created:Date.now()/1000, last_fired:null};
+      rules.push(r);
+      return {...base, operator:"watch_request", confidence:0.9, answer:"Okay. I'll alert you the next time "+personName(P[pid])+" is seen on any camera.", people:peopleOut([pid]), focus:{person_id:pid}, watch_rule:{id:r.id, text:r.text, kind:r.kind},
+        steps:[{title:"Resolve “this person”", detail:"Focus person: "+pid+"."},{title:"Create standing rule", detail:"person_arrives → push notification."}]};
+    }
+    return {...base, operator:"other", confidence:0.3, answer:"I couldn't map that to a question about your cameras. Try “Where was my father last seen?” or “Which guy is the delivery guy?”.", steps:[]};
+  }
+  const routes = [
+    ["GET", /^\/api\/state$/, () => ({ring:{mode:"sandbox", base:"http://localhost:8000/ring-sandbox"}, engines:{vision:"Amazon Nova Pro (us.amazon.nova-pro-v1:0)", embed:"Titan (amazon.titan-embed-image-v1)", decide:"jev (TypeSafe)", narrate:"Amazon Nova Lite (us.amazon.nova-lite-v1:0)"},
+        counts:{events:events.length, people:Object.keys(P).length, rules:rules.length, alerts:alerts.length}, now:Date.now()/1000})],
+    ["GET", /^\/api\/digest$/, () => ({headline:"One flagged event this week and a delivery driver back at the door today.", stats:{events_today:events.filter(e=>e.ts>=at(0,0,0)).length, people_today:1},
+        attention:[{kind:"flag", text:"Hooded visitor raised an object at the Front Door (unverified).", event_id:"e5", person_id:"p_vis", ts:byId("e5").ts},
+                   {kind:"unnamed_regular", text:"A man in a blue jacket has visited 3 times — who is he?", event_id:"e0", person_id:"p_del", ts:byId("e0").ts},
+                   {kind:"night_unknown", text:"Unknown visitor at the Front Door after 11 PM.", event_id:"e5", person_id:null, ts:byId("e5").ts},
+                   {kind:"routine", text:"Dad hasn't left the house yet — he usually goes out by now.", event_id:null, person_id:"p_dad", ts:null}]})],
+    ["GET", /^\/api\/cameras$/, () => cams.map(c => { const es = events.filter(e=>e.camera_id===c.id); return {...c, event_count:es.length, last_event_ts:es.length?es[0].ts:null}; })],
+    ["GET", /^\/api\/events$/, (m,q) => events.filter(e=>!q.get("camera")||e.camera_id===q.get("camera")).slice(0, Number(q.get("limit")||100))],
+    ["GET", /^\/api\/events\/([^/]+)$/, m => byId(m[1]) || {}],
+    ["GET", /^\/api\/people$/, () => Object.values(P).map(p => { const es = events.filter(e=>e.actors.some(a=>a.person_id===p.id));
+        return {...p, n_events:es.length, first_ts:Math.min(...es.map(e=>e.ts)), last_ts:Math.max(...es.map(e=>e.ts)), cameras:[...new Set(es.map(e=>e.camera_name))], thumb_url:""}; })],
+    ["POST", /^\/api\/people\/([^/]+)\/name$/, (m,q,b) => { Object.assign(P[m[1]], {name:b.name, relation:b.relation||null}); return P[m[1]]; }],
+    ["POST", /^\/api\/ask$/, (m,q,b) => ask(b)],
+    ["POST", /^\/api\/actors\/([^/]+)\/reassign$/, (m,q,b) => {
+        let act = null, evn = null; events.forEach(e => e.actors.forEach(a => { if (a.actor_id===m[1]){ act = a; evn = e; } }));
+        if (!act) throw Object.assign(new Error("No such sighting"), {status:404, detail:"No such sighting"});
+        const from = P[act.person_id];
+        let to;
+        if (b.person_id){ to = P[b.person_id]; if (!to) throw Object.assign(new Error("Unknown person"), {status:400, detail:"Unknown person "+b.person_id}); }
+        else { const id = "p_new"+(++newId); to = P[id] = {id, name:null, relation:null, kind:"person", label:from.label+" (separate)", role:"unknown", role_conf:0.5, is_resident:false}; }
+        Object.assign(act, {person_id:to.id, label:to.label, name:to.name, role:to.role});
+        pushFeed("info","Sighting reassigned");
+        return {from, to};
+    }],
+    ["POST", /^\/api\/people\/([^/]+)\/merge$/, (m,q,b) => {
+        if (b.into===m[1]) throw Object.assign(new Error("A person can't be merged into themselves"), {status:400, detail:"A person can't be merged into themselves"});
+        if (!P[b.into]) throw Object.assign(new Error("Unknown person"), {status:400, detail:"Unknown person "+b.into});
+        const from = P[m[1]], to = P[b.into];
+        events.forEach(e => e.actors.forEach(a => { if (a.person_id===from.id) Object.assign(a, {person_id:to.id, label:to.label, name:to.name, role:to.role}); }));
+        delete P[from.id]; pushFeed("info","Merged "+from.id+" into "+to.id);
+        return to;
+    }],
+    ["GET", /^\/api\/rules$/, () => rules.filter(r=>r.active)],
+    ["DELETE", /^\/api\/rules\/(\d+)$/, m => { const r = rules.find(x=>x.id===Number(m[1])); if (r) r.active = false; return {ok:true}; }],
+    ["GET", /^\/api\/alerts$/, () => alerts],
+    ["GET", /^\/api\/feed$/, (m,q) => feed.filter(f=>f.id>Number(q.get("after")||0))],
+    ["POST", /^\/api\/ring\/sync$/, () => { pushFeed("ingest_started","Syncing Ring history…"); setTimeout(()=>pushFeed("ingest_done","Sync complete: 0 new events"),900); return {ok:true}; }],
+    ["POST", /^\/api\/demo\/seed$/, () => ({ok:true, seeded:events.length})],
+    ["GET", /^\/api\/demo\/clips$/, () => [{name:"delivery_pizza.mp4", label:"Pizza delivery (blue jacket)"},{name:"dad_backyard.mp4", label:"Dad in the backyard"},{name:"night_visitor.mp4", label:"Night visitor"}]],
+    ["POST", /^\/api\/demo\/emit$/, (m,q,b) => { pushFeed("ingest_started","Ring "+b.kind+" on "+b.camera+" received"); setTimeout(()=>{ pushFeed("ingest_done","Event processed"); pushFeed("alert","Watching: the man in the blue jacket just arrived at the "+camName(b.camera)); },1200); return {accepted:true, webhook:"signature verified"}; }]
+  ];
+  return { async fetch(method, path, body){
+    const u = new URL(path, "http://x"); await new Promise(r=>setTimeout(r, 120 + Math.random()*180));
+    for (const [mth, re, fn] of routes){ const m = mth===method && u.pathname.match(re); if (m) return fn(m, u.searchParams, body||{}); }
+    const err = new Error("mock: no route "+method+" "+path); err.status = 404; throw err;
+  }};
+})();
+
+/* ---------- api ---------- */
+async function api(method, path, body){
+  if (MOCK) return Mock.fetch(method, path, body);
+  const res = await fetch(path, {method, headers: body ? {"Content-Type":"application/json"} : undefined, body: body ? JSON.stringify(body) : undefined});
+  if (!res.ok){
+    let t = ""; try { t = (await res.text()).slice(0,300); } catch(e){}
+    let detail = ""; try { const j = JSON.parse(t); detail = typeof j.detail==="string" ? j.detail : (j.detail ? JSON.stringify(j.detail) : ""); } catch(e){}
+    const err = new Error(detail || (method+" "+path+" → "+res.status+(t?" "+t:""))); err.status = res.status; err.detail = detail; throw err;
+  }
+  const ct = res.headers.get("content-type")||"";
+  return ct.includes("json") ? res.json() : res.text();
+}
+
+/* ---------- state ---------- */
+const S = { cameras:[], events:[], people:[], digest:null, camFilter:null, selectedId:null, focus:null, lastFeed:null, tab:"timeline", pending:false, camMap:{}, state:null };
+
+/* ---------- toasts / status ---------- */
+function toast(msg, cls, ms){
+  const t = h("div", {class:"toast "+(cls||""), text:msg, role: cls==="alert" ? "alert" : null});
+  $("toasts").append(t); setTimeout(()=>t.remove(), ms || (cls==="alert" ? 12000 : 5000));
+}
+let statusTimer;
+function setStatus(msg){ $("status").textContent = msg||""; clearTimeout(statusTimer); if (msg) statusTimer = setTimeout(()=>{ $("status").textContent=""; }, 6000); }
+
+/* ---------- top bar ---------- */
+async function loadState(){
+  try {
+    const s = await api("GET", "/api/state"); S.state = s;
+    const mode = (s.ring||{}).mode || "sandbox";
+    const p = $("ringPill"); p.hidden = false; p.className = "ringpill"+(mode==="live" ? " live" : "");
+    p.textContent = "Ring "+mode+(MOCK ? " · mock data" : ""); p.title = (s.ring||{}).base || "";
+    const c = s.counts||{};
+    $("counts").textContent = [c.events+" events", c.people+" people", c.rules+" watching"].join(" · ");
+    if ($("how").classList.contains("open")) renderHow();
+  } catch(e){ setStatus("state: "+e.message); }
+}
+
+/* ---------- how it works ---------- */
+function renderHow(){
+  const s = S.state || {}, en = s.engines || {}, mode = (s.ring||{}).mode || "sandbox";
+  const steps = [
+    ["Ring event", "A motion or doorbell event arrives by signed webhook; the clip is fetched through the Ring API.", "Ring "+mode],
+    ["Perceive", "Keyframes become a structured record: who is there, what they carry, what they do.", en.vision],
+    ["Decide", "Jev classifies each person's role and concern, the type of question, and the kind of watch rule, as typed choices with calibrated probabilities.", en.decide],
+    ["Re-identify", "Appearance embeddings link sightings into persistent people across cameras and days.", en.embed],
+    ["Memory graph", "People, events, cameras, objects and roles, stored locally.", null],
+    ["Reason", "Deterministic operators (last seen, after departure, identify a role) run over the graph. Dates are resolved in code.", null],
+    ["Answer + evidence", "A model narrates only from the retrieved facts, and every answer cites the clips it used.", en.narrate],
+    ["Watch", "Standing rules check every new event and send a push notification and a live alert.", null]
+  ];
+  const box = $("flow"); clear(box);
+  steps.forEach((st,i) => box.append(h("li",{}, h("i",{text:i+1}), h("b",{text:st[0]}), h("p",{text:st[1]}), st[2] ? h("code",{text:st[2]}) : null)));
+}
+
+/* ---------- cameras + timeline ---------- */
+async function loadCameras(){
+  try { S.cameras = await api("GET","/api/cameras"); } catch(e){ S.cameras = []; setStatus("cameras: "+e.message); }
+  S.camMap = {}; S.cameras.forEach(c => S.camMap[c.id] = c);
+  const box = $("camChips"); clear(box);
+  const mk = (id, label) => h("button", {class:"chip", type:"button", "aria-pressed": String(S.camFilter===id), onclick:()=>{ S.camFilter = id; loadEvents(); renderChips(); }}, label);
+  box.append(mk(null,"All"));
+  S.cameras.forEach(c => box.append(mk(c.id, c.name)));
+  const sel = $("emCam"); clear(sel); S.cameras.forEach(c => sel.append(h("option",{value:c.id,text:c.name})));
+}
+function renderChips(){
+  [...$("camChips").children].forEach((b,i) => b.setAttribute("aria-pressed", String((i===0 ? null : S.cameras[i-1].id) === S.camFilter)));
+}
+async function loadEvents(){
+  try { S.events = await api("GET", "/api/events?limit=200"+(S.camFilter ? "&camera="+encodeURIComponent(S.camFilter) : "")); }
+  catch(e){ S.events = []; setStatus("events: "+e.message); }
+  renderEvents();
+}
+function thumbEl(url, extra){
+  const u = safeUrl(url);
+  return u ? h("img", {class:"thumb", src:u, alt:"", loading:"lazy"}) : h("div", {class:"thumb "+(extra||"")});
+}
+function actorPill(a){
+  const who = a.name || a.label || "person";
+  return h("span", {class:"pill"+(a.role==="delivery_driver"?" ok":"")}, who + (a.role && a.role!=="unknown" ? " · "+nice(a.role) : ""));
+}
+
+/* today digest (hidden if /api/digest is missing or empty) */
+async function loadDigest(){
+  try { S.digest = await api("GET", "/api/digest"); } catch(e){ S.digest = null; }
+  renderEvents();
+}
+function dgIcon(kind){
+  if (kind==="routine"){
+    const svg = sv("svg",{class:"ico", viewBox:"0 0 16 16", "aria-hidden":"true", fill:"none", stroke:"currentColor", "stroke-width":"1.6", "stroke-linecap":"round"});
+    svg.append(sv("circle",{cx:8,cy:8,r:6.2}), sv("path",{d:"M8 4.6V8l2.3 1.5"}));
+    return svg;
+  }
+  return h("span",{class:"dot"});
+}
+function digestCard(){
+  const d = S.digest;
+  if (!d || (!d.headline && !(d.attention||[]).length)) return null;
+  const st = d.stats || {};
+  const stats = [st.events_today!=null ? st.events_today+" event"+(st.events_today===1?"":"s")+" today" : null, st.people_today!=null ? st.people_today+" "+(st.people_today===1?"person":"people") : null].filter(Boolean).join(" · ");
+  const rows = (d.attention||[]).slice(0,4).map(a => {
+    const label = a.event_id ? h("button",{class:"lnk", type:"button", onclick:()=>selectEvent(a.event_id)}, a.text) : h("span",{text:a.text});
+    let extra = null;
+    if (a.kind==="unnamed_regular" && a.person_id){
+      const inp = h("input",{type:"text", placeholder:"Name them", "aria-label":"Name for this person", maxlength:40});
+      extra = h("form",{onsubmit: async ev => { ev.preventDefault(); const name = inp.value.trim(); if (!name) return;
+          try { await api("POST","/api/people/"+encodeURIComponent(a.person_id)+"/name",{name}); toast("Saved: "+name); loadDigest(); loadPeople(); loadState(); loadEvents(); } catch(e){ toast(e.detail||e.message,"error"); } }},
+        inp, h("button",{class:"btn sm", type:"submit"},"Save"));
+    } else if (a.kind==="routine" && a.person_id && !a.event_id){
+      extra = h("div",{style:"margin-top:3px"}, h("button",{class:"lnkbtn", type:"button", onclick:()=>ask("Is my routine for this person normal today?", a.person_id)}, "Ask about this"));
+    }
+    return h("li",{class:a.kind==="flag" ? "flag" : ""}, dgIcon(a.kind), h("div",{class:"bd"}, label, a.ts ? h("span",{class:"tm",text:fmtTime(a.ts)}) : null, extra));
+  });
+  const title = (d.attention||[]).length ? "Needs attention" : "Today";
+  return h("div",{class:"dg"}, h("div",{class:"k",text:title}), d.headline ? h("div",{class:"hl",text:d.headline}) : null,
+    stats ? h("div",{class:"st",text:stats}) : null, rows.length ? h("ul",{}, rows) : null);
+}
+
+function renderEvents(){
+  const box = $("evList"); clear(box);
+  const dg = digestCard(); if (dg) box.append(dg);
+  if (!S.events.length){ box.append(h("div",{class:"empty"}, "No events yet. Open Demo → Seed demo history, or Sync Ring.")); return; }
+  let last = null;
+  const sorted = [...S.events].sort((a,b) => b.ts - a.ts);
+  for (const e of sorted){
+    const k = dayKey(e.ts);
+    if (k !== last){ box.append(h("div",{class:"day", text:dayLabel(e.ts)})); last = k; }
+    const proc = e.status === "processing";
+    const card = h("button", {class:"ev"+(proc?" processing":""), type:"button", "aria-current": String(S.selectedId===e.id), "data-id":e.id, onclick:()=>selectEvent(e.id)},
+      h("div", {style:"position:relative"}, thumbEl(e.thumb_url, proc ? "shimmer" : "")),
+      h("div", {},
+        h("div", {class:"t1"}, h("b",{text:e.camera_name||e.camera_id}), h("span",{text:fmtTime(e.ts)})),
+        h("div", {class:"sum", text: proc ? "Analyzing clip…" : (e.summary || nice(e.kind))})),
+      (e.actors||[]).length || (e.flags||[]).length ? h("div", {class:"pills"}, (e.flags||[]).map(f => h("span",{class:"pill flag", text:f})), (e.actors||[]).slice(0,3).map(actorPill)) : null);
+    box.append(card);
+  }
+}
+
+/* ---------- people / watching tabs ---------- */
+async function loadPeople(){
+  try { S.people = await api("GET","/api/people"); } catch(e){ S.people = []; setStatus("people: "+e.message); }
+  const box = $("pane-people"); clear(box);
+  if (!S.people.length){ box.append(h("div",{class:"empty"},"No people recognised yet.")); return; }
+  for (const p of S.people){
+    const nameIn = h("input", {type:"text", placeholder: p.name ? "Rename…" : "Name this person", "aria-label":"Name for "+personName(p), maxlength:40});
+    const relIn = h("input", {type:"text", placeholder:"relation", "aria-label":"Relation", maxlength:24, style:"max-width:120px"});
+    const form = h("form", {onsubmit: async ev => { ev.preventDefault(); const name = nameIn.value.trim(); if (!name) return;
+        try { await api("POST", "/api/people/"+encodeURIComponent(p.id)+"/name", {name, relation:relIn.value.trim()||null}); toast("Saved: "+name); loadPeople(); loadState(); loadDigest(); } catch(e){ toast(e.detail||e.message,"error"); } }},
+      nameIn, relIn, h("button",{class:"btn sm", type:"submit"},"Save"));
+
+    // "Same person as…" — merge with inline confirmation (no window.confirm)
+    const others = S.people.filter(x => x.id!==p.id);
+    let mrg = null;
+    if (others.length){
+      const err = h("div",{class:"ferr", role:"alert", hidden:true});
+      const conf = h("div",{class:"confirm", hidden:true});
+      const sel = h("select",{"aria-label":"Same person as"}, h("option",{value:"", disabled:true, selected:true, text:"Same person as…"}),
+        others.map(o => h("option",{value:o.id, text:personName(o)+" · "+o.id})));
+      sel.addEventListener("change", () => {
+        const tgt = others.find(o => o.id===sel.value); if (!tgt) return;
+        err.hidden = true; clear(conf); conf.hidden = false;
+        const yes = h("button",{class:"btn primary sm", type:"button"}, "Merge");
+        const no = h("button",{class:"btn ghost sm", type:"button", onclick:()=>{ conf.hidden = true; sel.selectedIndex = 0; }}, "Cancel");
+        yes.addEventListener("click", async () => {
+          yes.disabled = true;
+          try { await api("POST","/api/people/"+encodeURIComponent(p.id)+"/merge",{into:tgt.id}); toast("Merged into "+personName(tgt)); await Promise.all([loadPeople(), loadEvents(), loadState(), loadDigest()]); refreshCurrent(); }
+          catch(e){ conf.hidden = true; err.textContent = e.detail||e.message; err.hidden = false; sel.selectedIndex = 0; yes.disabled = false; }
+        });
+        conf.append(h("div",{text:"Merge "+personName(p)+" into "+personName(tgt)+"? Their sightings move over and this can't be undone."}), h("div",{style:"display:flex;gap:6px;margin-top:6px"}, yes, no));
+      });
+      mrg = h("div",{class:"mrg"}, sel, conf, err);
+    }
+    const rc = pct(p.role_conf);
+    box.append(h("div", {class:"person"},
+      thumbEl(p.thumb_url),
+      h("div", {},
+        h("h4", {}, personName(p), p.is_resident ? h("span",{class:"pill ok",text:"resident"}) : null, p.kind==="pet" ? h("span",{class:"pill",text:"pet"}) : null),
+        h("div", {class:"meta"}, (p.name && p.label ? p.label+" · " : ""), p.role ? nice(p.role)+(rc!=null ? " ("+rc+"%)" : "") : "role unknown"),
+        h("div", {class:"meta"}, (p.n_events||0)+" sightings · "+((p.cameras||[]).join(", ")||"—")),
+        h("div", {class:"meta"}, p.first_ts ? "first "+fmtFull(p.first_ts)+" · last "+fmtFull(p.last_ts) : "")),
+      form, mrg));
+  }
+}
+async function loadWatching(){
+  const box = $("pane-watching"); clear(box);
+  let rules = [], alerts = [];
+  try { rules = await api("GET","/api/rules"); } catch(e){ setStatus("rules: "+e.message); }
+  try { alerts = await api("GET","/api/alerts?limit=20"); } catch(e){ setStatus("alerts: "+e.message); }
+  box.append(h("h3",{class:"sec",text:"Active rules"}));
+  const act = rules.filter(r => r.active !== false);
+  if (!act.length) box.append(h("div",{class:"empty"},"Nothing watched yet. Ask “Tell me next time this person comes”."));
+  for (const r of act) box.append(h("div",{class:"rule"}, h("span",{text:r.text}),
+    h("button",{class:"btn sm", type:"button", "aria-label":"Delete rule", onclick: async () => { try { await api("DELETE","/api/rules/"+r.id); loadWatching(); loadState(); } catch(e){ toast(e.message,"error"); } }}, "Delete")));
+  box.append(h("h3",{class:"sec",text:"Recent alerts"}));
+  if (!alerts.length) box.append(h("div",{class:"empty"},"No alerts."));
+  for (const a of alerts) box.append(h("div",{class:"alert"}, a.message, h("small",{text:fmtFull(a.ts)})));
+}
+function setTab(t){
+  S.tab = t;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab===t)));
+  $("pane-timeline").hidden = t!=="timeline"; $("pane-people").hidden = t!=="people"; $("pane-watching").hidden = t!=="watching";
+  if (t==="people") loadPeople(); if (t==="watching") loadWatching();
+}
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+
+/* ---------- evidence panel ---------- */
+function showClip(url, offset, caption){
+  const v = $("vid"), u = safeUrl(url);
+  setBoxes([]);
+  $("vidNone").hidden = !!u; v.hidden = !u;
+  const ov = $("vidOv"); ov.hidden = !caption; ov.textContent = caption || "";
+  if (!u){ v.removeAttribute("src"); v.load(); return; }
+  const seek = () => { try { if (offset) v.currentTime = Number(offset); } catch(e){} v.play().catch(()=>{}); };
+  if (v.getAttribute("src") === u){ seek(); return; }
+  v.addEventListener("loadedmetadata", seek, {once:true});
+  v.setAttribute("src", u); v.load();
+}
+/* ----- evidence overlay: boxes drawn over the letterboxed video frame ----- */
+const ROLE_COL = {delivery_driver:"#1f7a55", resident_family:"#0b5f8c", resident_or_family:"#0b5f8c", guest_visitor:"#0f766e", service_worker:"#6b46c1", solicitor:"#8a5a00", suspicious:"#c62b45", passerby:"#5f5e5a", unknown:"#5f5e5a"};
+const OV = {items:[], show:true, media:null};      // OV.media = {vw,vh} lets tests stand in for a decoded video
+const OV_PAD = 0.4;                                // seconds a box lingers before its first / after its last keyframe
+function letterbox(cw, ch, vw, vh){                // rect of the picture inside an object-fit:contain box
+  const k = Math.min(cw/vw, ch/vh), w = vw*k, hh = vh*k;
+  return {x:(cw-w)/2, y:(ch-hh)/2, w, h:hh};
+}
+function interpBox(kf, t){
+  if (!kf || !kf.length) return null;
+  const k = [...kf].sort((a,b) => a.t-b.t);
+  if (t < k[0].t-OV_PAD || t > k[k.length-1].t+OV_PAD) return null;
+  if (t <= k[0].t) return k[0].bbox;
+  if (t >= k[k.length-1].t) return k[k.length-1].bbox;
+  let i = 0; while (i < k.length-2 && t > k[i+1].t) i++;
+  const a = k[i], b = k[i+1], f = b.t===a.t ? 0 : (t-a.t)/(b.t-a.t);
+  return a.bbox.map((v,j) => v + (b.bbox[j]-v)*f);
+}
+function setBoxes(items){
+  const c = $("boxes"); clear(c);
+  OV.items = (items||[]).filter(it => it.kf && it.kf.length);
+  OV.items.forEach(it => {
+    const sp = h("span",{text:it.label||""});
+    if (it.cls==="role" && it.color) sp.style.background = it.color;
+    it.el = h("div",{class:"bx "+it.cls}, sp);
+    if (it.cls==="role" && it.color) it.el.style.borderColor = it.color;
+    c.append(it.el);
+  });
+  layoutBoxes();
+}
+function layoutBoxes(){
+  const v = $("vid"), wrap = $("vidwrap");
+  const cw = wrap.clientWidth, ch = wrap.clientHeight;
+  const vw = (OV.media && OV.media.vw) || v.videoWidth, vh = (OV.media && OV.media.vh) || v.videoHeight;
+  const ok = OV.show && vw && vh && cw && ch;
+  const r = ok ? letterbox(cw, ch, vw, vh) : null, t = v.currentTime || 0;
+  for (const it of OV.items){
+    const b = ok ? interpBox(it.kf, t) : null;
+    if (!b){ it.el.style.display = "none"; continue; }
+    const x = r.x + Math.min(b[0],b[2])/1000*r.w, y = r.y + Math.min(b[1],b[3])/1000*r.h;
+    const w = Math.abs(b[2]-b[0])/1000*r.w, hh = Math.abs(b[3]-b[1])/1000*r.h;
+    const st = it.el.style;
+    st.display = "block"; st.left = x+"px"; st.top = y+"px"; st.width = w+"px"; st.height = hh+"px";
+    it.el.classList.toggle("in", y < 22);
+  }
+}
+function boxItems(c, ev){
+  const acts = (ev && ev.actors) || [], items = [], focus = c && c.person_id;
+  const lab = a => a.name || a.label || "person";
+  if (c && focus && (c.boxes||[]).length){
+    const f = acts.find(a => a.person_id===focus);
+    items.push({kf:c.boxes, cls:"focus", label: f ? lab(f) : (c.label||"match")});
+  }
+  acts.forEach(a => {
+    if (!(a.boxes||[]).length) return;
+    if (c && focus && a.person_id===focus){ if (!items.length) items.push({kf:a.boxes, cls:"focus", label:lab(a)}); return; }
+    items.push({kf:a.boxes, cls: (c && focus) ? "other" : "role", color: ROLE_COL[a.role] || ROLE_COL.unknown, label:lab(a)});
+  });
+  return items;
+}
+(function initOverlay(){
+  const v = $("vid");
+  const frame = () => { layoutBoxes(); if (!v.paused && !v.ended) sched(); };
+  const sched = () => { if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(frame); else requestAnimationFrame(frame); };
+  v.addEventListener("play", sched);
+  ["timeupdate","seeked","seeking","loadedmetadata","pause","resize"].forEach(ev => v.addEventListener(ev, layoutBoxes));
+  if (window.ResizeObserver) new ResizeObserver(layoutBoxes).observe($("vidwrap"));
+  $("whoTog").addEventListener("change", e => { OV.show = e.target.checked; layoutBoxes(); });
+})();
+
+/* ----- event detail + "Not them?" corrections ----- */
+function eventDetail(e){
+  S.curEvent = e;
+  const box = $("evDetail"); clear(box);
+  if (!e || !e.id) return;
+  const kv = h("div", {class:"kv"});
+  const row = (k, v) => { if (v==null || v==="" ) return; kv.append(h("span",{text:k}), h("b",{text:v})); };
+  row("When", fmtFull(e.ts)); row("Camera", e.camera_name); row("Trigger", nice(e.kind)+(e.sub_type ? " · "+nice(e.sub_type) : ""));
+  row("Scene", e.scene); row("Objects", (e.objects||[]).map(o=>nice(o.label)).join(", "));
+  const alist = (e.actors||[]).length ? h("div",{class:"alist"}, e.actors.map(a => actorRow(e, a))) : null;
+  box.append(h("div",{class:"card"}, h("h3",{text:"Event"}),
+    h("div",{style:"margin-bottom:8px", text:e.summary||""}),
+    (e.flags||[]).length ? h("div",{class:"pills",style:"margin-bottom:8px"}, e.flags.map(f=>h("span",{class:"pill flag",text:f}))) : null, kv, alist));
+}
+function actorRow(e, a){
+  const host = h("div",{});
+  const acts = (a.actions||[]).length ? " ("+a.actions.map(nice).join(", ")+")" : "";
+  const btn = a.actor_id!=null ? h("button",{class:"lnkbtn", type:"button", "aria-expanded":"false"}, "Not them?") : null;
+  host.append(h("div",{class:"arow"}, h("span",{class:"who"}, (a.name||a.label||"person")+(a.role ? " — "+nice(a.role) : ""), h("small",{text:acts})), btn));
+  if (btn) btn.addEventListener("click", () => toggleFix(btn, host, a));
+  return host;
+}
+async function toggleFix(btn, host, a){
+  const open = host.querySelector(".fix");
+  if (open){ open.remove(); btn.setAttribute("aria-expanded","false"); return; }
+  btn.setAttribute("aria-expanded","true");
+  let people = S.people; try { people = await api("GET","/api/people"); S.people = people; } catch(_){}
+  const sel = h("select",{"aria-label":"Who is this really?"},
+    h("option",{value:"", disabled:true, selected:true, text:"Who is it really?"}),
+    h("option",{value:"__new", text:"A different, new person"}),
+    people.filter(p => p.id!==a.person_id).map(p => h("option",{value:p.id, text:personName(p)+" · "+p.id})));
+  const err = h("div",{class:"ferr", role:"alert", hidden:true});
+  const go = h("button",{class:"btn primary sm", type:"submit"}, "Update");
+  const close = () => { form.remove(); btn.setAttribute("aria-expanded","false"); };
+  const form = h("form",{class:"fix", onsubmit: async ev => {
+      ev.preventDefault(); if (!sel.value) return; go.disabled = true; err.hidden = true;
+      try {
+        await api("POST","/api/actors/"+encodeURIComponent(a.actor_id)+"/reassign",{person_id: sel.value==="__new" ? null : sel.value});
+        toast("Updated — Recall will recognise them next time");
+        await Promise.all([loadPeople(), loadEvents(), loadState(), loadDigest()]); refreshCurrent();
+      } catch(x){ err.textContent = x.detail || x.message; err.hidden = false; go.disabled = false; }
+    }},
+    h("div",{class:"ttl", text:"Not "+(a.name||a.label||"them")+"?"}), sel, err,
+    h("div",{style:"display:flex;gap:6px"}, go, h("button",{class:"btn ghost sm", type:"button", onclick:close}, "Cancel")));
+  host.append(form); sel.focus();
+}
+async function refreshCurrent(){
+  if (!S.selectedId) return;
+  try {
+    const e = await api("GET","/api/events/"+encodeURIComponent(S.selectedId));
+    eventDetail(e);
+    setBoxes(boxItems(S.curCite && S.curCite.event_id===e.id ? S.curCite : null, e));
+  } catch(_){}
+}
+async function selectEvent(id, offset){
+  S.selectedId = id; S.curCite = null;
+  document.querySelectorAll(".ev").forEach(c => c.setAttribute("aria-current", String(c.dataset.id===id)));
+  let e = null;
+  try { e = await api("GET", "/api/events/"+encodeURIComponent(id)); } catch(err){ toast(err.message,"error"); return; }
+  if (S.selectedId!==id) return;
+  showClip(e.clip_url, offset||0, (e.camera_name||"")+" · "+fmtFull(e.ts));
+  eventDetail(e);
+  setBoxes(boxItems(null, e));
+}
+function openCitation(c){
+  S.selectedId = c.event_id; S.curCite = c;
+  document.querySelectorAll(".ev").forEach(x => x.setAttribute("aria-current", String(x.dataset.id===c.event_id)));
+  showClip(c.clip_url, c.t_offset, (c.camera_name||"")+" · "+fmtFull(c.ts));
+  setBoxes(boxItems(c, null));                        // focus person right away
+  api("GET","/api/events/"+encodeURIComponent(c.event_id)).then(e => {
+    if (S.curCite!==c) return;
+    eventDetail(e); setBoxes(boxItems(c, e));         // then everyone else in the clip
+  }).catch(()=>{});
+}
+function renderReasoning(steps){
+  const box = $("reasoning"); clear(box);
+  if (!steps || !steps.length) return;
+  box.append(h("div",{class:"card"}, h("h3",{text:"Reasoning"}),
+    h("ol",{class:"stepper"}, steps.map((s,i) => h("li",{}, h("i",{text:i+1}), h("b",{text:s.title}), s.detail ? h("span",{text:s.detail}) : null)))));
+}
+function renderPath(items, showEnd){
+  const box = $("path"); clear(box);
+  if (!items || !items.length) return;
+  const its = [...items].sort((a,b) => a.ts - b.ts);
+  const cams = S.cameras.length ? [...S.cameras] : [...new Map(its.map(i=>[i.camera_id,{id:i.camera_id,name:i.camera_name}])).values()];
+  const laneIds = cams.map(c=>c.id); its.forEach(i => { if (!laneIds.includes(i.camera_id)){ laneIds.push(i.camera_id); cams.push({id:i.camera_id, name:i.camera_name}); } });
+  const W = 356, L = 74, R = 24, LH = 30, top = 8, H = top + cams.length*LH + 22;
+  const svg = sv("svg", {class:"lanes", viewBox:"0 0 "+W+" "+H, role:"img", "aria-label":"Path across cameras over time"});
+  cams.forEach((c,i) => { const y = top + i*LH + LH/2; svg.append(sv("line",{class:"lane",x1:L,x2:W-R,y1:y,y2:y}), sv("text",{x:4,y:y+4},(c.name||c.id).slice(0,12))); });
+  // x by time, with a minimum gap so numbered dots never overlap
+  const t0 = its[0].ts, t1 = its[its.length-1].ts, span = t1 - t0;
+  const usable = W - L - R - 40, minGap = 20;
+  let xs = its.map(i => L + 12 + (span > 0 ? (i.ts - t0)/span*usable : 0));
+  for (let i=1;i<xs.length;i++) if (xs[i] - xs[i-1] < minGap) xs[i] = xs[i-1] + minGap;
+  const over = xs[xs.length-1] - (W - R - 22); if (over > 0) xs = xs.map((x,i) => i===0 ? x : Math.max(L+12+i*minGap*0.6, x - over*(i/(xs.length-1||1))));
+  const ys = its.map(i => top + Math.max(0, laneIds.indexOf(i.camera_id))*LH + LH/2);
+  svg.append(sv("polyline",{class:"link", points: xs.map((x,i)=>x+","+ys[i]).join(" ")}));
+  if (showEnd){
+    const ex = Math.min(W - R + 4, xs[xs.length-1] + 34);
+    svg.append(sv("line",{class:"end", x1:xs[xs.length-1], y1:ys[ys.length-1], x2:ex, y2:ys[ys.length-1]}));
+    svg.append(sv("text",{class:"endt", x:W-R+6, y:H-6, "text-anchor":"end"}, "no subsequent detections"));
+  }
+  its.forEach((it,i) => {
+    const g = sv("g",{});
+    const dot = sv("circle",{class:"dot", cx:xs[i], cy:ys[i], r:9, tabindex:0, role:"button", "aria-label":"Step "+(i+1)+": "+fmtTime(it.ts)+" "+it.camera_name});
+    const open = () => { if (it.event_id) selectEvent(it.event_id); };
+    dot.addEventListener("click", open); dot.addEventListener("keydown", e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); open(); } });
+    g.append(dot, sv("text",{class:"dotn", x:xs[i], y:ys[i]+3.5}, String(i+1)));
+    svg.append(g);
+  });
+  box.append(h("div",{class:"card"}, h("h3",{text:"Path"}), svg,
+    h("ul",{class:"pathlist"}, its.map((it,i) => h("li",{onclick:()=>it.event_id && selectEvent(it.event_id)}, h("em",{text:i+1}), h("span",{text:fmtTime(it.ts)+" "+(it.camera_name||"")+" — "+(it.text||"")}))))));
+}
+function renderPeopleCards(list){
+  const box = $("whoCards"); clear(box);
+  if (!list || !list.length) return;
+  box.append(h("div",{class:"card"}, h("h3",{text:"People"}), list.map(p => {
+    const full = S.people.find(x=>x.id===p.id) || {};
+    const rc = pct(p.role_conf);
+    return h("div",{class:"pc"}, thumbEl(full.thumb_url || p.thumb_url),
+      h("div",{}, h("div",{class:"n",text:personName(p)}),
+        h("div",{style:"font-size:12px;color:var(--dim)", text:(p.name && p.label ? p.label+" · " : "")+(p.role ? nice(p.role)+(rc!=null ? " · "+rc+"%" : "") : "")}),
+        p.appearance ? h("div",{style:"font-size:12px;color:var(--dim)", text:typeof p.appearance==="string" ? p.appearance : JSON.stringify(p.appearance)}) : null));
+  })));
+}
+
+/* ---------- chat ---------- */
+const SUGGESTIONS = ["Show me the last pizza delivery","Which guy is the delivery guy?","Who knocked six days ago?","Where was my father last seen?","Did anyone enter after Dad left?","Who pulled a gun at my door?","Is Mom's day normal today?","Tell me next time this person comes"];
+const OPLABEL = {routine_check:"Routine", identify_person:"Who is it", find_events:"Search", last_seen:"Last seen", after_departure:"After they left", security_incident:"Security", watch_request:"Watching", describe_person:"Profile"};
+const opLabel = op => OPLABEL[op] || nice(op);
+function addMsg(node, cls){
+  const hello = $("hello"); if (hello) hello.remove();
+  const m = h("div", {class:"msg "+cls}, node); $("log").append(m);
+  $("log").scrollTop = $("log").scrollHeight; return m;
+}
+function meter(conf){
+  const p = pct(conf); if (p==null || p===0) return null;
+  return h("span",{class:"meter "+(p>=80?"":p>=55?"mid":"low"), title:"confidence"}, h("i",{}, h("b",{style:"width:"+Math.min(100,p)+"%"})), p+"% sure");
+}
+function citeChip(c){
+  const label = String(c.label||"").replace(/^⚠\s*/, "⚠ ");
+  return h("button",{class:"cite", type:"button", title:(c.camera_name||"")+" · "+fmtFull(c.ts)+" — "+(c.label||""), onclick:()=>openCitation(c)},
+    thumbEl(c.thumb_url), h("span",{text:fmtShort(c.ts)+" · "+(c.camera_name||c.camera_id)+" · "+label.slice(0,48)}));
+}
+function renderAnswer(res){
+  const wrap = h("div", {});
+  wrap.append(h("div",{class:"answer", text:res.answer||"(no answer)"}));
+  const meta = h("div",{class:"meta-row"});
+  if (res.operator && res.operator!=="other") meta.append(h("span",{class:"op",text:opLabel(res.operator)}));
+  const m = meter(res.confidence); if (m) meta.append(m);
+  if (meta.childNodes.length) wrap.append(meta);
+  if ((res.citations||[]).length) wrap.append(h("div",{class:"cites"}, res.citations.map(citeChip)));
+  if (res.watch_rule) wrap.append(h("div",{class:"watchcard"}, h("b",{text:"Watching for this"}), res.watch_rule.text||"Rule created"));
+  if ((res.steps||[]).length) wrap.append(h("details",{class:"how"}, h("summary",{text:"How I got this"}),
+    h("ol",{class:"steps-mini", style:"list-style:none"}, res.steps.map((s,i) => h("li",{"data-n":i+1}, h("b",{text:s.title}), s.detail ? " — "+s.detail : "")))));
+  return wrap;
+}
+async function ask(q, focusId){
+  if (S.pending || !q.trim()) return;
+  if (focusId) S.focus = focusId;
+  S.pending = true; $("askBtn").disabled = true; $("q").disabled = true;
+  addMsg(document.createTextNode(q), "user");
+  const th = addMsg(h("span",{class:"dots","aria-label":"Thinking"}, h("i"),h("i"),h("i")), "bot");
+  try {
+    const res = await api("POST","/api/ask",{q, context:{focus_person_id:S.focus}});
+    if (res.focus && res.focus.person_id) S.focus = res.focus.person_id;
+    th.replaceChildren(renderAnswer(res));
+    renderReasoning(res.steps); renderPath(res.timeline, res.no_subsequent_detections!==false); renderPeopleCards(res.people);
+    if ((res.citations||[]).length) openCitation(res.citations[0]);
+    if (res.watch_rule){ loadState(); if (S.tab==="watching") loadWatching(); }
+  } catch(e){
+    th.classList.add("err"); th.replaceChildren(h("div",{text:"Something went wrong: "+e.message}));
+  } finally {
+    S.pending = false; $("askBtn").disabled = false; $("q").disabled = false; $("q").focus();
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+}
+$("askForm").addEventListener("submit", e => { e.preventDefault(); const v = $("q").value; $("q").value = ""; ask(v); });
+SUGGESTIONS.forEach(s => $("sugg").append(h("button",{class:"chip", type:"button", onclick:()=>ask(s)}, s)));
+document.addEventListener("keydown", e => {
+  if (e.key==="/" && !/^(INPUT|SELECT|TEXTAREA)$/.test((document.activeElement||{}).tagName||"")){ e.preventDefault(); $("q").focus(); }
+  if (e.key==="Escape"){ toggleDrawer(false); toggleHow(false); }
+});
+
+/* ---------- live feed ---------- */
+let feedBusy = false;
+async function pollFeed(){
+  if (feedBusy) return; feedBusy = true;
+  try {
+    const first = S.lastFeed === null;
+    const items = await api("GET","/api/feed?after="+(S.lastFeed||0));
+    for (const it of items){
+      S.lastFeed = Math.max(S.lastFeed||0, it.id);
+      if (first) continue;                       // don't replay history as toasts
+      if (it.type==="alert"){ toast(it.message,"alert"); loadState(); if (S.tab==="watching") loadWatching(); }
+      else if (it.type==="error"){ toast(it.message,"error"); setStatus(it.message); }
+      else if (it.type==="ingest_started"){ setStatus(it.message||"Analyzing…"); }
+      else if (it.type==="ingest_done"){ setStatus(it.message||"Done"); loadEvents(); loadCameras(); loadState(); loadDigest(); if (S.tab==="people") loadPeople(); }
+    }
+    if (S.lastFeed === null) S.lastFeed = 0;
+  } catch(e){ /* backend may be starting; retry silently */ }
+  finally { feedBusy = false; }
+}
+
+/* ---------- drawers / buttons ---------- */
+function toggleDrawer(open){
+  const d = $("drawer"); const o = open==null ? !d.classList.contains("open") : open;
+  if (o) toggleHow(false);
+  d.classList.toggle("open", o); $("demoBtn").setAttribute("aria-expanded", String(o));
+  if (o) loadClips();
+}
+function toggleHow(open){
+  const d = $("how"); const o = open==null ? !d.classList.contains("open") : open;
+  if (o) toggleDrawer(false);
+  d.classList.toggle("open", o); $("howBtn").setAttribute("aria-expanded", String(o));
+  if (o){ renderHow(); loadState(); }
+}
+async function loadClips(){
+  const sel = $("emClip"); clear(sel);
+  try { (await api("GET","/api/demo/clips")).forEach(c => sel.append(h("option",{value:c.name,text:c.label||c.name}))); } catch(e){ sel.append(h("option",{text:"(no clips)"})); }
+}
+function demoOut(o){ const p = $("demoOut"); p.hidden = false; p.textContent = typeof o==="string" ? o : JSON.stringify(o,null,2); }
+$("demoBtn").addEventListener("click", () => toggleDrawer());
+$("demoClose").addEventListener("click", () => toggleDrawer(false));
+$("howBtn").addEventListener("click", () => toggleHow());
+$("howClose").addEventListener("click", () => toggleHow(false));
+$("seedBtn").addEventListener("click", async () => {
+  const b = $("seedBtn"); b.disabled = true; demoOut("Seeding…");
+  try { demoOut(await api("POST","/api/demo/seed")); setStatus("Seeding demo history…"); } catch(e){ demoOut(e.message); toast(e.message,"error"); }
+  b.disabled = false; setTimeout(()=>{ loadEvents(); loadCameras(); loadState(); loadDigest(); }, 800);
+});
+$("emitForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  try { demoOut(await api("POST","/api/demo/emit",{camera:$("emCam").value, kind:$("emKind").value, clip:$("emClip").value})); }
+  catch(err){ demoOut(err.message); toast(err.message,"error"); }
+});
+$("syncBtn").addEventListener("click", async () => {
+  const b = $("syncBtn"); b.disabled = true; setStatus("Syncing Ring…");
+  try { await api("POST","/api/ring/sync"); } catch(e){ toast(e.message,"error"); }
+  b.disabled = false; loadEvents(); loadCameras(); loadState(); loadDigest();
+});
+
+/* ---------- boot ---------- */
+(async function boot(){
+  await loadCameras(); await Promise.all([loadState(), loadEvents(), loadPeople()]);
+  loadDigest();
+  pollFeed(); setInterval(pollFeed, 1500); setInterval(loadState, 10000);
+})();
+</script>
+</body>
+</html>
