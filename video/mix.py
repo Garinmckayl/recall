@@ -3,11 +3,13 @@
 Cues: video/recall-demo/compositions/cues/*.json = [{"t": seconds, "sfx": "bass_hit", "gain": 1.0, "dur": 1.5, "fade": 0.2}]
 """
 import glob, json, pathlib, subprocess, sys
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from envelope import make_envelope
 
 ROOT = pathlib.Path(__file__).parent
 A = ROOT / "audio"; P = ROOT / "recall-demo"
 DUR = 176.0
-MUSIC_GAIN, VO_GAIN, SFX_GAIN = 0.62, 1.0, 0.16
+MUSIC_GAIN, VO_GAIN, SFX_GAIN = 0.24, 1.0, 0.16   # music alone ~ voice level; ducked 14 dB under speech
 
 tl = json.load(open(P / "vo_timeline.json"))
 cues = []
@@ -31,14 +33,17 @@ def add(path):
     inputs.extend(["-i", str(path)]); return len(inputs) // 2 - 1
 
 m = add(A / "music.mp3")
-chains.append(f"[{m}:a]atrim=0:{DUR},asetpts=PTS-STARTPTS,volume={MUSIC_GAIN},aformat=sample_rates=48000:channel_layouts=stereo[music]")
+make_envelope(tl, ROOT / "audio" / "music_duck.wav", DUR)
+e = add(ROOT / "audio" / "music_duck.wav")
+chains.append(f"[{m}:a]atrim=0:{DUR},asetpts=PTS-STARTPTS,volume={MUSIC_GAIN},aformat=sample_rates=48000:channel_layouts=stereo[music_raw]")
+chains.append(f"[{e}:a]aformat=sample_rates=48000:channel_layouts=stereo[duck_env]")
+chains.append("[music_raw][duck_env]amultiply[music_d]")
 for k, v in tl.items():
     i = add(A / "vo" / f"{k}.mp3"); ms = int(v["start"] * 1000)
     chains.append(f"[{i}:a]aformat=sample_rates=48000:channel_layouts=stereo,volume={VO_GAIN},adelay={ms}|{ms}[vo_{k}]")
     vo_labels.append(f"[vo_{k}]")
 chains.append("".join(vo_labels) + f"amix=inputs={len(vo_labels)}:normalize=0:duration=longest,apad=whole_dur={DUR}[vo]")
-chains.append("[vo]asplit=3[vo_out][vo_sc][vo_sc2]")
-chains.append("[music][vo_sc]sidechaincompress=threshold=0.02:ratio=9:attack=15:release=450:makeup=1[music_d]")
+chains.append("[vo]asplit=2[vo_out][vo_sc2]")
 for n, c in enumerate(cues):
     fname, scale = SFX_MAP.get(c["sfx"], (c["sfx"], 1.0)) or (None, 0)
     if fname is None:
