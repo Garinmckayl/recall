@@ -28,3 +28,9 @@ Use the **same person in the same clothes** wherever the same "person" must recu
 
 Enroll Dad on clip 7 (`"name": "Dad", "relation": "father"`) and, if you like, name the delivery guy afterwards
 in the People tab. Keep every clip's audio free of music you don't own (the demo video must not use unlicensed music).
+
+## Footage in this folder
+- `dad_old_driveway.mp4`, `dad_old_frontdoor.mp4`, `dad_old_backyard.mp4` — **AI-generated** with Amazon Nova Reel 1.1 (one multi-shot generation of the same older man, see `video/generate_reel.py`), trimmed before the model's face drift, converted to grayscale night-camera style. Used by the default `manifest.json`.
+- `dad_driveway.mp4`, `dad_frontdoor.mp4`, `dad_backyard.mp4` — three cuts of one stock homecoming clip; used by `manifest_soldier.json` (the later scenes of the demo video were recorded with it).
+- `manifest_hook.json` — the default events with fixed clock times (8:03 / 8:08 / 8:13 PM) used to record the video's opening; seed it after 8:13 PM on the day you record: `RECALL_MANIFEST=demo_clips/manifest_hook.json`.
+- Everything else is stock footage from Mixkit (Mixkit Free License).

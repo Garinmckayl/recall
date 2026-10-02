@@ -142,7 +142,8 @@
       "clip": "dad_old_driveway.mp4",
       "camera": "Driveway",
       "kind": "motion",
-      "minutes_ago": 48,
+      "days_ago": 0,
+      "time": "20:03",
       "label": "Dad arrives",
       "name": "Dad",
       "relation": "father"
@@ -151,14 +152,16 @@
       "clip": "dad_old_frontdoor.mp4",
       "camera": "Front Door",
       "kind": "motion",
-      "minutes_ago": 43,
+      "days_ago": 0,
+      "time": "20:08",
       "label": "Dad at the front door"
     },
     {
       "clip": "dad_old_backyard.mp4",
       "camera": "Backyard",
       "kind": "motion",
-      "minutes_ago": 38,
+      "days_ago": 0,
+      "time": "20:13",
       "label": "Dad at the back door"
     }
   ]

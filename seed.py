@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+from pathlib import Path
 import shutil
 import sys
 import time
@@ -36,7 +37,8 @@ SAMPLE = {"events": [
 
 
 def load_manifest() -> dict:
-    p = config.DEMO_CLIPS_DIR / "manifest.json"
+    import os
+    p = Path(os.environ["RECALL_MANIFEST"]) if os.environ.get("RECALL_MANIFEST") else config.DEMO_CLIPS_DIR / "manifest.json"
     if p.exists():
         return json.loads(p.read_text())
     return SAMPLE

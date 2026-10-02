@@ -139,7 +139,7 @@
       "label": "Mom"
     },
     {
-      "clip": "dad_old_driveway.mp4",
+      "clip": "dad_driveway.mp4",
       "camera": "Driveway",
       "kind": "motion",
       "minutes_ago": 48,
@@ -148,14 +148,14 @@
       "relation": "father"
     },
     {
-      "clip": "dad_old_frontdoor.mp4",
+      "clip": "dad_frontdoor.mp4",
       "camera": "Front Door",
       "kind": "motion",
       "minutes_ago": 43,
       "label": "Dad at the front door"
     },
     {
-      "clip": "dad_old_backyard.mp4",
+      "clip": "dad_backyard.mp4",
       "camera": "Backyard",
       "kind": "motion",
       "minutes_ago": 38,
