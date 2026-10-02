@@ -89,6 +89,15 @@ async def t_boxes(pg):
             await pg.wait_for_timeout(3600)
 
 
+async def t_hero_old(pg):
+    """Same beat as t_hero, recorded against the old-man hook database (RECALL_URL=http://127.0.0.1:8401)."""
+    await t_hero(pg)
+
+
+async def t_boxes_old(pg):
+    await t_boxes(pg)
+
+
 async def t_reason(pg):
     """How the answer was reached: reasoning steps, confidence, citations, the video with the tracking box."""
     await _ready(pg)

@@ -80,13 +80,13 @@ The need is the same whether one family or a thousand residents are involved: kn
 Structured event records mean reasoning over rows instead of re-processing video, so answers are fast and cheap. Ingestion is signed and idempotent, safety flags are human-in-the-loop, corrections are owner-controlled, there is no face recognition, and it can be deployed in the customer's own AWS account. (These are use cases we designed for — not customers or pilots.)
 
 ## Built with
-Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro, Nova Lite, Titan embeddings) · TypeSafe Jev (Decisions API via OpenRouter) · Model Context Protocol (Alexa+) · Python · FastAPI · SQLite · ffmpeg · Playwright · HyperFrames · ElevenLabs
+Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro, Nova Lite, Nova Reel, Titan embeddings) · TypeSafe Jev (Decisions API via OpenRouter) · Model Context Protocol (Alexa+) · Python · FastAPI · SQLite · ffmpeg · Playwright · HyperFrames · ElevenLabs
 
 ---
 
 ## Track-specific evidence (for reviewers)
 - **Ring:** the repository calls Ring technology at runtime — `ring_api.RingClient` (devices, event history, clip and snapshot download), the `/ring/webhook` receiver with HMAC verification, and `pipeline.sync()`. The demo video shows Recall running on the Ring **sandbox** (same endpoints, signed webhooks), labelled on screen. Priority area: **caretaking**.
-- **AWS Builder:** Amazon Bedrock — Nova Pro (perception, Converse multi-image), Nova Lite (slot extraction and narration), Titan image and text embeddings (re-identification, retrieval). The integrations, what worked and what needs work are documented in [`PRODUCT_FEEDBACK.md`](https://github.com/Garinmckayl/recall/blob/main/PRODUCT_FEEDBACK.md).
+- **AWS Builder:** Amazon Bedrock — Nova Pro (perception, Converse multi-image), Nova Lite (slot extraction and narration), Titan image and text embeddings (re-identification, retrieval), and Nova Reel 1.1 (generated the older-man footage in the demo's opening, via S3 and the async API; `video/generate_reel.py`). The integrations, what worked and what needs work are documented in [`PRODUCT_FEEDBACK.md`](https://github.com/Garinmckayl/recall/blob/main/PRODUCT_FEEDBACK.md).
 - **Open Source:** new project, MIT licensed. Repository: https://github.com/Garinmckayl/recall · GitHub username: **Garinmckayl** · Contribution: a complete, documented memory layer for Ring events — signed-webhook ingestion, a Ring Partner API client and sandbox, person re-identification without faces, routine learning and proactive check-ins, an MCP server, 34 tests, deploy scripts and the demo-video source.
 - **Alexa+:** `POST /mcp` — Streamable HTTP, JSON-RPC 2.0, protocol 2025-11-25; tools `ask_home`, `last_seen`, `get_timeline`, `list_people`, `watch_for`. Validated with raw JSON-RPC (no Alexa+ device harness was available — see the friction log).
 
@@ -98,5 +98,5 @@ Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro,
 Everything in the repository was built between Aug 31 and Oct 23, 2026. The project grew from an earlier prototype ("HomeGuard", docs in `docs/v1/`) started in the same period; Recall replaced its analysis pipeline with the memory graph, Ring client and sandbox, re-identification, reasoning operators, routines and check-ins, corrections, the MCP server, deployment scripts and the demo-video source.
 
 ## Notes for reviewers
-- The video opens and closes with a short **dramatization** (labelled on screen). Everything else is the real product running on the Ring sandbox with licensed stock footage (Mixkit Free License); no real household footage or personal data is used.
+- The video opens and closes with a short **dramatization** (labelled on screen). Everything else is the real product running on the Ring sandbox. The footage is licensed stock (Mixkit Free License) plus **AI-generated clips of an older man made with Amazon Nova Reel** (used for "Dad" in the opening and in the default demo data), labelled on screen and on the end card. No real household footage or personal data is used.
 - Statistics in the video carry their sources on screen; the "412 clips this month" counter is captioned illustrative; business examples are tagged as example queries.

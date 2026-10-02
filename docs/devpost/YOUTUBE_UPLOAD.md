@@ -29,7 +29,7 @@ Chapters
 Code (MIT): https://github.com/Garinmckayl/recall
 
 About this video
-- The phone story at the start and end is a labelled dramatization. Everything else is the real product running on the Ring sandbox (same endpoints, signed webhooks) with licensed stock footage (Mixkit Free License).
+- The phone story at the start and end is a labelled dramatization. Everything else is the real product running on the Ring sandbox (same endpoints, signed webhooks) with licensed stock footage (Mixkit Free License) and AI-generated clips of an older man made with Amazon Nova Reel (labelled on screen).
 - Narration, score and sound effects are AI-generated with ElevenLabs.
 - Statistics on screen: AARP Home & Community Preferences Survey 2024; CDC Facts About Older Adult Falls; BMJ 2008 cohort study of people over 90 (Fleming & Brayne). The "clips this month" counter is illustrative.
 - Safety observations in Recall are always labelled unverified; the clip is the ground truth.
@@ -38,4 +38,4 @@ About this video
 **Tags**
 recall, ring, amazon developer hackathon, aws, amazon bedrock, amazon nova, caretaking, aging in place, elder care, home safety, visual memory, ai agents, mcp, alexa
 
-**Settings to check:** "Altered or synthetic content" — the narration and score are AI-generated and the opening is a dramatization; answer according to YouTube's current wording. Comments and embedding on. No music claims should appear (the score is generated).
+**Settings to check:** "Altered or synthetic content" — the narration and score are AI-generated and the opening features an AI-generated realistic person, so I would answer **Yes** and follow YouTube's current wording. Comments and embedding on. No music claims should appear (the score is generated).

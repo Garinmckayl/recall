@@ -80,6 +80,6 @@ Per-client rate limits on the endpoints that spend money (`/api/ask`, `/api/demo
 ## Layout
 `server.py` API + UI + webhook + MCP · `ring_api.py` client / HMAC · `ring_sim.py` sandbox · `pipeline.py` ingest · `perceive.py` Nova · `identity.py` re-id and corrections · `roles.py` role posterior · `query.py` operators · `routine.py` routines and check-ins · `digest.py` Today card · `watch.py` rules · `timeparse.py` · `aws.py` Bedrock · `jev.py` Decisions API + question sets · `db.py` / `views.py` · `static/index.html` UI · `seed.py` · `rehearse.py` · `deploy/` · `tests/` · `video/` (demo-video source: HyperFrames scenes, ElevenLabs audio scripts, screen-capture harness — see `video/README.md`). `docs/v1/` holds the earlier HomeGuard prototype's docs, which Recall grew from.
 
-Sample footage in `demo_clips/` is stock video from [Mixkit](https://mixkit.co/license/#videoFree) (Mixkit Free License), standing in for a real household.
+Sample footage in `demo_clips/` stands in for a real household: stock video from [Mixkit](https://mixkit.co/license/#videoFree) (Mixkit Free License), plus AI-generated clips of an older man (Dad) made with Amazon Nova Reel (`video/generate_reel.py`, labelled in the video).
 
 MIT licensed. Built during the submission period (Aug 31 – Oct 23, 2026).

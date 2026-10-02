@@ -22,6 +22,7 @@ Deadline: **Oct 23, 2026, 12:00 pm PT** (AWS credit request form due Oct 21, 12 
 4. [ ] On Devpost: create the project, paste each section of `SUBMISSION.md`, add the thumbnail and gallery images, add the video URL, select tracks/mini challenges (Ring, AWS Builder, Open Source), and add the repo URL.
 5. [ ] Product feedback field: paste or link `PRODUCT_FEEDBACK.md`; attach the friction log for the bonus.
 6. [ ] Request the AWS credits (form due Oct 21) if you want them.
+6b. [ ] Cost housekeeping: the Nova Reel generation (about $8.64 at $0.08/s) should be covered by your credits — check Cost Explorer a day later (filter service "Amazon Bedrock"; the Credit lines should offset it). The private S3 bucket `recall-nova-reel-<account>-use1` auto-deletes its contents after 14 days; delete the bucket when you no longer need it.
 7. [ ] Confirm your ElevenLabs plan allows commercial use of the generated music/voice, and that the shared-library voice (Brian, `gPPH6SLdL8XSX6GNJ40G`) is permitted for your use — the video may be promoted by Amazon/Devpost.
 8. [ ] Optional: contribute back — send the Ring team the sandbox/webhook feedback in `PRODUCT_FEEDBACK.md`.
 9. [ ] Submit early; edits are not allowed after the deadline.
