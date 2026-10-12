@@ -154,15 +154,17 @@ def media_person(person_id: str):
 @app.get("/api/state")
 def api_state():
     eng = aws.engine_report()
-    c = lambda t: (db.one(f"SELECT COUNT(*) AS n FROM {t}") or {"n": 0})["n"]  # noqa: E731
+    n_events = (db.one("SELECT COUNT(*) AS n FROM events") or {"n": 0})["n"]
+    n_people = (db.one("SELECT COUNT(*) AS n FROM persons") or {"n": 0})["n"]
+    n_alerts = (db.one("SELECT COUNT(*) AS n FROM alerts") or {"n": 0})["n"]
     return {
         "ring": {"mode": ring_api.mode(), "base": ring_api.api_base()},
         "engines": {"vision": eng.get("vision", f"Amazon Nova Pro ({config.NOVA_VISION_MODEL})"),
                     "embed": eng.get("embed_image", f"Titan ({config.TITAN_IMAGE_EMBED})"),
                     "decide": jev.client().engine_name, "narrate": eng.get("text", f"Amazon Nova Lite ({config.NOVA_TEXT_MODEL})")},
-        "counts": {"events": c("events"), "people": c("persons"),
+        "counts": {"events": n_events, "people": n_people,
                    "rules": (db.one("SELECT COUNT(*) AS n FROM watch_rules WHERE active=1") or {"n": 0})["n"],
-                   "alerts": c("alerts")},
+                   "alerts": n_alerts},
         "now": time.time(),
     }
 

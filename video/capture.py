@@ -156,6 +156,9 @@ async def t_pipeline(pg):
     await pg.locator("#demoClose").click(); await pg.wait_for_timeout(9000)
 
 
+TAKES = {fn.__name__: fn for fn in (t_hero, t_hero_old, t_boxes, t_boxes_old, t_reason, t_routine, t_trust, t_people, t_pipeline)}
+
+
 async def main(name):
     with Screen():
         async with async_playwright() as pw:
@@ -163,7 +166,7 @@ async def main(name):
             await pg.goto(BASE + "/"); await pg.wait_for_timeout(1200)
             ff, path = start_ffmpeg(name); await asyncio.sleep(0.5)
             try:
-                await globals()[name](pg)
+                await TAKES[name](pg)
             finally:
                 stop_ffmpeg(ff); await b.close()
     print("wrote", path)

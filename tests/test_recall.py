@@ -500,3 +500,12 @@ def test_live_mode_rejects_the_published_default_webhook_key(monkeypatch):
     assert not ring_api.verify_signature(raw, ring_api.sign(raw))
     monkeypatch.setattr(config, "RING_HMAC_KEY", "a-real-secret")
     assert ring_api.verify_signature(raw, ring_api.sign(raw))
+
+
+def test_sql_helpers_reject_unsafe_identifiers(mem):
+    with pytest.raises(ValueError):
+        db.insert("events; DROP TABLE events", id="x")
+    with pytest.raises(ValueError):
+        db.update("persons", "id", "p1", **{"name=1, role": "x"})
+    db.reset_all()                                  # fixed statements still wipe everything
+    assert db.one("SELECT COUNT(*) AS n FROM events")["n"] == 0

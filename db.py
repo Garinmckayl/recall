@@ -6,6 +6,7 @@ JSON-valued columns are stored as TEXT and decoded by `row()`.
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import threading
 import time
@@ -148,10 +149,11 @@ def conn() -> sqlite3.Connection:
             _conn.row_factory = sqlite3.Row
             _conn.execute("PRAGMA journal_mode=WAL")
             _conn.executescript(SCHEMA)
-            for col in ("boxes", "emb"):        # added after v1: per-frame boxes, per-sighting embeddings
-                have = {r["name"] for r in _conn.execute("PRAGMA table_info(actors)")}
-                if col not in have:
-                    _conn.execute(f"ALTER TABLE actors ADD COLUMN {col} TEXT")
+            have = {r["name"] for r in _conn.execute("PRAGMA table_info(actors)")}
+            if "boxes" not in have:             # added after v1: per-frame boxes
+                _conn.execute("ALTER TABLE actors ADD COLUMN boxes TEXT")
+            if "emb" not in have:               # added after v1: per-sighting embeddings
+                _conn.execute("ALTER TABLE actors ADD COLUMN emb TEXT")
             _conn.commit()
         return _conn
 
@@ -201,8 +203,19 @@ def execute(sql: str, args: Iterable[Any] = ()) -> int:
         return cur.lastrowid or 0
 
 
+_IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _ident(*names: str) -> None:
+    """Table/column names are interpolated into SQL (values never are): only plain identifiers may pass."""
+    for n in names:
+        if not _IDENT.match(n):
+            raise ValueError(f"unsafe SQL identifier: {n!r}")
+
+
 def insert(table: str, **cols: Any) -> int:
     keys = list(cols)
+    _ident(table, *keys)
     sql = f"INSERT INTO {table} ({','.join(keys)}) VALUES ({','.join('?' * len(keys))})"
     return execute(sql, [cols[k] for k in keys])
 
@@ -210,6 +223,7 @@ def insert(table: str, **cols: Any) -> int:
 def update(table: str, key: str, key_val: Any, **cols: Any) -> None:
     if not cols:
         return
+    _ident(table, key, *cols)
     sets = ",".join(f"{k}=?" for k in cols)
     execute(f"UPDATE {table} SET {sets} WHERE {key}=?", [cols[k] for k in cols] + [key_val])
 
@@ -252,6 +266,6 @@ def reset_all() -> None:
     """Wipe the memory (used by the demo seeder)."""
     with _lock:
         c = conn()
-        for t in ("events", "actors", "objects", "persons", "watch_rules", "alerts", "webhooks_seen", "feed"):
-            c.execute(f"DELETE FROM {t}")
+        c.executescript("DELETE FROM events; DELETE FROM actors; DELETE FROM objects; DELETE FROM persons; "
+                        "DELETE FROM watch_rules; DELETE FROM alerts; DELETE FROM webhooks_seen; DELETE FROM feed;")
         c.commit()
