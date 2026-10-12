@@ -18,7 +18,7 @@ if $SSH '[ -f ~/recall/.env ]'; then echo "kept existing ~/recall/.env"; else
   {
     grep -E '^(OPENROUTER_API_KEY|JEV_MODEL|VISION_MODEL|DECISION_MODEL|NARRATOR_MODEL|NTFY_TOPIC)=' .env
     echo "AWS_REGION=us-east-1"; echo "SERVER_URL=http://127.0.0.1:8300"
-    echo "RING_HMAC_KEY=$HMAC"; echo "ADMIN_TOKEN=$ADMIN"; echo "RECALL_WORKERS=2"
+    echo "RING_HMAC_KEY=$HMAC"; echo "ADMIN_TOKEN=$ADMIN"; echo "RECALL_WORKERS=2"; echo "RECALL_TRUST_PROXY=1"
   } | $SSH 'umask 077; cat > ~/recall/.env'
   echo "ADMIN_TOKEN (needed only to re-seed): $ADMIN"
 fi

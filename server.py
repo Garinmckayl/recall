@@ -67,9 +67,17 @@ _RATE = {"/api/ask": (20, 60), "/api/demo/emit": (6, 60), "/mcp": (40, 60)}
 _hits: dict[tuple[str, str], deque] = defaultdict(deque)
 
 
+TRUST_PROXY = os.getenv("RECALL_TRUST_PROXY", "") == "1"
+
+
 def _client_ip(request: Request) -> str:
-    return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-            or (request.client.host if request.client else "?"))
+    """Proxy headers are client-controlled unless a trusted proxy (the Cloudflare tunnel) sets them, so they
+    only count when RECALL_TRUST_PROXY=1; otherwise a caller could dodge the limits by inventing an address."""
+    if TRUST_PROXY:
+        fwd = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        if fwd:
+            return fwd
+    return request.client.host if request.client else "?"
 
 
 @app.middleware("http")
@@ -77,6 +85,9 @@ async def _rate_limit(request: Request, call_next):
     limit = _RATE.get(request.url.path)
     if limit and request.method == "POST":
         now, (n, per) = time.time(), limit
+        if len(_hits) > 5000:                      # bound memory: drop idle buckets
+            for k in [k for k, v in _hits.items() if not v or now - v[-1] > 120]:
+                del _hits[k]
         q = _hits[(_client_ip(request), request.url.path)]
         while q and now - q[0] > per:
             q.popleft()
@@ -88,7 +99,8 @@ async def _rate_limit(request: Request, call_next):
 
 
 def _require_admin(request: Request) -> None:
-    if config.ADMIN_TOKEN and request.headers.get("x-admin-token") != config.ADMIN_TOKEN:
+    import hmac as _hmac
+    if config.ADMIN_TOKEN and not _hmac.compare_digest(request.headers.get("x-admin-token", ""), config.ADMIN_TOKEN):
         raise HTTPException(403, "admin token required")
 
 

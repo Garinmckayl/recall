@@ -55,6 +55,8 @@ def verify_signature(raw: bytes, header: Optional[str], key: str | None = None) 
     """Constant-time check of X-Signature against the RAW request body."""
     if not header:
         return False
+    if key is None and mode() == "live" and config.RING_HMAC_KEY == "sandbox-hmac-key":
+        return False                                  # live platform + the published default key = anyone could forge events
     return hmac.compare_digest(sign(raw, key), header.strip())
 
 

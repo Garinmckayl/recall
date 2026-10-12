@@ -61,10 +61,18 @@ def reset_state() -> None:
     save_state({"devices": DEFAULT_DEVICES, "events": []})
 
 
+ALLOWED_CLIP_SUFFIXES = {".mp4", ".mov"}
+
+
 def resolve_clip(name: str) -> Optional[Path]:
+    """A clip is a bare filename of a video that sits directly in one of the clip folders. Anything with a
+    path component (../, absolute paths, subfolders) or a non-video suffix is refused — the name arrives from
+    an unauthenticated demo endpoint and is later served back as the event's media."""
+    if not name or name != Path(name).name or Path(name).suffix.lower() not in ALLOWED_CLIP_SUFFIXES:
+        return None
     for d in _SEARCH():
-        p = d / name
-        if p.exists():
+        p = (d / name).resolve()
+        if p.parent == d.resolve() and p.is_file():
             return p
     return None
 
@@ -144,7 +152,9 @@ def deliver_webhook(ev: dict, url: Optional[str] = None) -> dict:
 
 # -- auth + endpoints -----------------------------------------------------------------
 
-def _auth(authorization: Optional[str]) -> None:
+def _auth(authorization: Optional[str], request: Optional[Request] = None) -> None:
+    if request is not None and (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for")):
+        raise HTTPException(404, "not found")          # the sandbox is for the app itself, not for the public internet
     ok = {ring_api.SANDBOX_TOKEN, config.RING_ACCESS_TOKEN} - {""}
     if not authorization or authorization.removeprefix("Bearer ").strip() not in ok:
         raise HTTPException(401, "invalid or missing bearer access token")
@@ -157,14 +167,14 @@ def _device_resource(d: dict) -> dict:
 
 
 @router.get("/v1/devices")
-def devices(authorization: Optional[str] = Header(None)):
-    _auth(authorization)
+def devices(request: Request, authorization: Optional[str] = Header(None)):
+    _auth(authorization, request)
     return {"data": [_device_resource(d) for d in load_state()["devices"]]}
 
 
 @router.get("/v1/devices/{device_id}")
-def device(device_id: str, authorization: Optional[str] = Header(None)):
-    _auth(authorization)
+def device(device_id: str, request: Request, authorization: Optional[str] = Header(None)):
+    _auth(authorization, request)
     for d in load_state()["devices"]:
         if d["id"] == device_id:
             return {"data": _device_resource(d)}
@@ -172,8 +182,8 @@ def device(device_id: str, authorization: Optional[str] = Header(None)):
 
 
 @router.get("/v1/history/devices/{device_id}/events")
-def history(device_id: str, since: Optional[str] = None, authorization: Optional[str] = Header(None)):
-    _auth(authorization)
+def history(device_id: str, request: Request, since: Optional[str] = None, authorization: Optional[str] = Header(None)):
+    _auth(authorization, request)
     floor = ring_api._epoch(since) if since else 0.0
     evs = [e for e in load_state()["events"] if e["device_id"] == device_id and e["occurred_at"] > floor]
     evs.sort(key=lambda e: e["occurred_at"])
@@ -195,7 +205,7 @@ def _event_for(device_id: str, body: dict) -> dict:
 
 @router.post("/v1/devices/{device_id}/media/video/download")
 async def video_download(device_id: str, request: Request, authorization: Optional[str] = Header(None)):
-    _auth(authorization)
+    _auth(authorization, request)
     ev = _event_for(device_id, await request.json())
     p = resolve_clip(ev["clip"])
     if not p:
@@ -205,7 +215,7 @@ async def video_download(device_id: str, request: Request, authorization: Option
 
 @router.post("/v1/devices/{device_id}/media/image/download")
 async def image_download(device_id: str, request: Request, authorization: Optional[str] = Header(None)):
-    _auth(authorization)
+    _auth(authorization, request)
     ev = _event_for(device_id, await request.json())
     p = resolve_clip(ev["clip"])
     if not p:

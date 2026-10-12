@@ -419,8 +419,9 @@ def test_rate_limit_on_expensive_endpoints(mem, monkeypatch):
     import server
     monkeypatch.setitem(server._RATE, "/api/ask", (3, 60))
     server._hits.clear()
+    monkeypatch.setattr(server, "TRUST_PROXY", True)       # behind the tunnel the real client address is in CF-Connecting-IP
     c = TestClient(server.app)
-    codes = [c.post("/api/ask", json={"q": "who is here?"}).status_code for _ in range(5)]
+    codes = [c.post("/api/ask", json={"q": "who is here?"}, headers={"CF-Connecting-IP": "7.7.7.7"}).status_code for _ in range(5)]
     assert codes[:3] == [200, 200, 200] and codes[3:] == [429, 429]
     # a different client is unaffected
     assert c.post("/api/ask", json={"q": "hi"}, headers={"CF-Connecting-IP": "9.9.9.9"}).status_code == 200
@@ -458,3 +459,44 @@ def test_path_text_uses_description_when_no_actions(mem):
     add_event("p2", "front_door", at(0, "19:36"), "x", [{"pid": "person_50", "desc": "A man in a military uniform hugging a woman at the door."}])
     r = query.ask("Where was Dad last seen?", now=NOW)
     assert "military uniform" in r["timeline"][-1]["text"].lower() and "appears" not in r["timeline"][-1]["text"]
+
+
+# -- security regressions (from the Arcumet scan + review) -------------------------------
+
+def test_clip_names_cannot_escape_the_clip_folders(mem):
+    import ring_sim
+    for bad in ("../../.env", "../data/recall.db", "/etc/passwd", "sub/dir.mp4", "x.txt", "", "..", "a/../b.mp4"):
+        assert ring_sim.resolve_clip(bad) is None, bad
+    from fastapi.testclient import TestClient
+    import server
+    c = TestClient(server.app)
+    assert c.post("/api/demo/emit", json={"camera": "front_door", "clip": "../../.env"}).status_code in (400, 404)
+
+
+def test_sandbox_api_refuses_proxied_callers(mem):
+    from fastapi.testclient import TestClient
+    import server
+    c = TestClient(server.app)
+    h = {"Authorization": "Bearer sandbox-token"}
+    assert c.get("/ring-sandbox/v1/devices", headers=h).status_code == 200
+    assert c.get("/ring-sandbox/v1/devices", headers={**h, "CF-Connecting-IP": "1.2.3.4"}).status_code == 404
+
+
+def test_rate_limit_ignores_spoofed_proxy_headers_unless_trusted(mem, monkeypatch):
+    from fastapi.testclient import TestClient
+    import server
+    monkeypatch.setitem(server._RATE, "/api/ask", (2, 60)); server._hits.clear()
+    monkeypatch.setattr(server, "TRUST_PROXY", False)
+    c = TestClient(server.app)
+    codes = [c.post("/api/ask", json={"q": "hi"}, headers={"CF-Connecting-IP": f"9.9.9.{i}"}).status_code for i in range(4)]
+    assert codes[2:] == [429, 429]                      # rotating the header does not reset the bucket
+    server._hits.clear(); monkeypatch.setattr(server, "TRUST_PROXY", True)
+    assert [c.post("/api/ask", json={"q": "hi"}, headers={"CF-Connecting-IP": f"8.8.8.{i}"}).status_code for i in range(4)] == [200] * 4
+
+
+def test_live_mode_rejects_the_published_default_webhook_key(monkeypatch):
+    monkeypatch.setattr(config, "RING_ACCESS_TOKEN", "tok"); monkeypatch.setattr(config, "RING_HMAC_KEY", "sandbox-hmac-key")
+    raw = b"{}"
+    assert not ring_api.verify_signature(raw, ring_api.sign(raw))
+    monkeypatch.setattr(config, "RING_HMAC_KEY", "a-real-secret")
+    assert ring_api.verify_signature(raw, ring_api.sign(raw))
