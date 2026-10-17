@@ -4,7 +4,6 @@ The 3-minute demo video is generated from this folder. Generated media (audio, s
 
 | File | What it does |
 |---|---|
-| `PLAN.md` | The script: beat sheet, narration, sources shown on screen |
 | `gen_audio.py` | ElevenLabs narration (with word timings), sound effects and the score |
 | `align_vo.py` | Re-voice the narration and align it phrase-by-phrase to the timing the scenes were built on |
 | `regen_vo.py` | (earlier approach: match whole-clip durations) |

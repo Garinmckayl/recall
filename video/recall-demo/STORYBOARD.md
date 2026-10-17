@@ -2,7 +2,7 @@
 
 Canvas **1920×1080 @ 30 fps**, total **176 s**. Positioning line (verbatim wherever used):
 **Persistent visual memory for caretaking and safety.** Never call it security AI / video search / facial recognition except in the "Not …" negation beat.
-Full narrative: `../PLAN.md`. Narration timings: `vo_meta.json` (word-level, seconds within each clip) + `vo_timeline.json` (absolute start/end of each clip on the final timeline).
+Narration timings: `vo_meta.json` (word-level, seconds within each clip) + `vo_timeline.json` (absolute start/end of each clip on the final timeline).
 
 ## Timeline (absolute seconds) — each scene is one sub-composition file
 | id (= file = composition-id) | window | narration inside it |
@@ -50,4 +50,4 @@ Write `compositions/cues/<scene-id>.json` — an array of `{"t": <ABSOLUTE secon
 - Don't render MP4s. Report back in ≤ 6 lines: what the scene shows beat by beat, cues written, anything you need changed in the audio/timing.
 
 ## Per-scene direction
-(See each scene's brief in the dispatch message; the beat sheet in `../PLAN.md` is the source of truth for copy.)
+(See each scene's brief in the dispatch message for copy.)
