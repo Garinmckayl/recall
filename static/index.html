@@ -44,8 +44,8 @@ header{height:var(--hh);display:flex;align-items:center;gap:12px;padding:0 18px;
 .btn.ghost:hover{background:var(--bg);color:var(--ink);border-color:var(--line)}
 
 /* layout */
-.quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 18px;background:var(--green-soft);border-bottom:1px solid var(--green-line);font-size:13px}
-.quick b{color:var(--green)}.quick .btn{font-size:12.5px}
+.quick{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px;background:var(--green-soft);border-bottom:2px solid var(--green-line);font-size:18px}
+.quick b{color:var(--green);font-size:20px;font-weight:800}.quick .btn{font-size:17px;font-weight:700;padding:10px 20px}
 main{height:calc(100vh - var(--hh) - var(--qh,0px));display:grid;grid-template-columns:330px minmax(0,1fr) 400px;min-width:0}
 .panel{min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
 .panel:last-child{border-right:0}
@@ -267,7 +267,7 @@ svg.lanes .dotn{fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle
   <button class="btn" id="demoBtn" type="button" aria-label="Demo controls" aria-expanded="false" aria-controls="drawer"><span class="lbl">Demo</span><span class="ic" aria-hidden="true">▶</span></button>
 </header>
 <nav class="quick" id="quick" aria-label="Judge quickstart">
-  <b>Judge quickstart</b>
+  <b>Judge quickstart: 3 clicks</b>
   <button class="btn" id="qs1" type="button">1 · Where was Dad last seen?</button>
   <button class="btn" id="qs2" type="button">2 · Is Mom's day normal today?</button>
   <button class="btn primary" id="qs3" type="button">3 · Emit Ring event</button>

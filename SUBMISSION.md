@@ -1,14 +1,14 @@
 # Devpost submission, Recall
 
-Paste each block into the matching Devpost field. Two placeholders remain: `[[VIDEO URL]]` and `[[LIVE DEMO URL]]`.
+Paste each block into the matching Devpost field. One placeholder remains: `[[VIDEO URL]]`.
 
 ---
 
 ## Project name
 Recall
 
-## Elevator pitch (181 characters)
-Persistent visual memory for caretaking and safety: ask your Ring cameras where Dad was last seen and get one reconstructed answer with proof, plus a heads-up when a routine breaks.
+## Elevator pitch (197 characters)
+Ask your Ring cameras "Where was Dad last seen?" and get one answer with proof. Recall remembers, flags a broken routine, and warns when a camera went dark, so silence is never mistaken for safety.
 
 ## Tracks and challenges entered
 - **Ring** (primary), caretaking
@@ -19,10 +19,17 @@ Persistent visual memory for caretaking and safety: ask your Ring cameras where 
 ## Links
 - **Code:** https://github.com/Garinmckayl/recall (public, MIT license)
 - **Demo video (2:56):** [[VIDEO URL]]
-- **Try it live:** [[LIVE DEMO URL]]
+- **Try it live:** https://recall.arcumet.com
 - **Product feedback:** [`PRODUCT_FEEDBACK.md`](https://github.com/Garinmckayl/recall/blob/main/PRODUCT_FEEDBACK.md) · **Friction log:** [`FRICTION_LOG.md`](https://github.com/Garinmckayl/recall/blob/main/FRICTION_LOG.md)
 
 ---
+
+## Judge quickstart: 3 clicks, no login
+**Live: https://recall.arcumet.com**
+1. **Ask "Where was Dad last seen?"** One answer, a three-camera path, a box on him in every clip. https://recall.arcumet.com/?step=1
+2. **Ask "Is Mom's day normal today?"** The routine engine notices what *didn't* happen. https://recall.arcumet.com/?step=2
+3. **Emit Ring event.** A signed Ring webhook is ingested live and answerable seconds later. https://recall.arcumet.com/?step=3
+4. *Bonus:* send **device_offline** for the Backyard, then redo step 1. Recall now refuses to say "nothing happened" for a camera Ring says was dark.
 
 ## Inspiration
 It's 8:20 PM. Your father is 81 and lives alone. He isn't answering his phone.
@@ -45,12 +52,12 @@ The same memory answers "which guy is the delivery guy?" or "who knocked six day
 ## How we built it
 `Ring event → Perceive → Decide → Re-identify → Memory graph → Reason → Answer + evidence → Watch`
 
-- **Ring (repo calls Ring at runtime):** `ring_api.py` is a client for the Ring Partner API (device discovery, event history, clip and snapshot download); `server.py` receives Ring webhooks, verifying `X-Signature` (HMAC-SHA256 over the raw body), de-duplicating on `meta.request_id` and acknowledging immediately; `pipeline.py` pulls clips through the client and ingests them. With credentials it talks to the live platform; without them, to a local sandbox (`ring_sim.py`) that serves the same endpoints and sends signed webhooks, one code path either way.
+- **Ring (called at runtime, in an original way):** `ring_api.py` is written to the published Ring Partner API: OAuth refresh-token rotation, JSON:API device discovery with camera-module ids, `history-events` with cursor pagination, video download (200/206/redirects) and snapshot download (303 to a pre-signed URL), 429 backoff. `/ring/webhook` verifies `X-Signature` (HMAC-SHA256 over the raw body), de-duplicates on `meta.request_id` and on camera plus time, and acknowledges immediately. **Lifecycle webhooks (`device_offline` / `device_online`) feed a coverage log, so a "last seen" answer knows whether any camera was dark afterwards and says so instead of claiming "no later detections".** With credentials the client talks to the live platform; without them, to `ring_sim.py`, a sandbox that speaks the same documented wire formats and sends signed webhooks. One code path either way.
 - **Amazon Bedrock (AWS Builder):** Amazon **Nova Pro** reads six keyframes per clip in one Converse call and returns a structured event record (actors, appearance, carried objects, actions, interactions, a body box per keyframe, hedged safety observations). Amazon **Nova Lite** extracts query slots and narrates strictly from evidence. Amazon **Titan** embeddings (body-crop images and appearance text) drive person re-identification and semantic event retrieval. Integration details, what worked and what needs work are in `PRODUCT_FEEDBACK.md`.
 - **Decisions:** every classification, an actor's role and concern, the question's reasoning operator, the subject, the watch-rule type, is a typed, calibrated choice from TypeSafe's Jev model through the Decisions API. Generative models observe and narrate; they never decide.
 - **Reasoning:** deterministic operators over a SQLite memory graph (identify a role, find events, last seen, trajectory, after-departure, security incident, routine check, count, watch). Dates are resolved by code, not a model. A routine engine (median ± MAD) learns usual times; a background loop pushes check-ins.
 - **UI:** a single-file light interface, timeline, chat, evidence panel with video overlays, reasoning steps, People, and a "Needs attention" digest.
-- **Quality and safety:** 34 offline tests; a rehearsal tool that checks staged clips will support their demo question; rate limits and an admin token for public deployment.
+- **Quality and safety:** 44 offline tests; a rehearsal tool that checks staged clips will support their demo question; rate limits and an admin token for public deployment.
 
 ## Challenges we ran into
 - **Real Ring access.** The live platform needs early-access credentials, an ID check and a device. We built a faithful sandbox and kept one client code path for both. The client implements the published wire formats (OAuth refresh, JSON:API discovery, history pagination, media 200/206/303, Webhook v1.1, lifecycle events) and is tested against mocked transports; it has not been run against the live platform.
@@ -62,6 +69,7 @@ The same memory answers "which guy is the delivery guy?" or "who knocked six day
 - A hero answer that reads like a person and comes with **proof you can click**, a three-camera path with a box on the person in every clip.
 - A real memory: the same person recognised across cameras and days in seconds.
 - A working **live loop**: signed webhook → ingest → re-identify → rule fires → push notification.
+- **Coverage-aware answers:** Ring's own device status turns "no detections" from a guess into a claim that is only made when someone was watching.
 - **Proactive** caretaking: Recall pushes a check-in when a routine breaks, the case no clip search can find, because nothing happened.
 
 ## What we learned
@@ -87,12 +95,12 @@ Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro,
 ## Track-specific evidence (for reviewers)
 - **Ring:** the repository calls Ring technology at runtime, `ring_api.RingClient` (devices, event history, clip and snapshot download), the `/ring/webhook` receiver with HMAC verification, and `pipeline.sync()`. The demo video shows Recall running on the Ring **sandbox** (same endpoints, signed webhooks), labelled on screen. Priority area: **caretaking**.
 - **AWS Builder:** Amazon Bedrock, Nova Pro (perception, Converse multi-image), Nova Lite (slot extraction and narration), Titan image and text embeddings (re-identification, retrieval), and Nova Reel 1.1 (generated the older-man footage in the demo's opening, via S3 and the async API; `video/generate_reel.py`). The integrations, what worked and what needs work are documented in [`PRODUCT_FEEDBACK.md`](https://github.com/Garinmckayl/recall/blob/main/PRODUCT_FEEDBACK.md).
-- **Open Source:** new project, MIT licensed. Repository: https://github.com/Garinmckayl/recall · GitHub username: **Garinmckayl** · Contribution: a complete, documented memory layer for Ring events, signed-webhook ingestion, a Ring Partner API client and sandbox, person re-identification without faces, routine learning and proactive check-ins, an MCP server, 34 tests, deploy scripts and the demo-video source.
+- **Open Source:** new project, MIT licensed. Repository: https://github.com/Garinmckayl/recall · GitHub username: **Garinmckayl** · Contribution: a complete, documented memory layer for Ring events, signed-webhook ingestion, a Ring Partner API client and sandbox, person re-identification without faces, routine learning and proactive check-ins, an MCP server, 44 tests, deploy scripts and the demo-video source.
 - **Alexa+:** `POST /mcp`, Streamable HTTP, JSON-RPC 2.0, protocol 2025-11-25; tools `ask_home`, `last_seen`, `get_timeline`, `list_people`, `watch_for`. Validated with raw JSON-RPC (no Alexa+ device harness was available, see the friction log).
 
 ## Testing instructions
-- **Live:** [[LIVE DEMO URL]], open it, click **Where was Dad last seen?**, then **Is Mom's day normal today?**, then **Demo → Emit Ring event**. No login required. (Rate-limited to protect the demo.)
-- **Locally:** `pip install -r requirements.txt`, `cp .env.example .env` (OpenRouter key; AWS credentials with Bedrock access), `python3 -m uvicorn server:app`, `python3 seed.py`. The 34 tests run offline with `python3 -m pytest tests -q`. A 3-minute tour is in the README.
+- **Live:** https://recall.arcumet.com, open it, click **Where was Dad last seen?**, then **Is Mom's day normal today?**, then **Demo → Emit Ring event**, or just use the three quickstart buttons at the top of the page. No login required. (Rate-limited to protect the demo.)
+- **Locally:** `pip install -r requirements.txt`, `cp .env.example .env` (OpenRouter key; AWS credentials with Bedrock access), `python3 -m uvicorn server:app`, `python3 seed.py`. The 44 tests run offline with `python3 -m pytest tests -q`. A 3-minute tour is in the README.
 
 ## What was built during the submission period
 Everything in the repository was built between Aug 31 and Oct 23, 2026. The project grew from an earlier prototype ("HomeGuard", docs in `docs/v1/`) started in the same period; Recall replaced its analysis pipeline with the memory graph, Ring client and sandbox, re-identification, reasoning operators, routines and check-ins, corrections, the MCP server, deployment scripts and the demo-video source.

@@ -1,5 +1,7 @@
 # Recall
 
+## Your cameras saw everything. Recall gives them a memory.
+
 > Not security AI. Not video search. Not facial recognition. **Persistent visual memory for caretaking and safety.**
 
 **Amazon Developer Hackathon, Ring track (caretaking) · AWS Builder mini challenge · Open Source mini challenge · Alexa+ MCP server**
@@ -13,9 +15,11 @@ It's 8:20 PM. Your father is 81 and lives alone. He isn't answering his phone. T
 
 And it doesn't wait to be asked. Recall learns each named person's routine and pushes a check-in when the day breaks pattern: *"Mom usually appears around 7:30 AM (6 of the last 6 days). Nothing yet today."*
 
-## Judge quickstart (3 clicks, no setup)
+# Judge quickstart: 3 clicks, no setup
 
-Live demo: **https://recall.arcumet.com** (pre-seeded; nothing to install, nothing to sign in to).
+## Live: https://recall.arcumet.com
+
+Pre-seeded. Nothing to install, nothing to sign in to.
 
 1. **[Ask "Where was Dad last seen?"](https://recall.arcumet.com/?step=1)**: one reconstructed answer with the path across cameras, a tracked box on him in every clip, and "no later detections".
 2. **[Ask "Is Mom's day normal today?"](https://recall.arcumet.com/?step=2)**: the routine engine's answer (usual time, how many days, nothing yet today).
@@ -23,7 +27,7 @@ Live demo: **https://recall.arcumet.com** (pre-seeded; nothing to install, nothi
 
 Bonus for the Ring-minded: in the same drawer, send **device_offline** for the Backyard, then redo step 1. The answer now warns that "no later detections" is not conclusive because Ring reported that camera offline. That is Recall using Ring's device lifecycle webhooks to tell *nothing happened* from *nobody was watching*.
 
-## Screenshots
+# See it
 
 | Answer with evidence | Tracked on every clip | Proactive check-in |
 |---|---|---|
