@@ -314,7 +314,7 @@ svg.lanes .dotn{fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle
         <video id="vid" muted playsinline controls preload="metadata"></video>
         <div class="boxes" id="boxes" aria-hidden="true"></div>
         <div class="ov" id="vidOv" hidden></div>
-        <div class="none" id="vidNone">Select an event or ask a question — the exact clip opens here.</div>
+        <div class="none" id="vidNone">Select an event or ask a question, the exact clip opens here.</div>
       </div>
       <div class="vidbar"><label><input type="checkbox" id="whoTog" checked> Show who</label><span id="vidHint"></span></div>
       <div id="evDetail"></div>
@@ -445,10 +445,10 @@ const Mock = (() => {
     if (/father|dad/.test(q) && /(last|where)/.test(q) && !/after/.test(q)){
       const path = [byId("e2"), byId("e3"), byId("e4")];
       return {...base, operator:"last_seen", confidence:0.91, no_subsequent_detections:true,
-        answer:"Dad was last seen at "+fmtTime(path[2].ts)+" leaving in his car.\n"+path.map(e=>fmtTime(e.ts)+" — "+e.camera_name+": "+e.summary).join("\n")+"\nNo detections since.",
+        answer:"Dad was last seen at "+fmtTime(path[2].ts)+" leaving in his car.\n"+path.map(e=>fmtTime(e.ts)+", "+e.camera_name+": "+e.summary).join("\n")+"\nNo detections since.",
         citations:path.map(e=>cite(e,2,e.summary.slice(0,40),"p_dad")), timeline:path.map(tl), people:peopleOut(["p_dad"]), focus:{person_id:"p_dad"},
         steps:[{title:"Resolve “my father”", detail:"Matched enrolled person Dad (relation: father)."},{title:"Retrieve events", detail:"3 events involving Dad in the last 24 h."},
-               {title:"Order across cameras", detail:"Backyard → Garage → Driveway, 8 minutes total."},{title:"Last reliable observation", detail:"Driveway "+fmtTime(path[2].ts)+" — vehicle leaves property, confidence 91%."}]};
+               {title:"Order across cameras", detail:"Backyard → Garage → Driveway, 8 minutes total."},{title:"Last reliable observation", detail:"Driveway "+fmtTime(path[2].ts)+", vehicle leaves property, confidence 91%."}]};
     }
     if (/after/.test(q) && /(enter|left|leave)/.test(q)){
       return {...base, operator:"after_departure", confidence:0.88, no_subsequent_detections:false,
@@ -499,9 +499,9 @@ const Mock = (() => {
         counts:{events:events.length, people:Object.keys(P).length, rules:rules.length, alerts:alerts.length}, now:Date.now()/1000})],
     ["GET", /^\/api\/digest$/, () => ({headline:"One flagged event this week and a delivery driver back at the door today.", stats:{events_today:events.filter(e=>e.ts>=at(0,0,0)).length, people_today:1},
         attention:[{kind:"flag", text:"Hooded visitor raised an object at the Front Door (unverified).", event_id:"e5", person_id:"p_vis", ts:byId("e5").ts},
-                   {kind:"unnamed_regular", text:"A man in a blue jacket has visited 3 times — who is he?", event_id:"e0", person_id:"p_del", ts:byId("e0").ts},
+                   {kind:"unnamed_regular", text:"A man in a blue jacket has visited 3 times, who is he?", event_id:"e0", person_id:"p_del", ts:byId("e0").ts},
                    {kind:"night_unknown", text:"Unknown visitor at the Front Door after 11 PM.", event_id:"e5", person_id:null, ts:byId("e5").ts},
-                   {kind:"routine", text:"Dad hasn't left the house yet — he usually goes out by now.", event_id:null, person_id:"p_dad", ts:null}]})],
+                   {kind:"routine", text:"Dad hasn't left the house yet, he usually goes out by now.", event_id:null, person_id:"p_dad", ts:null}]})],
     ["GET", /^\/api\/cameras$/, () => cams.map(c => { const es = events.filter(e=>e.camera_id===c.id); return {...c, event_count:es.length, last_event_ts:es.length?es[0].ts:null}; })],
     ["GET", /^\/api\/events$/, (m,q) => events.filter(e=>!q.get("camera")||e.camera_id===q.get("camera")).slice(0, Number(q.get("limit")||100))],
     ["GET", /^\/api\/events\/([^/]+)$/, m => byId(m[1]) || {}],
@@ -694,7 +694,7 @@ async function loadPeople(){
         try { await api("POST", "/api/people/"+encodeURIComponent(p.id)+"/name", {name, relation:relIn.value.trim()||null}); toast("Saved: "+name); loadPeople(); loadState(); loadDigest(); } catch(e){ toast(e.detail||e.message,"error"); } }},
       nameIn, relIn, h("button",{class:"btn sm", type:"submit"},"Save"));
 
-    // "Same person as…" — merge with inline confirmation (no window.confirm)
+    // "Same person as…", merge with inline confirmation (no window.confirm)
     const others = S.people.filter(x => x.id!==p.id);
     let mrg = null;
     if (others.length){
@@ -722,7 +722,7 @@ async function loadPeople(){
       h("div", {},
         h("h4", {}, personName(p), p.is_resident ? h("span",{class:"pill ok",text:"resident"}) : null, p.kind==="pet" ? h("span",{class:"pill",text:"pet"}) : null),
         h("div", {class:"meta"}, (p.name && p.label ? p.label+" · " : ""), p.role ? nice(p.role)+(rc!=null ? " ("+rc+"%)" : "") : "role unknown"),
-        h("div", {class:"meta"}, (p.n_events||0)+" sightings · "+((p.cameras||[]).join(", ")||"—")),
+        h("div", {class:"meta"}, (p.n_events||0)+" sightings · "+((p.cameras||[]).join(", ")||"-")),
         h("div", {class:"meta"}, p.first_ts ? "first "+fmtFull(p.first_ts)+" · last "+fmtFull(p.last_ts) : "")),
       form, mrg));
   }
@@ -849,7 +849,7 @@ function actorRow(e, a){
   const host = h("div",{});
   const acts = (a.actions||[]).length ? " ("+a.actions.map(nice).join(", ")+")" : "";
   const btn = a.actor_id!=null ? h("button",{class:"lnkbtn", type:"button", "aria-expanded":"false"}, "Not them?") : null;
-  host.append(h("div",{class:"arow"}, h("span",{class:"who"}, (a.name||a.label||"person")+(a.role ? " — "+nice(a.role) : ""), h("small",{text:acts})), btn));
+  host.append(h("div",{class:"arow"}, h("span",{class:"who"}, (a.name||a.label||"person")+(a.role ? ", "+nice(a.role) : ""), h("small",{text:acts})), btn));
   if (btn) btn.addEventListener("click", () => toggleFix(btn, host, a));
   return host;
 }
@@ -869,7 +869,7 @@ async function toggleFix(btn, host, a){
       ev.preventDefault(); if (!sel.value) return; go.disabled = true; err.hidden = true;
       try {
         await api("POST","/api/actors/"+encodeURIComponent(a.actor_id)+"/reassign",{person_id: sel.value==="__new" ? null : sel.value});
-        toast("Updated — Recall will recognise them next time");
+        toast("Updated, Recall will recognise them next time");
         await Promise.all([loadPeople(), loadEvents(), loadState(), loadDigest()]); refreshCurrent();
       } catch(x){ err.textContent = x.detail || x.message; err.hidden = false; go.disabled = false; }
     }},
@@ -942,7 +942,7 @@ function renderPath(items, showEnd){
     svg.append(g);
   });
   box.append(h("div",{class:"card"}, h("h3",{text:"Path"}), svg,
-    h("ul",{class:"pathlist"}, its.map((it,i) => h("li",{onclick:()=>it.event_id && selectEvent(it.event_id)}, h("em",{text:i+1}), h("span",{text:fmtTime(it.ts)+" "+(it.camera_name||"")+" — "+(it.text||"")}))))));
+    h("ul",{class:"pathlist"}, its.map((it,i) => h("li",{onclick:()=>it.event_id && selectEvent(it.event_id)}, h("em",{text:i+1}), h("span",{text:fmtTime(it.ts)+" "+(it.camera_name||"")+", "+(it.text||"")}))))));
 }
 function renderPeopleCards(list){
   const box = $("whoCards"); clear(box);
@@ -972,7 +972,7 @@ function meter(conf){
 }
 function citeChip(c){
   const label = String(c.label||"").replace(/^⚠\s*/, "⚠ ");
-  return h("button",{class:"cite", type:"button", title:(c.camera_name||"")+" · "+fmtFull(c.ts)+" — "+(c.label||""), onclick:()=>openCitation(c)},
+  return h("button",{class:"cite", type:"button", title:(c.camera_name||"")+" · "+fmtFull(c.ts)+", "+(c.label||""), onclick:()=>openCitation(c)},
     thumbEl(c.thumb_url), h("span",{text:fmtShort(c.ts)+" · "+(c.camera_name||c.camera_id)+" · "+label.slice(0,48)}));
 }
 function renderAnswer(res){
@@ -985,7 +985,7 @@ function renderAnswer(res){
   if ((res.citations||[]).length) wrap.append(h("div",{class:"cites"}, res.citations.map(citeChip)));
   if (res.watch_rule) wrap.append(h("div",{class:"watchcard"}, h("b",{text:"Watching for this"}), res.watch_rule.text||"Rule created"));
   if ((res.steps||[]).length) wrap.append(h("details",{class:"how"}, h("summary",{text:"How I got this"}),
-    h("ol",{class:"steps-mini", style:"list-style:none"}, res.steps.map((s,i) => h("li",{"data-n":i+1}, h("b",{text:s.title}), s.detail ? " — "+s.detail : "")))));
+    h("ol",{class:"steps-mini", style:"list-style:none"}, res.steps.map((s,i) => h("li",{"data-n":i+1}, h("b",{text:s.title}), s.detail ? ", "+s.detail : "")))));
   return wrap;
 }
 async function ask(q, focusId){
