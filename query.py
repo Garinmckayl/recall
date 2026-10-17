@@ -316,23 +316,32 @@ def op_last_seen(person: Optional[dict], now: float, **_) -> dict:
                 "steps": [], "confidence": 0.0, "focus": person["id"], "people": [person["id"]]}
     sess = _session(evs)
     last = evs[-1]
+    gaps = db.coverage_gaps(last["ts"], now)
     a = _actor_of(last, person["id"])
     ms = min((x.get("match_score") or 1.0) for e in sess for x in e["actors"] if x.get("person_id") == person["id"])
     steps = [
         {"title": "Resolve the person", "detail": f"'{_pname(person)}' → {person['id']} ({person.get('label')}), {len(evs)} sightings."},
         {"title": "Sort sightings by time", "detail": f"Most recent: {views.fmt_when(last['ts'], now)} on {last['camera']['name']}."},
         {"title": "Cross-camera trajectory", "detail": f"{len(sess)} linked sighting(s) across {len({e['camera_id'] for e in sess})} camera(s) in the latest outing."},
-        {"title": "Last reliable observation", "detail": f"Weakest re-identification in this outing: {ms:.0%} similarity. No later detections."},
+        {"title": "Last reliable observation", "detail": f"Weakest re-identification in this outing: {ms:.0%} similarity. "
+                   + ("Later detections: none, but see the coverage check." if gaps else "No later detections.")},
     ]
+    if gaps:
+        steps.append({"title": "Coverage check (Ring device status)", "detail": "; ".join(
+            f"{g['name']} camera was offline from {views.clock(g['start'])}" + (f" to {views.clock(g['end'])}" if g["end"] else " and still is")
+            for g in gaps) + ". No detection during that time means the camera was not watching, not that nothing happened."})
     return {
         "facts": {"found": True, "person": views.person_dict(person), "last_seen": views.fmt_when(last["ts"], now),
                   "camera": last["camera"]["name"], "doing": views.humanize_actions((a or {}).get("actions") or [], (a or {}).get("carrying")),
                   "path": [f"{views.clock(e['ts'])} {e['camera']['name']}: " + views.humanize_actions((_actor_of(e, person['id']) or {}).get('actions') or []) for e in sess],
-                  "no_subsequent_detections": True},
-        "hint": f"{_pname(person).capitalize()} was last seen {views.fmt_when(last['ts'], now)} on the {last['camera']['name']} camera.",
+                  "no_subsequent_detections": not gaps,
+                  "coverage_gaps": [{"camera": g["name"], "offline_from": views.clock(g["start"]),
+                                     "back_online": views.clock(g["end"]) if g["end"] else None} for g in gaps]},
+        "hint": f"{_pname(person).capitalize()} was last seen {views.fmt_when(last['ts'], now)} on the {last['camera']['name']} camera."
+                + (f" Caution: {', '.join(sorted({g['name'] for g in gaps}))} was offline since then, so the absence of later sightings is not conclusive." if gaps else ""),
         "citations": [_cite(e, f"{views.clock(e['ts'])} · {e['camera']['name']}", person["id"]) for e in reversed(sess)],
         "timeline": _path_items(sess, person["id"], person), "people": [person["id"]], "focus": person["id"],
-        "steps": steps, "confidence": min(0.97, 0.55 + 0.45 * float(ms)), "no_subsequent": True,
+        "steps": steps, "confidence": min(0.97, 0.55 + 0.45 * float(ms)) * (0.85 if gaps else 1.0), "no_subsequent": not gaps,
     }
 
 

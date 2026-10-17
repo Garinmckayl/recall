@@ -133,6 +133,14 @@ CREATE TABLE IF NOT EXISTS feed (
     message TEXT,
     data TEXT
 );
+CREATE TABLE IF NOT EXISTS device_health (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    status TEXT NOT NULL,                 -- online | offline | added | removed
+    ts REAL NOT NULL,
+    source TEXT DEFAULT 'webhook'         -- webhook | status_api
+);
+CREATE INDEX IF NOT EXISTS ix_health_device ON device_health(device_id, ts);
 CREATE TABLE IF NOT EXISTS kv (
     k TEXT PRIMARY KEY,
     v TEXT
@@ -262,10 +270,37 @@ def camera_by_device(device_id: str) -> Optional[dict]:
     return one("SELECT * FROM cameras WHERE ring_device_id=?", (device_id,))
 
 
+def record_health(device_id: str, status: str, ts: float, source: str = "webhook") -> None:
+    last = one("SELECT status FROM device_health WHERE device_id=? ORDER BY ts DESC, id DESC LIMIT 1", (device_id,))
+    if source == "status_api" and last and last["status"] == status:
+        return
+    insert("device_health", device_id=device_id, status=status, ts=ts, source=source)
+
+
+def coverage_gaps(after: float, until: float) -> list[dict]:
+    """Camera downtime overlapping (after, until], from device_online / device_offline transitions:
+    [{camera, name, start, end|None}]. During a gap, 'no detections' means 'not watching', not 'nothing happened'."""
+    gaps = []
+    for cam in q("SELECT * FROM cameras WHERE ring_device_id IS NOT NULL"):
+        rows = q("SELECT status, ts FROM device_health WHERE device_id=? AND status IN ('online','offline') ORDER BY ts, id",
+                 (cam["ring_device_id"],))
+        start = None
+        for r in rows:
+            if r["status"] == "offline" and start is None:
+                start = r["ts"]
+            elif r["status"] == "online" and start is not None:
+                if r["ts"] > after and start < until:
+                    gaps.append({"camera": cam["id"], "name": cam["name"], "start": start, "end": r["ts"]})
+                start = None
+        if start is not None and start < until:
+            gaps.append({"camera": cam["id"], "name": cam["name"], "start": start, "end": None})
+    return gaps
+
+
 def reset_all() -> None:
     """Wipe the memory (used by the demo seeder)."""
     with _lock:
         c = conn()
         c.executescript("DELETE FROM events; DELETE FROM actors; DELETE FROM objects; DELETE FROM persons; "
-                        "DELETE FROM watch_rules; DELETE FROM alerts; DELETE FROM webhooks_seen; DELETE FROM feed;")
+                        "DELETE FROM watch_rules; DELETE FROM alerts; DELETE FROM webhooks_seen; DELETE FROM device_health; DELETE FROM feed;")
         c.commit()

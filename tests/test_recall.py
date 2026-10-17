@@ -128,13 +128,30 @@ def test_signature_roundtrip_and_tamper():
     assert not ring_api.verify_signature(raw, sig, "other")
 
 
-def test_parse_webhook_motion_and_button():
-    payload = {"meta": {"request_id": "r9"}, "data": {
-        "type": "button_press", "id": "evt_1", "attributes": {"occurred_at": "2026-09-28T19:42:13Z"},
-        "relationships": {"device": {"data": {"type": "device", "id": "dev_front_door"}}}}}
-    (ev,) = ring_api.parse_webhook(payload)
-    assert ev.kind == "doorbell" and ev.device_id == "dev_front_door" and ev.request_id == "r9"
-    assert ring_api.parse_webhook({"data": {"type": "device_online", "id": "x"}}) == []
+def _hook(etype, device="ava1.ring.device.X1", ts=1786715596787, rid="r9", **attrs):
+    return {"meta": {"version": "1.1", "time": "2026-08-14T13:53:16.2Z", "request_id": rid, "account_id": "ava1.ring.account.A"},
+            "data": {"id": f"{device}_{etype}_{ts}", "type": etype,
+                     "attributes": {"source": device, "source_type": "devices", "timestamp": ts, **attrs},
+                     "relationships": {"devices": {"links": {"self": f"/v1/devices/{device}"}}}}}
+
+
+def test_parse_webhook_v11_motion_button_and_lifecycle():
+    (ev,) = ring_api.parse_webhook(_hook("button_press"))
+    assert ev.kind == "doorbell" and ev.device_id == "ava1.ring.device.X1" and ev.request_id == "r9"
+    assert ev.account_id == "ava1.ring.account.A" and abs(ev.occurred_at - 1786715596.787) < 1e-6   # epoch ms -> s
+    (m,) = ring_api.parse_webhook(_hook("motion_detected", sub_type="human", component_ids=["0"]))
+    assert m.sub_type == "human" and m.component_ids == ["0"]
+    off = _hook("device_offline")
+    assert ring_api.parse_webhook(off) == []
+    (d,) = ring_api.parse_lifecycle(off)
+    assert d.status == "offline" and d.device_id == "ava1.ring.device.X1"
+
+
+def test_parse_history_events():
+    obj = {"type": "history-events", "id": "opaque", "attributes": {"event_type": "ding", "start": 1699457230000, "end": 1699457260000},
+           "relationships": {"source": {"data": {"type": "devices", "id": "ava1.ring.device.X1"}}}}
+    ev = ring_api.parse_event(obj)
+    assert ev.type == "button_press" and ev.device_id == "ava1.ring.device.X1" and ev.duration_ms == 30000
 
 
 def test_webhook_endpoint_signature_and_idempotency(mem, monkeypatch):
@@ -144,15 +161,83 @@ def test_webhook_endpoint_signature_and_idempotency(mem, monkeypatch):
     seen = []
     monkeypatch.setattr(pipeline, "accept", lambda ev, source=None: seen.append(ev.ring_event_id) or "evt_x")
     c = TestClient(server.app)
-    body = json.dumps({"meta": {"request_id": "rq1"}, "data": {
-        "type": "motion_detected", "id": "evt_a", "attributes": {"sub_type": "human", "occurred_at": "2026-09-28T19:42:13Z"},
-        "relationships": {"device": {"data": {"id": "dev_front_door"}}}}}).encode()
+    body = json.dumps(_hook("motion_detected", rid="rq1", sub_type="human")).encode()
     assert c.post("/ring/webhook", content=body).status_code == 401
     assert c.post("/ring/webhook", content=body, headers={"X-Signature": "sha256=bad"}).status_code == 401
     ok = {"X-Signature": ring_api.sign(body)}
     assert c.post("/ring/webhook", content=body, headers=ok).json()["status"] == "accepted"
     assert c.post("/ring/webhook", content=body, headers=ok).json()["status"] == "duplicate"
-    assert seen == ["evt_a"]
+    assert len(seen) == 1
+
+
+def test_client_request_shapes_and_429_backoff(monkeypatch):
+    import httpx
+    sent = []
+
+    def handler(request):
+        sent.append(request)
+        if len(sent) == 1:
+            return httpx.Response(429, headers={"Retry-After": "0"})
+        if request.url.path.endswith("/media/image/download"):
+            return httpx.Response(303, headers={"Location": "https://signed.example/img"})
+        if request.url.host == "signed.example":
+            return httpx.Response(200, content=b"JPEG")
+        return httpx.Response(206, content=b"MP4", headers={"X-Media-Length": "3000"})
+
+    c = ring_api.RingClient(base="https://api.example", token="t")
+    c._http = httpx.Client(transport=httpx.MockTransport(handler))
+    ev = ring_api.RingEvent("e", "ava1.ring.device.X1", "motion_detected", 1786715596.787)
+    assert c.download_clip(ev, seconds=5) == b"MP4"
+    body = json.loads(sent[1].content)
+    assert body == {"timestamp": 1786715596787, "duration": 5000} and len(sent) == 2   # one retry after the 429
+    assert c.download_snapshot(ev) == b"JPEG"
+    snap = json.loads(sent[2].content)
+    assert snap["type"] == "at_timestamp" and snap["image_options"]["format"] == "jpeg"
+    assert sent[2].headers["authorization"] == "Bearer t" and "authorization" not in sent[3].headers
+
+
+def test_history_pagination_and_multicamera_components():
+    import httpx
+    pages = {
+        None: {"data": [{"type": "history-events", "id": "b", "attributes": {"event_type": "motion", "start": 2000000, "end": 2005000},
+                         "relationships": {"source": {"data": {"id": "D"}}}}],
+               "links": {"next": "/v1/history/devices/D/events?page[key]=2026-01-01T00:00:00Z"}},
+        "2026-01-01T00:00:00Z": {"data": [{"type": "history-events", "id": "a", "attributes": {"event_type": "ding", "start": 1000000, "end": 1005000},
+                                           "relationships": {"source": {"data": {"id": "D"}}}}], "links": {}},
+    }
+    seen = []
+
+    def handler(request):
+        seen.append(str(request.url))
+        return httpx.Response(200, json=pages[request.url.params.get("page[key]")])
+
+    c = ring_api.RingClient(base="https://api.example", token="t")
+    c._http = httpx.Client(transport=httpx.MockTransport(handler))
+    evs = c.device_events("D")
+    assert [e.ring_event_id for e in evs] == ["a", "b"] and len(seen) == 2          # followed links.next, sorted oldest-first
+    c._multicam["D"] = ["1", "2"]
+    assert c._components(ring_api.RingEvent("e", "D", "motion_detected", 1.0, component_ids=["2"])) == [{"component_id": "2"}]
+    assert c._components(ring_api.RingEvent("e", "other", "motion_detected", 1.0)) == []
+
+
+def test_coverage_gaps_from_lifecycle_webhooks(mem):
+    db.record_health("dev_backyard", "offline", at(0, "20:15") - 3600)
+    db.record_health("dev_backyard", "online", at(0, "20:15") - 1800)
+    db.record_health("dev_garage", "offline", at(0, "19:00"))
+    gaps = db.coverage_gaps(at(0, "19:30") - 3600 * 2, NOW)
+    by = {g["name"]: g for g in gaps}
+    assert by["Backyard"]["end"] is not None and by["Garage"]["end"] is None
+    assert [g["name"] for g in db.coverage_gaps(NOW - 60, NOW)] == ["Garage"]       # the Backyard outage ended earlier
+
+
+def test_last_seen_flags_offline_camera(mem):
+    add_person("person_01", "older man in a grey cardigan", "Dad", "father", 1)
+    add_event("e1", "backyard", at(0, "19:13"), "Dad walks to the door",
+              [{"pid": "person_01", "actions": ["approaching door"]}])
+    db.record_health("dev_backyard", "offline", at(0, "19:20"))
+    r = query.op_last_seen(db.one("SELECT * FROM persons WHERE id='person_01'"), NOW)
+    assert r["facts"]["no_subsequent_detections"] is False and r["facts"]["coverage_gaps"][0]["camera"] == "Backyard"
+    assert "not conclusive" in r["hint"] and any("Coverage check" in s["title"] for s in r["steps"])
 
 
 # -- roles ----------------------------------------------------------------------------

@@ -46,7 +46,21 @@ def sync_devices() -> list[dict]:
     devs = ring_api.client().list_devices()
     for d in devs:
         db.upsert_camera(_slug(d["name"]), d["name"], d["id"], d.get("zone") or "exterior")
+        if d.get("online") is not None:
+            db.record_health(d["id"], "online" if d["online"] else "offline", time.time(), source="status_api")
     return devs
+
+
+def device_event(ev: ring_api.DeviceEvent) -> None:
+    """Device lifecycle webhook -> coverage log (+ feed line). Recall uses it to tell 'nothing happened' from 'nobody was watching'."""
+    db.record_health(ev.device_id, ev.status, ev.occurred_at)
+    cam = db.camera_by_device(ev.device_id)
+    if cam is None and ev.type in ("device_added", "device_online"):
+        sync_devices()
+        cam = db.camera_by_device(ev.device_id)
+    name = cam["name"] if cam else ev.device_id
+    db.feed("info", f"{name} camera {ev.type.removeprefix('device_').replace('_', ' ')}",
+            {"device_id": ev.device_id, "type": ev.type})
 
 
 # -- accept + sync --------------------------------------------------------------------
@@ -63,6 +77,10 @@ def accept(ev: ring_api.RingEvent, source: Optional[str] = None) -> Optional[str
     eid = event_id_for(ev.ring_event_id)
     if db.one("SELECT 1 FROM events WHERE id=?", (eid,)):
         return eid
+    # A webhook id (<device>_<type>_<ms>) and a history id differ for the same event, so also match on camera + time.
+    twin = db.one("SELECT id FROM events WHERE camera_id=? AND kind=? AND ABS(ts-?)<5", (cam["id"], ev.kind, ev.occurred_at))
+    if twin:
+        return twin["id"]
     db.insert("events", id=eid, ring_event_id=ev.ring_event_id, camera_id=cam["id"], ts=ev.occurred_at,
               kind=ev.kind, sub_type=ev.sub_type, status="queued", raw=ev.raw or {},
               source=source or ("ring" if ring_api.mode() == "live" else "ring_sandbox"))
@@ -118,10 +136,11 @@ def _fetch_clip(e: dict, cam: dict) -> Path:
     if dst.exists() and dst.stat().st_size > 0:
         return dst
     config.CLIPS_DIR.mkdir(parents=True, exist_ok=True)
+    attrs = (e.get("raw") or {}).get("attributes", {})
     ev = ring_api.RingEvent(ring_event_id=e["ring_event_id"], device_id=cam["ring_device_id"],
                             type="button_press" if e["kind"] == "doorbell" else "motion_detected",
-                            occurred_at=e["ts"], component_ids=(e.get("raw") or {}).get("attributes", {})
-                            .get("component_ids", [0]))
+                            occurred_at=e["ts"], component_ids=[str(c) for c in attrs.get("component_ids", [])],
+                            duration_ms=max(0, int(attrs.get("end", 0) - attrs.get("start", 0))) if attrs.get("end") else 0)
     raw = ring_api.client().download_clip(ev)
     tmp = config.CLIPS_DIR / f"{e['id']}.src"
     tmp.write_bytes(raw)

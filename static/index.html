@@ -44,7 +44,9 @@ header{height:var(--hh);display:flex;align-items:center;gap:12px;padding:0 18px;
 .btn.ghost:hover{background:var(--bg);color:var(--ink);border-color:var(--line)}
 
 /* layout */
-main{height:calc(100vh - var(--hh));display:grid;grid-template-columns:330px minmax(0,1fr) 400px;min-width:0}
+.quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 18px;background:var(--green-soft);border-bottom:1px solid var(--green-line);font-size:13px}
+.quick b{color:var(--green)}.quick .btn{font-size:12.5px}
+main{height:calc(100vh - var(--hh) - var(--qh,0px));display:grid;grid-template-columns:330px minmax(0,1fr) 400px;min-width:0}
 .panel{min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
 .panel:last-child{border-right:0}
 .scroll{overflow-y:auto;min-height:0;flex:1;padding:14px}
@@ -264,6 +266,13 @@ svg.lanes .dotn{fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle
   <button class="btn" id="syncBtn" type="button" aria-label="Sync Ring"><span class="lbl">Sync Ring</span><span class="ic" aria-hidden="true">↻</span></button>
   <button class="btn" id="demoBtn" type="button" aria-label="Demo controls" aria-expanded="false" aria-controls="drawer"><span class="lbl">Demo</span><span class="ic" aria-hidden="true">▶</span></button>
 </header>
+<nav class="quick" id="quick" aria-label="Judge quickstart">
+  <b>Judge quickstart</b>
+  <button class="btn" id="qs1" type="button">1 · Where was Dad last seen?</button>
+  <button class="btn" id="qs2" type="button">2 · Is Mom's day normal today?</button>
+  <button class="btn primary" id="qs3" type="button">3 · Emit Ring event</button>
+  <span class="note" id="qsNote" style="color:var(--dim)"></span>
+</nav>
 
 <main>
   <section class="panel left" aria-label="Camera timeline">
@@ -338,6 +347,12 @@ svg.lanes .dotn{fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle
     <div style="margin-top:14px"><button class="btn primary" type="submit">Emit event</button></div>
   </form>
   <p class="note">Events are delivered through the signed Ring webhook path.</p>
+  <h3 class="sec" style="margin-top:22px">Camera health (Ring lifecycle webhooks)</h3>
+  <form id="camForm">
+    <label for="camSel">Camera</label><select id="camSel"></select>
+    <div style="margin-top:14px;display:flex;gap:8px"><button class="btn" type="submit" data-online="0">Send device_offline</button><button class="btn" type="submit" data-online="1">Send device_online</button></div>
+  </form>
+  <p class="note">Take the Backyard offline, then ask where Dad was last seen: the answer warns that "no later detections" may just mean no coverage.</p>
   <pre id="demoOut" hidden></pre>
 </aside>
 
@@ -592,6 +607,7 @@ async function loadCameras(){
   box.append(mk(null,"All"));
   S.cameras.forEach(c => box.append(mk(c.id, c.name)));
   const sel = $("emCam"); clear(sel); S.cameras.forEach(c => sel.append(h("option",{value:c.id,text:c.name})));
+  const cs = $("camSel"); clear(cs); S.cameras.forEach(c => cs.append(h("option",{value:c.id,text:c.name+(c.online===false?" (offline)":"")})));
 }
 function renderChips(){
   [...$("camChips").children].forEach((b,i) => b.setAttribute("aria-pressed", String((i===0 ? null : S.cameras[i-1].id) === S.camFilter)));
@@ -1051,6 +1067,20 @@ $("emitForm").addEventListener("submit", async e => {
   try { demoOut(await api("POST","/api/demo/emit",{camera:$("emCam").value, kind:$("emKind").value, clip:$("emClip").value})); }
   catch(err){ demoOut(err.message); toast(err.message,"error"); }
 });
+$("camForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  try { demoOut(await api("POST","/api/demo/camera",{camera:$("camSel").value, online:e.submitter.dataset.online==="1"})); setTimeout(loadCameras, 600); }
+  catch(err){ demoOut(err.message); toast(err.message,"error"); }
+});
+$("qs1").addEventListener("click", () => ask("Where was Dad last seen?"));
+$("qs2").addEventListener("click", () => ask("Is Mom's day normal today?"));
+$("qs3").addEventListener("click", () => { toggleDrawer(true); $("emitForm").scrollIntoView({block:"center"}); $("qsNote").textContent = "Pick a camera and clip, then press Emit event: it goes through the signed webhook."; });
+document.documentElement.style.setProperty("--qh", $("quick").offsetHeight+"px");
+addEventListener("load", () => {                       // deep links for the README / Devpost quickstart: /?step=1|2|3
+  const step = new URLSearchParams(location.search).get("step");
+  setTimeout(() => { if (step==="1") $("qs1").click(); else if (step==="2") $("qs2").click(); else if (step==="3") $("qs3").click(); }, 1200);
+});
+addEventListener("resize", () => document.documentElement.style.setProperty("--qh", $("quick").offsetHeight+"px"));
 $("syncBtn").addEventListener("click", async () => {
   const b = $("syncBtn"); b.disabled = true; setStatus("Syncing Ring…");
   try { await api("POST","/api/ring/sync"); } catch(e){ toast(e.message,"error"); }

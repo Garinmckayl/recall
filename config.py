@@ -59,6 +59,9 @@ HOUSEHOLD = ["Dad", "Mom"]
 # platform; without it, to the local sandbox that mirrors the same endpoints.
 RING_API_BASE = os.getenv("RING_API_BASE", "")
 RING_ACCESS_TOKEN = os.getenv("RING_ACCESS_TOKEN", "")
+RING_REFRESH_TOKEN = os.getenv("RING_REFRESH_TOKEN", "")       # preferred: access tokens last ~4 h, so we refresh
+RING_CLIENT_ID = os.getenv("RING_CLIENT_ID", "")
+RING_CLIENT_SECRET = os.getenv("RING_CLIENT_SECRET", "")
 RING_HMAC_KEY = os.getenv("RING_HMAC_KEY", "sandbox-hmac-key")
 SERVER_URL = os.getenv("SERVER_URL", "http://127.0.0.1:8000")
 

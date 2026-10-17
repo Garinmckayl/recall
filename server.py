@@ -63,7 +63,7 @@ app.include_router(ring_sim.router)
 # -- public-deploy guards -------------------------------------------------------------
 # Per-client sliding-window limits on the endpoints that spend money (Bedrock/Jev). Behind a proxy or
 # Cloudflare tunnel the client IP comes from CF-Connecting-IP / X-Forwarded-For.
-_RATE = {"/api/ask": (20, 60), "/api/demo/emit": (6, 60), "/mcp": (40, 60)}
+_RATE = {"/api/ask": (20, 60), "/api/demo/emit": (6, 60), "/api/demo/camera": (6, 60), "/mcp": (40, 60)}
 _hits: dict[tuple[str, str], deque] = defaultdict(deque)
 
 
@@ -179,7 +179,9 @@ def api_cameras():
     out = []
     for cam in db.q("SELECT * FROM cameras ORDER BY name"):
         s = db.one("SELECT COUNT(*) AS n, MAX(ts) AS last FROM events WHERE camera_id=?", (cam["id"],))
-        out.append({"id": cam["id"], "name": cam["name"], "zone": cam["zone"],
+        h = db.one("SELECT status FROM device_health WHERE device_id=? AND status IN ('online','offline') "
+                   "ORDER BY ts DESC, id DESC LIMIT 1", (cam["ring_device_id"],))
+        out.append({"id": cam["id"], "name": cam["name"], "zone": cam["zone"], "online": not h or h["status"] == "online",
                     "event_count": s["n"], "last_event_ts": s["last"]})
     return out
 
@@ -320,6 +322,8 @@ async def ring_webhook(request: Request):
         if db.one("SELECT 1 FROM webhooks_seen WHERE request_id=?", (rid,)):
             return {"status": "duplicate", "request_id": rid}
         db.insert("webhooks_seen", request_id=rid, ts=time.time())
+    for dev in ring_api.parse_lifecycle(payload):
+        pipeline.device_event(dev)
     accepted = []
     for ev in ring_api.parse_webhook(payload):
         eid = pipeline.accept(ev)
@@ -351,6 +355,17 @@ def api_demo_emit(payload: dict):
     if not payload.get("clip"):
         raise HTTPException(400, "clip required")
     return ring_sim.emit(cam["ring_device_id"], payload["clip"], payload.get("kind") or "motion")
+
+
+@app.post("/api/demo/camera")
+def api_demo_camera(payload: dict):
+    """Flip a sandbox camera offline/online. Delivers a signed device_offline / device_online webhook."""
+    cam = db.one("SELECT * FROM cameras WHERE id=? OR name=?", (payload.get("camera"), payload.get("camera")))
+    if not cam:
+        raise HTTPException(400, "unknown camera")
+    if ring_api.mode() == "live":
+        raise HTTPException(400, "only available against the Ring sandbox")
+    return ring_sim.set_device_online(cam["ring_device_id"], bool(payload.get("online")))
 
 
 @app.post("/api/demo/checkin")

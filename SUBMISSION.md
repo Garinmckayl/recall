@@ -53,7 +53,7 @@ The same memory answers "which guy is the delivery guy?" or "who knocked six day
 - **Quality and safety:** 34 offline tests; a rehearsal tool that checks staged clips will support their demo question; rate limits and an admin token for public deployment.
 
 ## Challenges we ran into
-- **Real Ring access.** The live platform needs early-access credentials, an ID check and a device. We built a faithful sandbox and kept one client code path for both. Parts of the docs we could read were truncated (webhook payload, download bodies), so parsing is deliberately tolerant — documented in the friction log.
+- **Real Ring access.** The live platform needs early-access credentials, an ID check and a device. We built a faithful sandbox and kept one client code path for both. The client implements the published wire formats (OAuth refresh, JSON:API discovery, history pagination, media 200/206/303, Webhook v1.1, lifecycle events) and is tested against mocked transports; it has not been run against the live platform.
 - **Re-identification without faces.** Generic image embeddings leak background and framing. We blend image, text and attribute similarity and keep exemplar sets that can be rebuilt after owner corrections.
 - **Honest answers.** An early version narrated "Yes" while its own facts said "no entry recorded". A computed verdict is now the first sentence of every answer, with tests to keep it that way.
 - **Trust.** No accusatory language for safety events; they are flagged as unverified observations.
