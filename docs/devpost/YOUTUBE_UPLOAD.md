@@ -1,19 +1,19 @@
-# YouTube / Vimeo upload — Recall demo (copy and paste)
+# YouTube / Vimeo upload, Recall demo (copy and paste)
 
-**File:** `video/renders/recall-demo-final.mp4` (1920×1080, 30 fps, H.264 + AAC, 2:56 — under the 3-minute limit; not committed, download it from the review link)
+**File:** `video/renders/recall-demo-final.mp4` (1920×1080, 30 fps, H.264 + AAC, 2:56, under the 3-minute limit; not committed, download it from the review link)
 **Visibility:** Public (Devpost requires a public video) · **Audience:** not made for kids · **Category:** Science & Technology
 **Thumbnail:** `docs/devpost/youtube-thumbnail-1280x720.jpg`
 
 **Title**
-Recall — persistent visual memory for caretaking and safety | Amazon Developer Hackathon
+Recall, persistent visual memory for caretaking and safety | Amazon Developer Hackathon
 
 **Description**
 ```
-"Where was Dad last seen?" One reconstructed answer from your Ring cameras — with proof. Recall gives a home a memory, and pushes a check-in when a routine breaks.
+"Where was Dad last seen?" One reconstructed answer from your Ring cameras, with proof. Recall gives a home a memory, and pushes a check-in when a routine breaks.
 
 Not security AI. Not video search. Not facial recognition. Persistent visual memory for caretaking and safety.
 
-Built for the Amazon Developer Hackathon — Ring track (caretaking), AWS Builder and Open Source mini challenges, with an MCP server for Alexa+.
+Built for the Amazon Developer Hackathon, Ring track (caretaking), AWS Builder and Open Source mini challenges, with an MCP server for Alexa+.
 
 Chapters
 0:00 The call you dread
@@ -24,7 +24,7 @@ Chapters
 1:35 You stay in control
 1:47 Business value
 2:12 Built on Amazon Bedrock and Ring's APIs
-2:29 Next time — don't scrub. Ask.
+2:29 Next time, don't scrub. Ask.
 
 Code (MIT): https://github.com/Garinmckayl/recall
 
@@ -38,4 +38,4 @@ About this video
 **Tags**
 recall, ring, amazon developer hackathon, aws, amazon bedrock, amazon nova, caretaking, aging in place, elder care, home safety, visual memory, ai agents, mcp, alexa
 
-**Settings to check:** "Altered or synthetic content" — the narration and score are AI-generated and the opening features an AI-generated realistic person, so I would answer **Yes** and follow YouTube's current wording. Comments and embedding on. No music claims should appear (the score is generated).
+**Settings to check:** "Altered or synthetic content", the narration and score are AI-generated and the opening features an AI-generated realistic person, so I would answer **Yes** and follow YouTube's current wording. Comments and embedding on. No music claims should appear (the score is generated).

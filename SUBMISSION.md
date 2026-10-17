@@ -88,7 +88,7 @@ The need is the same whether one family or a thousand residents are involved: kn
 Structured event records mean reasoning over rows instead of re-processing video, so answers are fast and cheap. Ingestion is signed and idempotent, safety flags are human-in-the-loop, corrections are owner-controlled, there is no face recognition, and it can be deployed in the customer's own AWS account. (These are use cases we designed for, not customers or pilots.)
 
 ## Built with
-Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro, Nova Lite, Nova Reel, Titan embeddings) · TypeSafe Jev (Decisions API via OpenRouter) · Model Context Protocol (Alexa+) · Python · FastAPI · SQLite · ffmpeg · Playwright · HyperFrames · ElevenLabs
+Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro, Nova Lite, Nova Reel, Titan embeddings) · TypeSafe Jev (Decisions API via OpenRouter) · Model Context Protocol (Alexa+) · Amazon EC2 · Python · FastAPI · SQLite · ffmpeg · Playwright · HyperFrames · ElevenLabs
 
 ---
 
