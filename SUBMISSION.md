@@ -103,7 +103,7 @@ Ring Partner API (client, signed webhooks, sandbox) · Amazon Bedrock (Nova Pro,
 - **Locally:** `pip install -r requirements.txt`, `cp .env.example .env` (OpenRouter key; AWS credentials with Bedrock access), `python3 -m uvicorn server:app`, `python3 seed.py`. The 44 tests run offline with `python3 -m pytest tests -q`. A 3-minute tour is in the README.
 
 ## What was built during the submission period
-Everything in the repository was built between Aug 31 and Oct 23, 2026. The project grew from an earlier prototype ("HomeGuard", docs in `docs/v1/`) started in the same period; Recall replaced its analysis pipeline with the memory graph, Ring client and sandbox, re-identification, reasoning operators, routines and check-ins, corrections, the MCP server, deployment scripts and the demo-video source.
+Everything in the repository was built between Aug 31 and Oct 23, 2026. The project grew from an earlier prototype ("HomeGuard") started in the same period; Recall replaced its analysis pipeline with the memory graph, Ring client and sandbox, re-identification, reasoning operators, routines and check-ins, corrections, the MCP server, deployment scripts and the demo-video source.
 
 ## Notes for reviewers
 - The video opens and closes with a short **dramatization** (labelled on screen). Everything else is the real product running on the Ring sandbox. The footage is licensed stock (Mixkit Free License) plus **AI-generated clips of an older man made with Amazon Nova Reel** (used for "Dad" in the opening and in the default demo data), labelled on screen and on the end card. No real household footage or personal data is used.
